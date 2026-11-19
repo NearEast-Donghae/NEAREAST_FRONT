@@ -137,4 +137,5 @@ const Step5Confirm = ({
 };
 
 export default Step5Confirm;
+export { FINAL_ICON }; // 저장된 여행에도 같은 아이콘을 쓰기 위해
 export type { FinalScheduleItem, TravelSummary };

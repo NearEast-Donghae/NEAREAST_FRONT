@@ -17,7 +17,7 @@
   position: absolute;
   top: 28px;
   left: calc(95px - var(--page-offset)); /* 캔버스는 가운데, 헤더는 화면 왼쪽 */
-  width: 1250px;
+  width: calc(1250px + 2 * var(--page-offset)); /* 화면 오른쪽 끝까지 — 나의 여행 일정 버튼 자리 */
   display: flex;
   align-items: flex-start;
   gap: 55px;

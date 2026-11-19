@@ -1,0 +1,35 @@
+/* 헤더 오른쪽 끝 — 헤더가 flex라 margin-left: auto로 밀어낸다 */
+.MyTripsButton {
+  margin-left: auto;
+  align-self: center;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: 1px solid #d6d6d6;
+  border-radius: 100px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.MyTripsButton:hover {
+  background-color: #f5f5f5;
+}
+
+.MyTripsButton--active,
+.MyTripsButton--active:hover {
+  background-color: #333;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.MyTripsButton-Icon {
+  font-size: 14px;
+}
