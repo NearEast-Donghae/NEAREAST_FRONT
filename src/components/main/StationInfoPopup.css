@@ -1,0 +1,184 @@
+/* ==========================================
+   StationInfoPopup — 역 상세정보 팝업
+   ========================================== */
+
+.StationInfoPopup {
+  position: relative;
+  width: 800px;
+  min-height: 530px;
+  background-color: #ffffff;
+  border-radius: 50px;
+  font-family: 'Noto Sans KR', sans-serif;
+  overflow: hidden;
+}
+
+.StationInfoPopup-Content {
+  position: absolute;
+  top: 40px;
+  left: 48px;
+  width: 704px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* 팝업 상단 */
+.StationInfoPopup-Header {
+  width: 704px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.StationInfoPopup-Title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #575757;
+  line-height: 24px;
+}
+
+.StationInfoPopup-CloseButton {
+  width: 42px;
+  height: 42px;
+  background: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 26px;
+  font-weight: 500;
+  color: #1f1f1f;
+  line-height: 38px;
+  padding: 0 14px;
+}
+
+/* 역 소개 */
+.StationInfoPopup-Body {
+  width: 704px;
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.StationInfoPopup-Photo {
+  width: 220px;
+  height: 194px;
+  background-color: #ebebeb;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.StationInfoPopup-PhotoPlaceholder {
+  font-size: 15px;
+  color: #707070;
+}
+
+.StationInfoPopup-Info {
+  width: 454px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.StationInfoPopup-NameRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.StationInfoPopup-Name {
+  font-size: 35px;
+  font-weight: 700;
+  color: #1f1f1f;
+  line-height: 51px;
+  margin: 0;
+}
+
+.StationInfoPopup-Status {
+  height: 30px;
+  background-color: #ebebeb;
+  border-radius: 15px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #575757;
+  line-height: 19px;
+}
+
+.StationInfoPopup-Description {
+  font-size: 18px;
+  font-weight: 400;
+  color: #575757;
+  line-height: 29px;
+  width: 426px;
+  margin: 0;
+}
+
+.StationInfoPopup-TrainsLabel {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1f1f1f;
+  line-height: 25px;
+  margin: 0;
+}
+
+.StationInfoPopup-TrainList {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.StationInfoPopup-TrainTag {
+  height: 30px;
+  background-color: #ebebeb;
+  border-radius: 15px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #575757;
+}
+
+/* 구분선 */
+.StationInfoPopup-Divider {
+  width: 704px;
+  height: 1px;
+  background-color: #d6d6d6;
+}
+
+/* 관심 목록 담기 버튼 */
+.StationInfoPopup-WishlistButton {
+  position: absolute;
+  top: 433px;
+  left: 48px;
+  width: 676px;
+  height: 54px;
+  background-color: #333;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0 14px;
+}
+
+.StationInfoPopup-WishlistButton:hover {
+  background-color: #444;
+}

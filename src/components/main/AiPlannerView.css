@@ -1,0 +1,398 @@
+/* ==========================================
+   AiPlannerView — AI 여행 플래너 화면
+   ========================================== */
+
+.AiPlannerView {
+  position: relative;
+  width: 1440px;
+  margin: 0 auto;
+  min-height: 1024px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 상단 헤더 */
+.AiPlannerView-Header {
+  position: absolute;
+  top: 28px;
+  left: calc(95px - var(--page-offset)); /* 캔버스는 가운데, 헤더는 화면 왼쪽 */
+  width: 1250px;
+  display: flex;
+  align-items: center;
+  gap: 55px;
+  padding: 10px 0 16px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.AiPlannerView-Logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: inherit;
+  font-size: 23px;
+  font-weight: 700;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.AiPlannerView-Nav {
+  display: flex;
+  gap: 55px;
+  align-items: center;
+}
+
+.AiPlannerView-NavItem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: #333;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.AiPlannerView-NavItem--active {
+  font-weight: 700;
+}
+
+/* 페이지 제목 */
+.AiPlannerView-PageTitle {
+  position: absolute;
+  top: 121px;
+  left: 100px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #18232d;
+  margin: 0;
+}
+
+/* AI 대화 블록 */
+.AiPlannerView-ChatBlock {
+  position: absolute;
+  left: 109px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+  width: 374px;
+}
+
+.AiPlannerView-ChatBlock--date {
+  top: 207px;
+}
+
+.AiPlannerView-ChatBlock--duration {
+  top: 442px;
+}
+
+.AiPlannerView-ChatItem {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.AiPlannerView-AiAvatar {
+  width: 38px;
+  height: 38px;
+  background-color: #d9d9d9;
+  border-radius: 19px;
+  flex-shrink: 0;
+}
+
+.AiPlannerView-ChatBubble {
+  width: 308px;
+  height: 70px;
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.AiPlannerView-ChatBubbleText {
+  font-size: 15px;
+  font-weight: 700;
+  color: #18232d;
+}
+
+/* 선택지 행 */
+.AiPlannerView-ChoiceRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.AiPlannerView-ChoiceButton {
+  height: 32px;
+  min-width: 80px;
+  padding: 0 12px;
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 7px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #4a6070;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.AiPlannerView-ChoiceButton--selected {
+  background-color: #333;
+  border-color: #333;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* 사용자 답변 */
+.AiPlannerView-UserReply {
+  position: absolute;
+  top: 360px;
+  left: 634px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.AiPlannerView-UserBubble {
+  width: 224px;
+  height: 34px;
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AiPlannerView-UserBubbleText {
+  font-size: 13px;
+  color: #18232d;
+}
+
+.AiPlannerView-UserAvatar {
+  width: 34px;
+  height: 34px;
+  background-color: #d9d9d9;
+  border-radius: 17px;
+  flex-shrink: 0;
+}
+
+/* 하단 구분선 */
+.AiPlannerView-Divider {
+  position: absolute;
+  top: 791px;
+  left: 85px;
+  width: 850px;
+  height: 1px;
+  background-color: #e0eaf0;
+}
+
+/* 하위 탭 */
+.AiPlannerView-StepTabs {
+  position: absolute;
+  top: 805px;
+  left: 166px;
+  display: flex;
+  gap: 128px;
+  align-items: center;
+}
+
+.AiPlannerView-StepTab {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.AiPlannerView-StepNumber {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  background-color: #d9d9d9;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AiPlannerView-StepNumber span {
+  font-size: 10px;
+  color: #000;
+}
+
+.AiPlannerView-StepLabel {
+  font-size: 11px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.AiPlannerView-StepTab--active .AiPlannerView-StepLabel {
+  font-weight: 500;
+  color: #18232d;
+}
+
+/* 우측 사이드바 */
+.AiPlannerView-Sidebar {
+  position: absolute;
+  top: 177px;
+  left: 969px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.AiPlannerView-SidebarSection {
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 10px;
+  padding: 15px 20px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.AiPlannerView-SidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 360px;
+}
+
+.AiPlannerView-SidebarTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #18232d;
+}
+
+.AiPlannerView-EditButton {
+  height: 26px;
+  padding: 0 10px;
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  color: #4a6070;
+  cursor: pointer;
+}
+
+.AiPlannerView-SidebarStations,
+.AiPlannerView-SidebarTrains {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.AiPlannerView-SidebarLabel {
+  font-size: 12px;
+  color: #000;
+}
+
+.AiPlannerView-TagRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.AiPlannerView-Tag {
+  height: 25px;
+  background-color: #eef2f5;
+  border-radius: 13px;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #18232d;
+}
+
+/* 여행 조건 입력 현황 박스 */
+.AiPlannerView-ConditionBox {
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 10px;
+  padding: 17px 20px 47px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.AiPlannerView-ConditionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #18232d;
+}
+
+.AiPlannerView-ConditionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 360px;
+}
+
+.AiPlannerView-ConditionItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.AiPlannerView-ConditionIcon {
+  width: 18px;
+  height: 18px;
+  background-color: #eef2f5;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.AiPlannerView-ConditionIcon--filled {
+  background-color: #4a6070;
+}
+
+.AiPlannerView-ConditionKey {
+  font-size: 13px;
+  font-weight: 500;
+  color: #000;
+  min-width: 80px;
+}
+
+.AiPlannerView-ConditionValue {
+  font-size: 13px;
+  color: #000;
+  margin-left: auto;
+}
+
+.AiPlannerView-ConditionDivider {
+  height: 1px;
+  background-color: #e0eaf0;
+  width: 100%;
+}
+
+/* 일정 만들기 버튼 */
+.AiPlannerView-CreateButton {
+  height: 50px;
+  background-color: #333;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  width: 400px;
+}
+
+.AiPlannerView-CreateButton:hover {
+  background-color: #444;
+}

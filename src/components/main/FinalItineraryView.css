@@ -1,0 +1,297 @@
+/* ==========================================
+   FinalItineraryView — 최종 여행 일정
+   피그마 프레임: 29:81
+   ========================================== */
+
+.FinalItineraryView {
+  position: relative;
+  width: 1440px;
+  margin: 0 auto;
+  min-height: 1024px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 상단 메뉴 (top-28, left-95, w-1250) */
+.FinalItineraryView-Header {
+  position: absolute;
+  top: 28px;
+  left: calc(95px - var(--page-offset)); /* 캔버스는 가운데, 헤더는 화면 왼쪽 */
+  width: 1250px;
+  display: flex;
+  align-items: flex-start;
+  gap: 55px;
+  overflow: hidden;
+  padding-bottom: 16px;
+  padding-top: 10px;
+  color: #333;
+  white-space: nowrap;
+}
+
+.FinalItineraryView-Logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: inherit;
+  font-size: 23px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.FinalItineraryView-Nav {
+  display: flex;
+  gap: 55px;
+}
+
+.FinalItineraryView-NavItem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: #333;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.FinalItineraryView-NavItem--active {
+  font-weight: 700;
+}
+
+/* 제목 블록 (top-121, left-100, w-1200) */
+.FinalItineraryView-TitleBlock {
+  position: absolute;
+  top: 121px;
+  left: 100px;
+  width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.FinalItineraryView-Title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.FinalItineraryView-Subtitle {
+  font-size: 17px;
+  font-weight: 400;
+  color: #737373;
+  margin: 0;
+  white-space: pre;
+}
+
+/* 메인 콘텐츠 (top-267, left-95, w-1230) */
+.FinalItineraryView-Content {
+  position: absolute;
+  top: 267px;
+  left: 95px;
+  width: 1230px;
+  display: flex;
+  gap: 27px;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+/* =========================================
+   왼쪽: 시간순 여행 일정 (w-900)
+   ========================================= */
+.FinalItineraryView-Timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 900px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.FinalItineraryView-TimelineTitle {
+  font-size: 25px;
+  font-weight: 700;
+  color: #242a33;
+  margin: 0;
+  padding-bottom: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* 타임라인 행 */
+.FinalItineraryView-TimelineRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  width: 870px;
+  background-color: #ffffff;
+  border: 0.5px solid #d7dee5;
+  border-radius: 5px;
+  padding: 13px 13px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* 시간 레이블 (파란색, bold) */
+.FinalItineraryView-TimeLabel {
+  font-size: 17px;
+  font-weight: 700;
+  color: #284f87;
+  white-space: pre;
+  flex-shrink: 0;
+}
+
+/* 활동 아이콘 */
+.FinalItineraryView-RowIcon {
+  font-size: 20px;
+  font-weight: 700;
+  color: #242a33;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 활동 설명 */
+.FinalItineraryView-RowDesc {
+  font-size: 17px;
+  font-weight: 400;
+  color: #242a33;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* 편집 아이콘 */
+.FinalItineraryView-EditIcon {
+  font-size: 18px;
+  font-weight: 400;
+  color: #77818d;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   오른쪽 사이드바 (w-298)
+   ========================================= */
+.FinalItineraryView-Sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 298px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* 여행 동선 카드 */
+.FinalItineraryView-RouteCard {
+  background-color: #ffffff;
+  border: 1px solid #d7dee5;
+  border-radius: 9px;
+  padding: 17px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 284px;
+  box-sizing: border-box;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.FinalItineraryView-RouteCardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #242a33;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.FinalItineraryView-RouteMapWrap {
+  width: 252px;
+  height: 125px;
+  flex-shrink: 0;
+}
+
+.FinalItineraryView-RouteMapImg {
+  width: 252px;
+  height: 125px;
+  display: block;
+}
+
+/* 여행 요약 카드 */
+.FinalItineraryView-SummaryCard {
+  background-color: #ffffff;
+  border: 1px solid #d7dee5;
+  border-radius: 9px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  width: 284px;
+  box-sizing: border-box;
+  overflow: hidden;
+  flex-shrink: 0;
+  color: #242a33;
+}
+
+.FinalItineraryView-SummaryTitle {
+  font-size: 21px;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.FinalItineraryView-SummaryRow {
+  font-size: 15px;
+  font-weight: 400;
+  margin: 0;
+  white-space: pre;
+}
+
+/* =========================================
+   이전 · 저장 버튼 (top-805, left-95)
+   ========================================= */
+.FinalItineraryView-ActionRow {
+  position: absolute;
+  top: 805px;
+  left: 95px;
+  width: 1200px;
+  display: flex;
+  gap: 26px;
+  align-items: flex-start;
+  overflow: hidden;
+  padding-top: 8px;
+}
+
+.FinalItineraryView-PrevButton {
+  width: 220px;
+  padding: 13px 22px;
+  background-color: #ffffff;
+  border: 1px solid #d7d7d7;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #333;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.FinalItineraryView-SaveButton {
+  width: 220px;
+  padding: 13px 22px;
+  background-color: #333;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+}

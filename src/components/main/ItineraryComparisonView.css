@@ -1,0 +1,280 @@
+/* ==========================================
+   ItineraryComparisonView — 추천 일정 비교
+   피그마 프레임: 29:158
+   ========================================== */
+
+.ItineraryComparisonView {
+  position: relative;
+  width: 1440px;
+  margin: 0 auto;
+  min-height: 1024px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 상단 메뉴 (top-28, left-95, w-1250) */
+.ItineraryComparisonView-Header {
+  position: absolute;
+  top: 28px;
+  left: calc(95px - var(--page-offset)); /* 캔버스는 가운데, 헤더는 화면 왼쪽 */
+  width: 1250px;
+  display: flex;
+  align-items: flex-start;
+  gap: 55px;
+  overflow: hidden;
+  padding-bottom: 16px;
+  padding-top: 10px;
+  color: #333;
+  white-space: nowrap;
+}
+
+.ItineraryComparisonView-Logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: inherit;
+  font-size: 23px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ItineraryComparisonView-Nav {
+  display: flex;
+  gap: 55px;
+}
+
+.ItineraryComparisonView-NavItem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: #333;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.ItineraryComparisonView-NavItem--active {
+  font-weight: 700;
+}
+
+/* 이전으로 (top-107, left-95) */
+.ItineraryComparisonView-BackLink {
+  position: absolute;
+  top: 107px;
+  left: 95px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #4a6070;
+  padding: 0;
+  white-space: pre;
+}
+
+/* 타이틀 블록 (top-146, left-563, w-640) */
+.ItineraryComparisonView-TitleBlock {
+  position: absolute;
+  top: 146px;
+  left: 563px;
+  width: 640px;
+  height: 62px;
+  white-space: nowrap;
+}
+
+.ItineraryComparisonView-TitleLabel {
+  position: absolute;
+  top: 0;
+  left: 136px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0;
+}
+
+.ItineraryComparisonView-TitleHeading {
+  position: absolute;
+  top: 27px;
+  left: 0;
+  font-size: 29px;
+  font-weight: 700;
+  color: #18232d;
+  margin: 0;
+}
+
+/* =========================================
+   카드 공통
+   ========================================= */
+.ItineraryComparisonView-Card {
+  position: absolute;
+  top: 253px;
+  width: 440px;
+  height: 580px;
+  background-color: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 12px;
+  /* 내부 레이아웃: 제목 위쪽 패딩 35, 옆 20, 아래 23 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 35px 20px 23px;
+  box-sizing: border-box;
+}
+
+/* 카드별 위치 */
+.ItineraryComparisonView-Card--option-1 { left: 50px; }
+.ItineraryComparisonView-Card--option-2 { left: 510px; }
+.ItineraryComparisonView-Card--option-3 { left: 970px; }
+
+/* 카드 제목 */
+.ItineraryComparisonView-CardTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #18232d;
+  margin: 0 0 auto 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 구분선 — 카드 제목 아래 (절대 위치: 카드 내부 top-90, 좌우 inset 20px) */
+.ItineraryComparisonView-Divider {
+  position: absolute;
+  /* top: 253 + 90 = 343  → 카드 내 offset: 90px */
+  top: 90px;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background-color: #e0eaf0;
+  flex-shrink: 0;
+}
+
+/* 정보 섹션 (구분선 아래부터, flex grow) */
+.ItineraryComparisonView-InfoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  width: 400px;
+  margin-top: 56px; /* 구분선(90px) + 여백 ~ 카드 패딩 위쪽 맞춤 */
+  flex: 1;
+}
+
+/* 카드 1은 gap이 더 큼 */
+.ItineraryComparisonView-Card--option-1 .ItineraryComparisonView-InfoSection {
+  gap: 34px;
+}
+
+/* 카드 3은 gap 22px */
+.ItineraryComparisonView-Card--option-3 .ItineraryComparisonView-InfoSection {
+  gap: 22px;
+}
+
+/* 정보 그룹 */
+.ItineraryComparisonView-InfoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ItineraryComparisonView-InfoLabel {
+  font-size: 12px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0;
+  line-height: normal;
+}
+
+/* 여행 시간 행 */
+.ItineraryComparisonView-TimeRow {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.ItineraryComparisonView-TimeMain {
+  font-size: 16px;
+  font-weight: 700;
+  color: #18232d;
+}
+
+.ItineraryComparisonView-TimeRange {
+  font-size: 12px;
+  font-weight: 400;
+  color: #000000;
+}
+
+/* 역 태그 묶음 */
+.ItineraryComparisonView-StationTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  row-gap: 8px;
+}
+
+.ItineraryComparisonView-StationTag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 5px 4px 5px 5px;
+  background-color: #eef2f5;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #18232d;
+  white-space: nowrap;
+}
+
+/* 열차 체험 목록 */
+.ItineraryComparisonView-TrainList {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.ItineraryComparisonView-TrainItem {
+  font-size: 12px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0;
+  line-height: normal;
+  /* 디자인 그대로: 100px height, 18px 아래 여백 */
+  height: 100px;
+  white-space: pre-wrap;
+}
+
+.ItineraryComparisonView-TrainItem + .ItineraryComparisonView-TrainItem {
+  margin-top: 18px;
+  position: absolute;
+  /* 두 번째 아이템은 mt-18px에 위치 */
+}
+
+/* 선택 버튼 */
+.ItineraryComparisonView-SelectButton {
+  width: 400px;
+  height: 46px;
+  border-radius: 8px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 기본: 비선택 (방문지/균형형 스타일) */
+  background-color: #eef2f5;
+  border: 1px solid #e0eaf0;
+  color: #000000;
+}
+
+/* 선택됨: 열차 우선 스타일 */
+.ItineraryComparisonView-SelectButton--active {
+  background-color: #333;
+  border: none;
+  color: #ffffff;
+}

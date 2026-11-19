@@ -1,0 +1,142 @@
+/* ==========================================
+   MapView — 메인 지도 화면
+   ========================================== */
+
+.MapView {
+  position: relative;
+  width: 1440px;
+  margin: 0 auto;
+  min-height: 1024px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 상단 헤더 */
+.MapView-Header {
+  position: absolute;
+  top: 28px;
+  left: calc(95px - var(--page-offset)); /* 캔버스는 가운데, 헤더는 화면 왼쪽 */
+  width: 1250px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 55px;
+  padding: 10px 0 16px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.MapView-Logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: inherit;
+  font-size: 23px;
+  font-weight: 700;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.MapView-Nav {
+  display: flex;
+  gap: 55px;
+  align-items: center;
+}
+
+.MapView-NavItem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: #333;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.MapView-NavItem--active {
+  font-weight: 700;
+}
+
+/* 검색바 */
+.MapView-SearchBar {
+  position: absolute;
+  top: 202px;
+  left: 312px;
+  width: 800px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.MapView-SearchInput {
+  flex: 1;
+  height: 45px;
+  background-color: #f5f5f5;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+}
+
+.MapView-SearchIcon {
+  font-size: 16px;
+  color: #737373;
+  flex-shrink: 0;
+}
+
+.MapView-SearchField {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+}
+
+.MapView-SearchField::placeholder {
+  color: #737373;
+}
+
+.MapView-SearchButton {
+  height: 26px;
+  padding: 0 16px;
+  background-color: #d7d7d7;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.MapView-SearchButton:hover {
+  background-color: #c0c0c0;
+}
+
+/* 지도 영역 */
+.MapView-MapArea {
+  position: absolute;
+  top: 300px;
+  left: 90px;
+  width: 1260px;
+  height: 660px;
+  background-color: #d9d9d9;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* 카카오맵이 둥근 모서리 밖으로 나가지 않게 */
+}
+
+.MapView-MapPlaceholder {
+  font-size: 20px;
+  color: #737373;
+}

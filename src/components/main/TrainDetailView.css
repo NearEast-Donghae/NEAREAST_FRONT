@@ -1,0 +1,238 @@
+/* ==========================================
+   TrainDetailView — 열차 상세정보 화면
+   ========================================== */
+
+.TrainDetailView {
+  position: relative;
+  width: 1440px;
+  margin: 0 auto;
+  min-height: 1024px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 상단 헤더 */
+.TrainDetailView-Header {
+  position: absolute;
+  top: 28px;
+  left: calc(95px - var(--page-offset)); /* 캔버스는 가운데, 헤더는 화면 왼쪽 */
+  width: 1250px;
+  display: flex;
+  align-items: center;
+  gap: 55px;
+  padding: 10px 0 16px;
+}
+
+.TrainDetailView-Logo {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: inherit;
+  font-size: 23px;
+  font-weight: 700;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.TrainDetailView-Nav {
+  display: flex;
+  gap: 55px;
+  align-items: center;
+}
+
+.TrainDetailView-NavItem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: #333;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.TrainDetailView-NavItem--active {
+  font-weight: 700;
+}
+
+/* 본문 */
+.TrainDetailView-Main {
+  position: absolute;
+  top: 132px;
+  left: 120px;
+  width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 뒤로가기 */
+.TrainDetailView-TitleRow {
+  display: flex;
+  align-items: center;
+}
+
+.TrainDetailView-BackButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #575757;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.TrainDetailView-BackButton:hover {
+  color: #333;
+}
+
+/* 타이틀 블록 */
+.TrainDetailView-TitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.TrainDetailView-Title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1f1f1f;
+  line-height: 52px;
+  margin: 0;
+}
+
+.TrainDetailView-Subtitle {
+  font-size: 19px;
+  color: #575757;
+  line-height: 28px;
+  margin: 0;
+}
+
+.TrainDetailView-OperationDays {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a6070;
+  background-color: #eef2f5;
+  border-radius: 100px;
+  padding: 4px 14px;
+  line-height: 21px;
+  width: fit-content;
+}
+
+/* 정차역 섹션 */
+.TrainDetailView-StopsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.TrainDetailView-SectionTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f1f1f;
+  margin: 0;
+}
+
+/* 테이블 */
+.TrainDetailView-StopsTable {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.TrainDetailView-TableHeader {
+  display: grid;
+  grid-template-columns: 48px 1fr 100px 120px 120px;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 12px 24px;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.TrainDetailView-TableHeader span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #575757;
+}
+
+/* 정차역 행 */
+.TrainDetailView-StopRow {
+  display: grid;
+  grid-template-columns: 48px 1fr 100px 120px 120px;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e0eaf0;
+  position: relative;
+}
+
+.TrainDetailView-StopRow:last-child {
+  border-bottom: none;
+}
+
+.TrainDetailView-StopRow--pass {
+  background-color: #fafafa;
+  opacity: 0.75;
+}
+
+/* 역 아이콘 + 연결선 */
+.TrainDetailView-StopLine {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 24px;
+  height: 100%;
+}
+
+.TrainDetailView-ConnectorLine {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: calc(100% + 28px);
+  background-color: #d6d6d6;
+  z-index: 0;
+}
+
+.TrainDetailView-StopIcon {
+  position: relative;
+  z-index: 1;
+}
+
+/* 열 텍스트 */
+.TrainDetailView-ColStation {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f1f1f;
+  padding-left: 8px;
+}
+
+.TrainDetailView-ColType {
+  font-size: 14px;
+  color: #575757;
+}
+
+.TrainDetailView-ColArrival,
+.TrainDetailView-ColDeparture {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  font-variant-numeric: tabular-nums;
+}
+
+.TrainDetailView-StopRow--pass .TrainDetailView-ColStation,
+.TrainDetailView-StopRow--pass .TrainDetailView-ColArrival,
+.TrainDetailView-StopRow--pass .TrainDetailView-ColDeparture {
+  color: #aaa;
+}
