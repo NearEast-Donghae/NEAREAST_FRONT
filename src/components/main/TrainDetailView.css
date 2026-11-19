@@ -294,3 +294,8 @@
   font-size: 13px;
   color: #707070;
 }
+
+/* 좋아요 기준: 열차를 담으면 버튼이 톡 튕긴다 (Scale + Spring, styles/motion.css) */
+.TrainDetailView-SaveButton--saved {
+  animation: motion-pop var(--motion-long) var(--ease-spring);
+}

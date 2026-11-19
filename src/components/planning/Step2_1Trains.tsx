@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PlanningLayout from './PlanningLayout';
+import CheckboxMark from '../common/CheckboxMark';
 import './PlanningLayout.css';
 import './Step2_1Trains.css';
 
@@ -107,8 +108,9 @@ const Step2_1Trains = ({
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleTrain(train.name)}
-                    className="Step2_1Trains__checkbox"
+                    className="motion-checkbox-input"
                   />
+                  <CheckboxMark />
                   <span className="Step2_1Trains__trainName">{train.name}</span>
                   {savedTrainTypes.includes(train.name) && (
                     <span className="Step2_1Trains__savedBadge">담아둔 열차</span>

@@ -1,0 +1,192 @@
+/* ==========================================
+   모션 공통 규칙 — 모든 화면이 이 값과 키프레임을 같이 쓴다
+   - 들어오는 움직임: Ease out / 나가는 움직임: Ease in
+   - 지속 시간: 0.2 ~ 0.4초
+   - 기준표: 스낵바(아래에서 Slide) · 토스트(Fade) · 팝업(배경 어둡게 + Scale 90→100%)
+            바텀시트(아래에서 Slide + 배경 Fade) · 좋아요(Scale + Spring)
+            체크박스(선 그리기, Ease in out) · 로딩(Linear 회전) · 타이틀(Stagger)
+   ========================================== */
+
+:root {
+  --motion-short: 0.2s;
+  --motion-medium: 0.3s;
+  --motion-long: 0.4s;
+  --motion-stagger-step: 0.08s; /* 타이틀 → 서브타이틀 → … 사이 간격 */
+
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  /* 목표 크기를 살짝 넘었다가 돌아오는 곡선 — 좋아요의 '톡' 튕김 */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── 키프레임 ── */
+
+@keyframes motion-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes motion-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* 팝업: 90% → 100% */
+@keyframes motion-scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motion-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+
+/* 스낵바·바텀시트: 화면 아래에서 */
+@keyframes motion-slide-up-in {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motion-slide-down-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(100%); }
+}
+
+/* 타이틀 Stagger: 한 줄씩 살짝 올라오며 등장 */
+@keyframes motion-rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 좋아요: 작아졌다가 Spring 곡선으로 원래 크기를 살짝 넘어 돌아온다 */
+@keyframes motion-pop {
+  from { transform: scale(0.85); }
+  to { transform: scale(1); }
+}
+
+@keyframes motion-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 공통 유틸리티 클래스 ── */
+
+/* 타이틀과 서브타이틀: 자식 요소가 한 줄씩 순서대로 등장 */
+.motion-stagger > * {
+  animation: motion-rise-in var(--motion-medium) var(--ease-out) both;
+}
+.motion-stagger > :nth-child(2) { animation-delay: calc(var(--motion-stagger-step) * 1); }
+.motion-stagger > :nth-child(3) { animation-delay: calc(var(--motion-stagger-step) * 2); }
+.motion-stagger > :nth-child(4) { animation-delay: calc(var(--motion-stagger-step) * 3); }
+.motion-stagger > :nth-child(5) { animation-delay: calc(var(--motion-stagger-step) * 4); }
+.motion-stagger > :nth-child(n + 6) { animation-delay: calc(var(--motion-stagger-step) * 5); }
+
+/* 토스트: 제자리 Fade in */
+.motion-toast {
+  animation: motion-fade-in var(--motion-short) var(--ease-out) both;
+}
+
+/* 로딩: 일정한 속도로 계속 회전.
+   한 바퀴 0.8초 — 0.2~0.4초 규칙은 한 번 재생되는 전환용이고, 반복 회전을 0.4초로 돌리면 떨려 보여서 예외로 둔다 */
+.motion-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  vertical-align: -0.15em;
+  animation: motion-spin 0.8s linear infinite;
+}
+
+/* 버튼 안 로딩 표시 — 글자 앞에 스피너 */
+.motion-loading-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 체크박스: 체크 표시의 선이 그려진다 (Ease in out).
+   마크업: <input type="checkbox" class="motion-checkbox-input"> 바로 뒤에 <CheckboxMark /> */
+.motion-checkbox-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 숨긴 input의 기준점 — 없으면 키보드로 포커스할 때 페이지 맨 위로 스크롤될 수 있다 */
+label:has(> .motion-checkbox-input) {
+  position: relative;
+}
+
+.motion-checkbox {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #aaa;
+  border-radius: 5px;
+  background-color: #ffffff;
+  transition: background-color var(--motion-short) var(--ease-in-out),
+    border-color var(--motion-short) var(--ease-in-out);
+}
+
+.motion-checkbox svg {
+  width: 14px;
+  height: 14px;
+  overflow: visible;
+}
+
+.motion-checkbox path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 16;
+  stroke-dashoffset: 16; /* 선 길이만큼 밀어 두면 안 보이고, 0으로 줄이면 그려진다 */
+  transition: stroke-dashoffset var(--motion-medium) var(--ease-in-out);
+}
+
+.motion-checkbox-input:checked + .motion-checkbox {
+  border-color: #333;
+  background-color: #333;
+}
+
+.motion-checkbox-input:checked + .motion-checkbox path {
+  stroke-dashoffset: 0;
+}
+
+.motion-checkbox-input:focus-visible + .motion-checkbox {
+  outline: 2px solid #4a6070;
+  outline-offset: 2px;
+}
+
+/* ── 움직임 줄이기 설정을 켠 사용자에게는 애니메이션을 끈다 ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* 로딩 표시는 멈추면 의미가 없어서, 회전 대신 천천히 깜빡이게 한다 */
+  .motion-spinner {
+    animation: motion-fade-in 1s linear infinite alternate !important;
+    animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
