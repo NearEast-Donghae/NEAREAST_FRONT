@@ -1,0 +1,281 @@
+/* ==========================================
+   MyTripsView — 나의 여행 일정 (저장한 여행 조회)
+   ========================================== */
+
+.MyTripsView {
+  box-sizing: border-box;
+  width: 1440px; /* 다른 화면과 같은 캔버스, 넓은 화면에서는 가운데 */
+  margin: 0 auto;
+  min-height: calc(100vh - 110px); /* AppHeader 높이 제외 */
+  padding: 28px 95px 64px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+}
+
+/* 페이지 제목 — 계획하기 페이지 제목과 같은 크기 */
+.MyTripsView-PageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.MyTripsView-Title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.MyTripsView-Subtitle {
+  margin: 0;
+  font-size: 17px;
+  color: #737373;
+}
+
+.MyTripsView-Status {
+  margin: 0;
+  font-size: 15px;
+  color: #707070;
+}
+
+/* 빈 상태 */
+.MyTripsView-Empty {
+  width: 1250px;
+  box-sizing: border-box;
+  padding: 72px 40px;
+  border-radius: 12px;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.MyTripsView-EmptyTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.MyTripsView-EmptyText {
+  margin: 0;
+  font-size: 15px;
+  color: #575757;
+}
+
+.MyTripsView-EmptyActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* 버튼 */
+.MyTripsView-Button {
+  padding: 11px 22px;
+  border: 1px solid #d6d6d6;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.MyTripsView-Button:hover {
+  background-color: #f5f5f5;
+}
+
+.MyTripsView-Button--primary,
+.MyTripsView-Button--primary:hover {
+  background-color: #333;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.MyTripsView-Button--primary:hover {
+  opacity: 0.85;
+}
+
+.MyTripsView-Button--danger {
+  color: #c0392b;
+}
+
+/* 목록 + 상세 */
+.MyTripsView-Body {
+  width: 1250px;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.MyTripsView-List {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.MyTripsView-Card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 24px;
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+  cursor: pointer;
+}
+
+.MyTripsView-Card:hover {
+  background-color: #f5f5f5;
+}
+
+.MyTripsView-Card--selected,
+.MyTripsView-Card--selected:hover {
+  background-color: #333;
+  border-color: #333;
+  color: #ffffff;
+}
+
+.MyTripsView-CardBadge,
+.MyTripsView-DetailBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background-color: #eef2f5;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4a6070;
+}
+
+.MyTripsView-CardTitle {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.MyTripsView-CardMeta {
+  font-size: 14px;
+  color: #575757;
+}
+
+.MyTripsView-CardSavedAt {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.MyTripsView-Card--selected .MyTripsView-CardMeta,
+.MyTripsView-Card--selected .MyTripsView-CardSavedAt {
+  color: #d6d6d6;
+}
+
+/* 상세 */
+.MyTripsView-Detail {
+  padding: 32px 36px;
+  border-radius: 12px;
+  background-color: #f5f5f5;
+}
+
+.MyTripsView-DetailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.MyTripsView-DetailTitle {
+  margin: 10px 0 6px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.MyTripsView-DetailDate {
+  margin: 0;
+  font-size: 15px;
+  color: #575757;
+}
+
+.MyTripsView-Summary {
+  margin: 0 0 28px;
+  padding: 18px 22px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.MyTripsView-SummaryRow {
+  display: flex;
+  gap: 16px;
+  font-size: 15px;
+}
+
+.MyTripsView-SummaryRow dt {
+  width: 72px;
+  flex-shrink: 0;
+  color: #707070;
+}
+
+.MyTripsView-SummaryRow dd {
+  margin: 0;
+  color: #333;
+}
+
+/* 타임라인 */
+.MyTripsView-TimelineTitle {
+  margin: 0 0 14px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.MyTripsView-Timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.MyTripsView-TimelineRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0eaf0;
+  font-size: 15px;
+}
+
+.MyTripsView-TimelineRow:last-child {
+  border-bottom: none;
+}
+
+.MyTripsView-TimelineTime {
+  width: 52px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.MyTripsView-TimelineIcon {
+  width: 20px;
+  flex-shrink: 0;
+  text-align: center;
+  color: #4a6070;
+}
+
+.MyTripsView-TimelineText {
+  color: #333;
+}

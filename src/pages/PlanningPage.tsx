@@ -5,7 +5,10 @@ import Step2_1Trains from '../components/planning/Step2_1Trains';
 import Step2A_TrainDetail, { TrainDetailInfo } from '../components/planning/Step2A_TrainDetail';
 import Step3Schedule, { ScheduleItem } from '../components/planning/Step3Schedule';
 import Step4FreeTime, { FreeTimeSlot } from '../components/planning/Step4FreeTime';
-import Step5Confirm, { FinalScheduleItem, TravelSummary } from '../components/planning/Step5Confirm';
+import Step5Confirm, { FINAL_ICON, FinalScheduleItem, TravelSummary } from '../components/planning/Step5Confirm';
+import { createItinerary } from '../api/itineraries';
+import { ROUTES, navigateTo } from '../routes';
+import { formatTravelDate } from '../utils/format';
 
 type PlanningView =
   | 'step1'
@@ -202,9 +205,33 @@ const PlanningPage = () => {
     );
   };
 
-  const handleSavePlan = () => {
-    // 여행 계획 저장 처리 (실제로는 API 호출)
-    alert('여행 계획이 저장되었습니다!');
+  const handleSavePlan = async () => {
+    // selectedActivities에는 id만 있어서 이름으로 바꿔 저장한다
+    const activityNames = freeTimeSlots
+      .flatMap((slot) => slot.suggestions)
+      .filter((activity) => selectedActivities.includes(activity.id))
+      .map((activity) => activity.name);
+
+    try {
+      await createItinerary({
+        source: 'planner',
+        title: `${selectedStations.join(' · ') || basicInfo.departureStation} 여행`,
+        travelDateLabel: formatTravelDate(basicInfo.travelDate),
+        timeRange: `${basicInfo.startTime} – ${basicInfo.endTime}`,
+        stations: selectedStations,
+        trains: selectedTrains,
+        activities: activityNames,
+        timeline: finalScheduleItems.map((item) => ({
+          time: item.time,
+          icon: FINAL_ICON[item.type],
+          description: item.label,
+        })),
+      });
+    } catch {
+      alert('여행 계획을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
+    navigateTo(ROUTES.myTrips);
   };
 
   // 최종 일정 아이템 변환

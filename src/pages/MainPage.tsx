@@ -8,6 +8,9 @@ import {
   ItineraryComparisonView,
   FinalItineraryView,
 } from '../components/main';
+import { createItinerary } from '../api/itineraries';
+import { ROUTES, navigateTo } from '../routes';
+import { splitDotList } from '../utils/format';
 import type {
   MainNavTab,
   TrainResult,
@@ -111,13 +114,32 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
   const [selectedTrain, setSelectedTrain] = useState<TrainResult | null>(null);
 
+  const handleSaveAiItinerary = async () => {
+    try {
+      await createItinerary({
+        source: 'ai',
+        title: `${DUMMY_SUMMARY.visitedStations} 여행`,
+        travelDateLabel: DUMMY_SUMMARY.date,
+        timeRange: DUMMY_SUMMARY.timeRange,
+        stations: splitDotList(DUMMY_SUMMARY.visitedStations),
+        trains: splitDotList(DUMMY_SUMMARY.trainName),
+        activities: splitDotList(DUMMY_SUMMARY.extraActivities),
+        timeline: DUMMY_TIMELINE.map(({ time, icon, description }) => ({ time, icon, description })),
+      });
+    } catch {
+      alert('여행 계획을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
+    navigateTo(ROUTES.myTrips);
+  };
+
   const handleNavigate = (tab: MainNavTab) => {
     setActiveNav(tab);
     switch (tab) {
       case '철도 지도':     setCurrentView('map');        break;
       case '열차 정보':     setCurrentView('trainInfo');   break;
       case 'AI 여행 플래너': setCurrentView('aiPlanner');   break;
-      case '여행 계획하기':  window.location.hash = '#/planning'; break; // 라우터 도입 전까지 main.tsx의 해시 라우팅 사용
+      case '여행 계획하기':  navigateTo(ROUTES.planning); break;
     }
   };
 
@@ -193,7 +215,7 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
           timeline={DUMMY_TIMELINE}
           summary={DUMMY_SUMMARY}
           onBack={() => setCurrentView('itineraryComparison')}
-          onSave={() => alert('여행 계획이 저장되었습니다.')}
+          onSave={handleSaveAiItinerary}
         />
       )}
     </>

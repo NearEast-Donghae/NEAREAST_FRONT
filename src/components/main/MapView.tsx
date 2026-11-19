@@ -10,6 +10,7 @@
 
 import React, { useState } from 'react';
 import KakaoMap from './KakaoMap';
+import MyTripsButton from '../layout/MyTripsButton';
 import './MapView.css';
 
 export type MainNavTab = '철도 지도' | '열차 정보' | 'AI 여행 플래너' | '여행 계획하기';
@@ -48,6 +49,7 @@ export default function MapView({ activeNav, onNavigate, onStationClick }: MapVi
             </button>
           ))}
         </nav>
+        <MyTripsButton />
       </header>
 
       {/* 검색바 */}

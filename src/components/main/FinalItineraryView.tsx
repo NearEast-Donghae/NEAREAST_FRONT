@@ -1,4 +1,5 @@
 import React from 'react';
+import MyTripsButton from '../layout/MyTripsButton';
 import './FinalItineraryView.css';
 import type { MainNavTab } from './MapView';
 import travelRouteMap from '../../assets/icons/travel-route-map.svg';
@@ -56,6 +57,7 @@ const FinalItineraryView: React.FC<FinalItineraryViewProps> = ({
             </button>
           ))}
         </nav>
+        <MyTripsButton />
       </header>
 
       {/* 제목 (top-121, left-100) */}

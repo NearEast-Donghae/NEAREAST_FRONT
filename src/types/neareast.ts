@@ -104,3 +104,27 @@ export interface SelectedItems {
   stations: string[];
   trains: string[];
 }
+
+// 저장된 여행 — '여행 계획하기'와 'AI 여행 플래너' 두 흐름이 같은 모양으로 저장한다
+export type SavedTripSource = 'planner' | 'ai';
+
+export interface SavedTripTimelineRow {
+  time: string;
+  icon: string; // ▣ ◉ ⌂ ♧ ♨ 등 일정 화면과 같은 기호
+  description: string;
+}
+
+export interface SavedTrip {
+  id: string;
+  source: SavedTripSource;
+  title: string;
+  travelDateLabel: string; // 화면 표시용 '2026.11.21 (토)'
+  timeRange: string;
+  stations: string[];
+  trains: string[];
+  activities: string[];
+  timeline: SavedTripTimelineRow[];
+  createdAt: string; // ISO 8601
+}
+
+export type NewSavedTrip = Omit<SavedTrip, 'id' | 'createdAt'>;

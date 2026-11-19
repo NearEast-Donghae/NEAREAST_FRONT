@@ -1,4 +1,5 @@
 import React from 'react';
+import MyTripsButton from '../layout/MyTripsButton';
 import './TrainDetailView.css';
 import type { MainNavTab } from './MapView';
 import stationStopIcon from '../../assets/icons/station-stop.svg';
@@ -49,6 +50,7 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
             </button>
           ))}
         </nav>
+        <MyTripsButton />
       </header>
 
       {/* 본문 */}

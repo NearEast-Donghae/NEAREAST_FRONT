@@ -1,6 +1,8 @@
 /* 메인 화면 헤더(MapView-Header)와 같은 위치·크기 — 높이 110px은 PlanningLayout의 min-height 계산과 맞춤 */
-.PlanningHeader {
+.AppHeader {
   box-sizing: border-box;
+  /* 메인 헤더처럼 1440px 캔버스 기준 — 창 폭 기준이면 1440px보다 좁은 화면에서 오른쪽 버튼 위치가 달라진다 */
+  width: calc(1440px + 2 * var(--page-offset));
   height: 110px;
   padding: 38px 95px 18px;
   display: flex;
@@ -11,7 +13,7 @@
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-.PlanningHeader-Logo {
+.AppHeader-Logo {
   background: none;
   border: none;
   padding: 0;
@@ -23,13 +25,13 @@
   flex-shrink: 0;
 }
 
-.PlanningHeader-Nav {
+.AppHeader-Nav {
   display: flex;
   gap: 55px;
   align-items: center;
 }
 
-.PlanningHeader-NavItem {
+.AppHeader-NavItem {
   background: none;
   border: none;
   cursor: pointer;
@@ -41,6 +43,6 @@
   flex-shrink: 0;
 }
 
-.PlanningHeader-NavItem--active {
+.AppHeader-NavItem--active {
   font-weight: 700;
 }

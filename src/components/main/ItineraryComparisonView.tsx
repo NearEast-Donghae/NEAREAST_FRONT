@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import MyTripsButton from '../layout/MyTripsButton';
 import './ItineraryComparisonView.css';
 import type { MainNavTab } from './MapView';
 
@@ -53,6 +54,7 @@ const ItineraryComparisonView: React.FC<ItineraryComparisonViewProps> = ({
             </button>
           ))}
         </nav>
+        <MyTripsButton />
       </header>
 
       {/* 이전으로 */}

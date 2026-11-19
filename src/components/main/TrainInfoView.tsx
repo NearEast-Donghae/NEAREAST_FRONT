@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MainNavTab } from './MapView';
+import MyTripsButton from '../layout/MyTripsButton';
 import './TrainInfoView.css';
 
 const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기'];
@@ -75,6 +76,7 @@ export default function TrainInfoView({
             </button>
           ))}
         </nav>
+        <MyTripsButton />
       </header>
 
       {/* 본문 */}
