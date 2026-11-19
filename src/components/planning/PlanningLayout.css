@@ -1,0 +1,134 @@
+.PlanningLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: 28px 95px 38px;
+  box-sizing: border-box;
+  width: 1440px; /* 넓은 화면에서 가운데 정렬 */
+  margin: 0 auto;
+  min-height: calc(100vh - 110px); /* 헤더 높이 제외 */
+  background: #fff;
+}
+
+.PlanningLayout__header {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 1200px;
+}
+
+.PlanningLayout__title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 34px;
+  color: #333;
+  margin: 0;
+  line-height: normal;
+}
+
+.PlanningLayout__subtitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: #737373;
+  margin: 0;
+  line-height: normal;
+}
+
+.PlanningLayout__content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  width: 1230px;
+}
+
+.PlanningLayout__navigation {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  padding-top: 8px;
+  width: 1200px;
+}
+
+/* ── 공용 버튼 ─────────────────────────────── */
+.PlanningButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 22px;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  min-width: 220px;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.PlanningButton:hover {
+  opacity: 0.85;
+}
+
+.PlanningButton--primary {
+  background: #333;
+  color: #fff;
+}
+
+.PlanningButton--secondary {
+  background: #fff;
+  color: #333;
+  border: 1px solid #d7d7d7;
+}
+
+/* ── 공용 카드 ─────────────────────────────── */
+.PlanningCard {
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  padding: 24px 26px;
+}
+
+/* ── 공용 입력 필드 ───────────────────────── */
+.PlanningField {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.PlanningField__label {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #737373;
+}
+
+.PlanningField__select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px 11px 14px;
+  border: 1px solid #d7d7d7;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #fff;
+  width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.PlanningField__selectValue {
+  font-size: 18px;
+  color: #333;
+  flex: 1;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.PlanningField__selectArrow {
+  font-size: 16px;
+  color: #737373;
+}

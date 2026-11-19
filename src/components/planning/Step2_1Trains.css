@@ -1,0 +1,154 @@
+.Step2_1Trains__selectionArea {
+  display: flex;
+  flex-direction: column;
+  width: 875px;
+}
+
+.Step2_1Trains__tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid #d7d7d7;
+  margin-bottom: 16px;
+}
+
+.Step2_1Trains__tab {
+  padding: 14px 26px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #737373;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.Step2_1Trains__tab--active {
+  font-weight: 700;
+  color: #333;
+  border-bottom-color: #333;
+}
+
+.Step2_1Trains__searchBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 19px;
+  border: 1px solid #d7d7d7;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.Step2_1Trains__searchIcon {
+  font-size: 18px;
+  color: #737373;
+}
+
+.Step2_1Trains__searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  color: #333;
+  background: transparent;
+}
+
+.Step2_1Trains__searchInput::placeholder {
+  color: #737373;
+}
+
+.Step2_1Trains__trainList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.Step2_1Trains__trainItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15.5px 0;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 54px;
+}
+
+.Step2_1Trains__trainLabel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+}
+
+.Step2_1Trains__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #333;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.Step2_1Trains__trainName {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #333;
+}
+
+.Step2_1Trains__detailLink {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  color: #737373;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.Step2_1Trains__detailLink:hover {
+  color: #333;
+}
+
+.Step2_1Trains__hint {
+  margin-top: 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: #737373;
+}
+
+/* 요약 카드 */
+.Step2_1Trains__summaryCard {
+  width: 290px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.Step2_1Trains__summaryTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #333;
+  margin: 0 0 4px;
+}
+
+.Step2_1Trains__summaryCategory {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.Step2_1Trains__summaryItems {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  color: #737373;
+  margin: 0 0 8px;
+}

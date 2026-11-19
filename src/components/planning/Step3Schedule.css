@@ -1,0 +1,149 @@
+.Step3Schedule__timelineArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 950px;
+}
+
+.Step3Schedule__timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d7d7d7;
+  margin-bottom: 4px;
+}
+
+.Step3Schedule__timelineTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 25px;
+  color: #333;
+}
+
+.Step3Schedule__addButton {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 400;
+}
+
+.Step3Schedule__addButton:hover {
+  text-decoration: underline;
+}
+
+/* 타임라인 목록 */
+.Step3Schedule__timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.Step3Schedule__timelineItem {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding: 12.5px 18.5px;
+  min-height: 49px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+/* 빈 시간 항목: 배경 강조 */
+.Step3Schedule__timelineItem--free {
+  background: #f0f4ff;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+.Step3Schedule__timelineDot {
+  font-size: 20px;
+  color: #333;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.Step3Schedule__timelineTime {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #333;
+  min-width: 100px;
+}
+
+.Step3Schedule__timelineIcon {
+  font-size: 20px;
+  color: #333;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.Step3Schedule__timelineLabel {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 19px;
+  font-weight: 400;
+  color: #333;
+  flex: 1;
+}
+
+.Step3Schedule__activityButton {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  color: #333;
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.Step3Schedule__activityButton:hover {
+  background: #f5f5f5;
+}
+
+/* 철도 자원 카드 */
+.Step3Schedule__resourceCard {
+  width: 255px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-self: flex-start;
+}
+
+.Step3Schedule__resourceTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #333;
+  margin: 0;
+}
+
+.Step3Schedule__resourceCategory {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #333;
+  margin: 0;
+}
+
+.Step3Schedule__resourceItems {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  color: #737373;
+  margin: 0 0 4px;
+}
+
+.Step3Schedule__resourceHint {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: #737373;
+  margin: 4px 0 0;
+  line-height: 1.5;
+}

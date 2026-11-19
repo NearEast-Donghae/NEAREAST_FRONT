@@ -1,0 +1,115 @@
+.Step4FreeTime__listArea {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 910px;
+  padding: 24px 26px;
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+}
+
+.Step4FreeTime__slotSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.Step4FreeTime__slotTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 19px;
+  color: #333;
+  margin: 0;
+}
+
+/* 카테고리 필터 */
+.Step4FreeTime__categoryFilter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.Step4FreeTime__categoryTag {
+  padding: 8px 10px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #737373;
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 60px;
+  text-align: center;
+}
+
+.Step4FreeTime__categoryTag--active {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+  font-weight: 700;
+}
+
+/* 활동 목록 */
+.Step4FreeTime__activityList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.Step4FreeTime__activityItem {
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 52px;
+}
+
+.Step4FreeTime__activityLabel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 17px;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.Step4FreeTime__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #333;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.Step4FreeTime__activityName {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  color: #333;
+}
+
+/* 안내 카드 */
+.Step4FreeTime__guideCard {
+  width: 275px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-self: flex-start;
+}
+
+.Step4FreeTime__guideTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #333;
+  margin: 0;
+}
+
+.Step4FreeTime__guideText {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  color: #737373;
+  margin: 0;
+  line-height: 1.5;
+}

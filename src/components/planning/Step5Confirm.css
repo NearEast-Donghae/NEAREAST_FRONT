@@ -1,0 +1,177 @@
+.Step5Confirm__timelineArea {
+  display: flex;
+  flex-direction: column;
+  width: 900px;
+}
+
+.Step5Confirm__timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #d7d7d7;
+  margin-bottom: 4px;
+}
+
+.Step5Confirm__timelineTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 25px;
+  color: #333;
+}
+
+.Step5Confirm__addButton {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.Step5Confirm__addButton:hover {
+  text-decoration: underline;
+}
+
+/* 타임라인 목록 */
+.Step5Confirm__timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.Step5Confirm__timelineItem {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 13.5px 13.5px;
+  min-height: 51px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.Step5Confirm__timelineDot {
+  font-size: 20px;
+  color: #333;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.Step5Confirm__timelineTime {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  color: #333;
+  min-width: 70px;
+}
+
+.Step5Confirm__timelineIcon {
+  font-size: 20px;
+  color: #333;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.Step5Confirm__timelineLabel {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  color: #333;
+  flex: 1;
+}
+
+.Step5Confirm__editButton {
+  font-size: 18px;
+  color: #737373;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.Step5Confirm__editButton:hover {
+  background: #f0f0f0;
+}
+
+/* 사이드 패널 */
+.Step5Confirm__sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 298px;
+}
+
+/* 지도 카드 */
+.Step5Confirm__mapCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.Step5Confirm__mapTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.Step5Confirm__mapPlaceholder {
+  height: 125px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.Step5Confirm__mapPlaceholderText {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: #737373;
+  text-align: center;
+  padding: 8px;
+}
+
+/* 여행 요약 카드 */
+.Step5Confirm__summaryCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.Step5Confirm__summaryTitle {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #333;
+  margin: 0;
+}
+
+.Step5Confirm__summaryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.Step5Confirm__summaryRow {
+  display: flex;
+  gap: 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+}
+
+.Step5Confirm__summaryRow dt {
+  color: #737373;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.Step5Confirm__summaryRow dd {
+  color: #333;
+  margin: 0;
+}
