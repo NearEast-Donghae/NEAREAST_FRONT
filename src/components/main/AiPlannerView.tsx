@@ -1,14 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MainNavTab } from './MapView';
 import HeaderActions from '../layout/HeaderActions';
+import LoginGate from '../layout/LoginGate';
+import { ROUTES } from '../../routes';
 import { sendChatMessage } from '../../api/chat';
 import { CREATE_ITINERARY_OPTION, PLANNER_QUESTIONS } from '../../data/plannerQuestions';
 import { useSavedPlaces } from '../../hooks/useSavedPlaces';
 import { savedPlacesStore } from '../../store/savedPlaces';
-import type { ChatMessage, ChatPlace, ChatRequest, PlanConditions } from '../../types/neareast';
+import { useAuthUser } from '../../hooks/useAuthUser';
+import {
+  createConversationTitle,
+  formatConversationDate,
+  loadConversations,
+  saveConversations,
+} from '../../store/chatHistory';
+import type { ChatConversation, ChatMessage, ChatPlace, ChatRequest, PlanConditions } from '../../types/neareast';
 import './AiPlannerView.css';
 
-const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기'];
+const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
 
 // 첫 화면의 추천 질문 — 마지막 것이 여행 짜기 기능으로 들어가는 입구
 const WELCOME_SUGGESTIONS = [
@@ -20,10 +29,11 @@ const WELCOME_SUGGESTIONS = [
 
 const SAVED_PLACES_PLANNING_QUESTION = '담아둔 장소로 여행 일정 짜줘';
 
-let messageSequence = 0;
+// 저장된 대화를 다시 불러와도 id가 겹치지 않게, 페이지를 새로 열 때마다 0부터 세는 번호 대신 시각+난수를 쓴다
+const createId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
 function createMessage(sender: ChatMessage['sender'], text: string, extra: Partial<ChatMessage> = {}): ChatMessage {
-  messageSequence += 1;
-  return { id: `message-${messageSequence}`, sender, text, ...extra };
+  return { id: createId('message'), sender, text, ...extra };
 }
 
 interface AiPlannerViewProps {
@@ -43,6 +53,50 @@ export default function AiPlannerView({
   const savedPlaces = useSavedPlaces();
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [inputText, setInputText] = useState('');
+
+  // 대화 목록 — 로그인한 계정별로 저장된다 (로그인 전에는 화면이 잠겨 있어 빈 목록)
+  const user = useAuthUser();
+  const userEmail = user?.email ?? null;
+  const [conversations, setConversations] = useState<ChatConversation[]>(() =>
+    userEmail === null ? [] : loadConversations(userEmail)
+  );
+  // 지금 화면의 대화 — 첫 메시지를 보내기 전(새 대화)에는 목록에 없어서 null
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+
+  // 다른 계정으로 로그인하면 그 계정의 목록으로 바꾸고 새 대화로 시작한다
+  useEffect(() => {
+    setConversations(userEmail === null ? [] : loadConversations(userEmail));
+    setActiveConversationId(null);
+  }, [userEmail]);
+
+  // 메시지가 오갈 때마다 지금 대화를 목록 맨 위에 저장한다
+  useEffect(() => {
+    if (userEmail === null || activeConversationId === null || messages.length === 0) return;
+    setConversations((previous) => {
+      const existing = previous.find((conversation) => conversation.id === activeConversationId);
+      // 목록에서 대화를 열기만 한 경우는 내용이 같으니, 최신순 위치가 바뀌지 않게 저장하지 않는다
+      const isUnchanged =
+        existing !== undefined &&
+        existing.messages.length === messages.length &&
+        existing.messages[existing.messages.length - 1]?.id === messages[messages.length - 1]?.id &&
+        JSON.stringify(existing.conditions) === JSON.stringify(conditions);
+      if (isUnchanged) return previous;
+
+      const now = new Date().toISOString();
+      const firstQuestion = messages.find((message) => message.sender === 'user')?.text ?? '새 대화';
+      const updated: ChatConversation = {
+        id: activeConversationId,
+        title: existing?.title ?? createConversationTitle(firstQuestion),
+        messages,
+        conditions,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+      };
+      const next = [updated, ...previous.filter((conversation) => conversation.id !== activeConversationId)];
+      saveConversations(userEmail, next);
+      return next;
+    });
+  }, [messages, conditions, activeConversationId, userEmail]);
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -88,6 +142,9 @@ export default function AiPlannerView({
     };
     const conversationId = conversationIdRef.current;
 
+    // 새 대화의 첫 메시지면 목록에 넣을 id를 만든다 (저장은 메시지가 바뀌면 효과(useEffect)가 한다)
+    if (activeConversationId === null) setActiveConversationId(createId('chat'));
+
     setInputText('');
     setMessages((previous) => [...lockQuickReplies(previous, userText), userMessage]);
     setIsAiTyping(true);
@@ -132,11 +189,31 @@ export default function AiPlannerView({
 
   const handleNewConversation = () => {
     conversationIdRef.current += 1;
+    setActiveConversationId(null);
     setMessages([]);
     setConditions({});
     setIsAiTyping(false);
     setInputText('');
     inputRef.current?.focus();
+  };
+
+  // 지난 대화 열기 — 답변을 기다리는 중에는 목록 버튼이 막혀 있어서, 받던 답변이 다른 대화로 섞이지 않는다
+  const handleOpenConversation = (conversation: ChatConversation) => {
+    conversationIdRef.current += 1;
+    setActiveConversationId(conversation.id);
+    setMessages(conversation.messages);
+    setConditions(conversation.conditions);
+    setIsAiTyping(false);
+    setInputText('');
+  };
+
+  const handleDeleteConversation = (conversation: ChatConversation) => {
+    if (userEmail === null) return;
+    if (!window.confirm(`‘${conversation.title}’ 대화를 삭제할까요?`)) return;
+    const next = conversations.filter((item) => item.id !== conversation.id);
+    setConversations(next);
+    saveConversations(userEmail, next);
+    if (conversation.id === activeConversationId) handleNewConversation();
   };
 
   const handleTogglePlace = (place: ChatPlace) => {
@@ -166,209 +243,257 @@ export default function AiPlannerView({
         <HeaderActions />
       </header>
 
-      <section className="AiPlannerView-Chat" aria-label="AI 여행 플래너 대화">
-        <div className="AiPlannerView-ChatBar">
-          <h1 className="AiPlannerView-ChatTitle">
-            <span className="AiPlannerView-ChatTitleAvatar" aria-hidden="true">AI</span>
-            AI 여행 플래너
-          </h1>
-          {messages.length > 0 && (
-            <button className="AiPlannerView-NewChatButton" onClick={handleNewConversation}>
+      {/* 로그인해야 쓸 수 있다 — 헤더는 감싸지 않아서 다른 탭으로 이동은 된다 */}
+      <LoginGate serviceName="AI 여행 플래너" returnTo={{ route: ROUTES.main, mainNav: 'AI 여행 플래너' }}>
+        <section className="AiPlannerView-Chat" aria-label="AI 여행 플래너 대화">
+          {/* 대화 목록 */}
+          <aside className="AiPlannerView-History" aria-label="대화 목록">
+            <button
+              className="AiPlannerView-NewChatButton"
+              onClick={handleNewConversation}
+              disabled={isAiTyping}
+            >
               + 새 대화
             </button>
-          )}
-        </div>
-
-        <div className="AiPlannerView-MessageList" ref={messageListRef} aria-live="polite">
-          <div className="AiPlannerView-MessageColumn">
-            {messages.length === 0 ? (
-              <div className="AiPlannerView-Welcome">
-                <span className="AiPlannerView-WelcomeAvatar" aria-hidden="true">AI</span>
-                <h2 className="AiPlannerView-WelcomeTitle">동해선 여행, 무엇이든 물어보세요</h2>
-                <p className="AiPlannerView-WelcomeText">
-                  역과 가볼 곳을 찾아 드리고, 원하면 열차 여행 일정까지 같이 짜 드려요.
-                </p>
-
-                {savedPlaces.length > 0 && (
-                  <section className="AiPlannerView-WelcomeSaved" aria-label="담아둔 장소">
-                    <div className="AiPlannerView-WelcomeSavedHeader">
-                      <span className="AiPlannerView-WelcomeSavedTitle">담아둔 장소 {savedPlaces.length}곳</span>
-                      <button
-                        className="AiPlannerView-WelcomeSavedAction"
-                        onClick={() => handleSendMessage(SAVED_PLACES_PLANNING_QUESTION)}
-                      >
-                        이 장소들로 일정 짜기 →
-                      </button>
-                    </div>
-                    <ul className="AiPlannerView-WelcomeSavedList">
-                      {savedPlaces.map((place) => (
-                        <li key={place.id} className="AiPlannerView-WelcomeSavedItem">
-                          <span className="AiPlannerView-WelcomeSavedName">📍 {place.name}</span>
-                          <span className="AiPlannerView-WelcomeSavedFrom">{place.savedFrom}에서</span>
-                          <button
-                            className="AiPlannerView-WelcomeSavedRemove"
-                            onClick={() => savedPlacesStore.remove(place.id)}
-                            aria-label={`${place.name} 빼기`}
-                          >
-                            ×
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-
-                <div className="AiPlannerView-WelcomeGrid">
-                  {WELCOME_SUGGESTIONS.map((suggestion) => (
-                    <button
-                      key={suggestion.question}
-                      className="AiPlannerView-WelcomeCard"
-                      onClick={() => handleSendMessage(suggestion.question)}
-                    >
-                      <span className="AiPlannerView-WelcomeCardTitle">{suggestion.title}</span>
-                      <span className="AiPlannerView-WelcomeCardQuestion">“{suggestion.question}”</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <p className="AiPlannerView-HistoryTitle">대화 목록</p>
+            {conversations.length === 0 ? (
+              <p className="AiPlannerView-HistoryEmpty">아직 대화가 없어요. 질문을 보내면 여기에 쌓여요.</p>
             ) : (
-              messages.map((message) =>
-                message.sender === 'ai' ? (
-                  <div key={message.id} className="AiPlannerView-AiMessage">
-                    <span className="AiPlannerView-AiAvatar" aria-hidden="true">AI</span>
-                    <div className="AiPlannerView-AiContent">
-                      <p className="AiPlannerView-AiText">{message.text}</p>
+              <ul className="AiPlannerView-HistoryList">
+                {conversations.map((conversation) => {
+                  const isActive = conversation.id === activeConversationId;
+                  return (
+                    <li
+                      key={conversation.id}
+                      className={`AiPlannerView-HistoryItem${isActive ? ' AiPlannerView-HistoryItem--active' : ''}`}
+                    >
+                      <button
+                        className="AiPlannerView-HistoryOpen"
+                        onClick={() => handleOpenConversation(conversation)}
+                        disabled={isAiTyping}
+                        aria-current={isActive ? 'true' : undefined}
+                      >
+                        <span className="AiPlannerView-HistoryItemTitle">{conversation.title}</span>
+                        <span className="AiPlannerView-HistoryItemDate">
+                          {formatConversationDate(conversation.updatedAt)}
+                        </span>
+                      </button>
+                      <button
+                        className="AiPlannerView-HistoryDelete"
+                        onClick={() => handleDeleteConversation(conversation)}
+                        disabled={isAiTyping}
+                        aria-label={`${conversation.title} 대화 삭제`}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </aside>
 
-                      {message.places !== undefined && (
-                        <div className="AiPlannerView-PlaceList">
-                          {message.places.map((place) => {
-                            const isSaved = savedPlaces.some((saved) => saved.id === place.id);
-                            return (
-                              <article key={place.id} className="AiPlannerView-PlaceCard">
-                                <span className="AiPlannerView-PlaceCategory">{place.category}</span>
-                                <h3 className="AiPlannerView-PlaceName">{place.name}</h3>
-                                {place.stationName !== undefined && place.stationName !== place.name && (
-                                  <p className="AiPlannerView-PlaceStation">가까운 역 · {place.stationName}</p>
-                                )}
-                                <p className="AiPlannerView-PlaceDescription">{place.description}</p>
-                                {place.notice !== undefined && (
-                                  <p className="AiPlannerView-PlaceNotice">{place.notice}</p>
-                                )}
-                                {place.source !== undefined && (
-                                  <p className="AiPlannerView-PlaceSource">출처: {place.source}</p>
-                                )}
-                                <button
-                                  className={`AiPlannerView-PlaceButton${isSaved ? ' AiPlannerView-PlaceButton--saved' : ''}`}
-                                  onClick={() => handleTogglePlace(place)}
-                                  aria-pressed={isSaved}
-                                >
-                                  {isSaved ? '✓ 여행에 담음' : '여행에 담기'}
-                                </button>
-                              </article>
-                            );
-                          })}
+          <div className="AiPlannerView-ChatMain">
+            <div className="AiPlannerView-ChatBar">
+              <h1 className="AiPlannerView-ChatTitle">
+                <span className="AiPlannerView-ChatTitleAvatar" aria-hidden="true">AI</span>
+                {conversations.find((conversation) => conversation.id === activeConversationId)?.title ??
+                  'AI 여행 플래너'}
+              </h1>
+            </div>
+
+            <div className="AiPlannerView-MessageList" ref={messageListRef} aria-live="polite">
+              <div className="AiPlannerView-MessageColumn">
+                {messages.length === 0 ? (
+                  <div className="AiPlannerView-Welcome motion-stagger">
+                    <span className="AiPlannerView-WelcomeAvatar" aria-hidden="true">AI</span>
+                    <h2 className="AiPlannerView-WelcomeTitle">동해선 여행, 무엇이든 물어보세요</h2>
+                    <p className="AiPlannerView-WelcomeText">
+                      역과 가볼 곳을 찾아 드리고, 원하면 열차 여행 일정까지 같이 짜 드려요.
+                    </p>
+
+                    {savedPlaces.length > 0 && (
+                      <section className="AiPlannerView-WelcomeSaved" aria-label="담아둔 장소">
+                        <div className="AiPlannerView-WelcomeSavedHeader">
+                          <span className="AiPlannerView-WelcomeSavedTitle">담아둔 장소 {savedPlaces.length}곳</span>
+                          <button
+                            className="AiPlannerView-WelcomeSavedAction"
+                            onClick={() => handleSendMessage(SAVED_PLACES_PLANNING_QUESTION)}
+                          >
+                            이 장소들로 일정 짜기 →
+                          </button>
                         </div>
-                      )}
-
-                      {message.options !== undefined && (
-                        <div className="AiPlannerView-ChoiceRow">
-                          {message.options.map((option) => (
-                            <button
-                              key={option}
-                              className={`AiPlannerView-ChoiceButton${message.selectedOption === option ? ' AiPlannerView-ChoiceButton--selected' : ''}`}
-                              onClick={() => handleSendMessage(option)}
-                              disabled={message.selectedOption !== undefined || isAiTyping}
-                            >
-                              {option}
-                            </button>
+                        <ul className="AiPlannerView-WelcomeSavedList">
+                          {savedPlaces.map((place) => (
+                            <li key={place.id} className="AiPlannerView-WelcomeSavedItem">
+                              <span className="AiPlannerView-WelcomeSavedName">📍 {place.name}</span>
+                              <span className="AiPlannerView-WelcomeSavedFrom">{place.savedFrom}에서</span>
+                              <button
+                                className="AiPlannerView-WelcomeSavedRemove"
+                                onClick={() => savedPlacesStore.remove(place.id)}
+                                aria-label={`${place.name} 빼기`}
+                              >
+                                ×
+                              </button>
+                            </li>
                           ))}
-                        </div>
-                      )}
+                        </ul>
+                      </section>
+                    )}
+
+                    <div className="AiPlannerView-WelcomeGrid">
+                      {WELCOME_SUGGESTIONS.map((suggestion) => (
+                        <button
+                          key={suggestion.question}
+                          className="AiPlannerView-WelcomeCard"
+                          onClick={() => handleSendMessage(suggestion.question)}
+                        >
+                          <span className="AiPlannerView-WelcomeCardTitle">{suggestion.title}</span>
+                          <span className="AiPlannerView-WelcomeCardQuestion">“{suggestion.question}”</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 ) : (
-                  <div key={message.id} className="AiPlannerView-UserMessage">
-                    <p className="AiPlannerView-UserBubble">{message.text}</p>
+                  messages.map((message) =>
+                    message.sender === 'ai' ? (
+                      <div key={message.id} className="AiPlannerView-AiMessage">
+                        <span className="AiPlannerView-AiAvatar" aria-hidden="true">AI</span>
+                        <div className="AiPlannerView-AiContent">
+                          <p className="AiPlannerView-AiText">{message.text}</p>
+
+                          {message.places !== undefined && (
+                            <div className="AiPlannerView-PlaceList">
+                              {message.places.map((place) => {
+                                const isSaved = savedPlaces.some((saved) => saved.id === place.id);
+                                return (
+                                  <article key={place.id} className="AiPlannerView-PlaceCard">
+                                    <span className="AiPlannerView-PlaceCategory">{place.category}</span>
+                                    <h3 className="AiPlannerView-PlaceName">{place.name}</h3>
+                                    {place.stationName !== undefined && place.stationName !== place.name && (
+                                      <p className="AiPlannerView-PlaceStation">가까운 역 · {place.stationName}</p>
+                                    )}
+                                    <p className="AiPlannerView-PlaceDescription">{place.description}</p>
+                                    {place.notice !== undefined && (
+                                      <p className="AiPlannerView-PlaceNotice">{place.notice}</p>
+                                    )}
+                                    {place.source !== undefined && (
+                                      <p className="AiPlannerView-PlaceSource">출처: {place.source}</p>
+                                    )}
+                                    <button
+                                      className={`AiPlannerView-PlaceButton${isSaved ? ' AiPlannerView-PlaceButton--saved' : ''}`}
+                                      onClick={() => handleTogglePlace(place)}
+                                      aria-pressed={isSaved}
+                                    >
+                                      {isSaved ? '✓ 여행에 담음' : '여행에 담기'}
+                                    </button>
+                                  </article>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {message.options !== undefined && (
+                            <div className="AiPlannerView-ChoiceRow">
+                              {message.options.map((option) => (
+                                <button
+                                  key={option}
+                                  className={`AiPlannerView-ChoiceButton${message.selectedOption === option ? ' AiPlannerView-ChoiceButton--selected' : ''}`}
+                                  onClick={() => handleSendMessage(option)}
+                                  disabled={message.selectedOption !== undefined || isAiTyping}
+                                >
+                                  {option}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div key={message.id} className="AiPlannerView-UserMessage">
+                        <p className="AiPlannerView-UserBubble">{message.text}</p>
+                      </div>
+                    )
+                  )
+                )}
+
+                {isAiTyping && (
+                  <div className="AiPlannerView-AiMessage">
+                    <span className="AiPlannerView-AiAvatar" aria-hidden="true">AI</span>
+                    <p className="AiPlannerView-Typing" aria-label="AI가 답변을 입력하는 중">
+                      <span />
+                      <span />
+                      <span />
+                    </p>
                   </div>
-                )
-              )
-            )}
-
-            {isAiTyping && (
-              <div className="AiPlannerView-AiMessage">
-                <span className="AiPlannerView-AiAvatar" aria-hidden="true">AI</span>
-                <p className="AiPlannerView-Typing" aria-label="AI가 답변을 입력하는 중">
-                  <span />
-                  <span />
-                  <span />
-                </p>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-
-        <div className="AiPlannerView-Footer">
-          {/* 여행 계획 바 — 챗봇 안의 여행 짜기 기능 현황 */}
-          {isPlanTrayVisible && (
-            <div className="AiPlannerView-PlanTray" aria-label="여행 계획 현황">
-              <div className="AiPlannerView-PlanTrayInfo">
-                <span className="AiPlannerView-PlanTrayTitle">
-                  여행 계획 {filledConditionCount}/{PLANNER_QUESTIONS.length}
-                </span>
-                <div className="AiPlannerView-PlanChips">
-                  {PLANNER_QUESTIONS.map((question) => {
-                    const value = conditions[question.key];
-                    return (
-                      <span
-                        key={question.key}
-                        className={`AiPlannerView-PlanChip${value !== undefined ? ' AiPlannerView-PlanChip--filled' : ''}`}
-                        title={question.label}
-                      >
-                        {value ?? question.label}
-                      </span>
-                    );
-                  })}
-                  {savedPlaces.map((place) => (
-                    <button
-                      key={place.id}
-                      className="AiPlannerView-PlanChip AiPlannerView-PlanChip--place"
-                      onClick={() => handleTogglePlace(place)}
-                      aria-label={`${place.name} 빼기`}
-                    >
-                      📍 {place.name} ×
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <button className="AiPlannerView-PlanCreateButton" onClick={onCreateItinerary} disabled={!isPlanComplete}>
-                일정 만들기 →
-              </button>
             </div>
-          )}
 
-          <form className="AiPlannerView-InputBar" onSubmit={handleSubmit}>
-            <textarea
-              ref={inputRef}
-              className="AiPlannerView-Input"
-              rows={1}
-              value={inputText}
-              onChange={(event) => setInputText(event.target.value)}
-              onKeyDown={handleInputKeyDown}
-              placeholder="역, 가볼 곳, 여행 일정을 자유롭게 물어보세요"
-              aria-label="메시지 입력"
-            />
-            <button
-              type="submit"
-              className="AiPlannerView-SendButton"
-              disabled={inputText.trim() === '' || isAiTyping}
-              aria-label="보내기"
-            >
-              ↑
-            </button>
-          </form>
-          <p className="AiPlannerView-Disclaimer">AI 답변은 틀릴 수 있어요. 운행 시간과 장소 정보는 출발 전에 꼭 확인하세요.</p>
-        </div>
-      </section>
+            <div className="AiPlannerView-Footer">
+              {/* 여행 계획 바 — 챗봇 안의 여행 짜기 기능 현황 */}
+              {isPlanTrayVisible && (
+                <div className="AiPlannerView-PlanTray" aria-label="여행 계획 현황">
+                  <div className="AiPlannerView-PlanTrayInfo">
+                    <span className="AiPlannerView-PlanTrayTitle">
+                      여행 계획 {filledConditionCount}/{PLANNER_QUESTIONS.length}
+                    </span>
+                    <div className="AiPlannerView-PlanChips">
+                      {PLANNER_QUESTIONS.map((question) => {
+                        const value = conditions[question.key];
+                        return (
+                          <span
+                            key={question.key}
+                            className={`AiPlannerView-PlanChip${value !== undefined ? ' AiPlannerView-PlanChip--filled' : ''}`}
+                            title={question.label}
+                          >
+                            {value ?? question.label}
+                          </span>
+                        );
+                      })}
+                      {savedPlaces.map((place) => (
+                        <button
+                          key={place.id}
+                          className="AiPlannerView-PlanChip AiPlannerView-PlanChip--place"
+                          onClick={() => handleTogglePlace(place)}
+                          aria-label={`${place.name} 빼기`}
+                        >
+                          📍 {place.name} ×
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <button className="AiPlannerView-PlanCreateButton" onClick={onCreateItinerary} disabled={!isPlanComplete}>
+                    일정 만들기 →
+                  </button>
+                </div>
+              )}
+
+              <form className="AiPlannerView-InputBar" onSubmit={handleSubmit}>
+                <textarea
+                  ref={inputRef}
+                  className="AiPlannerView-Input"
+                  rows={1}
+                  value={inputText}
+                  onChange={(event) => setInputText(event.target.value)}
+                  onKeyDown={handleInputKeyDown}
+                  placeholder="역, 가볼 곳, 여행 일정을 자유롭게 물어보세요"
+                  aria-label="메시지 입력"
+                />
+                <button
+                  type="submit"
+                  className="AiPlannerView-SendButton"
+                  disabled={inputText.trim() === '' || isAiTyping}
+                  aria-label="보내기"
+                >
+                  ↑
+                </button>
+              </form>
+              <p className="AiPlannerView-Disclaimer">AI 답변은 틀릴 수 있어요. 운행 시간과 장소 정보는 출발 전에 꼭 확인하세요.</p>
+            </div>
+          </div>
+        </section>
+      </LoginGate>
     </div>
   );
 }
