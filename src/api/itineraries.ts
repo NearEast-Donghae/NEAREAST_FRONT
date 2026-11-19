@@ -8,6 +8,10 @@ import type { NewSavedTrip, SavedTrip, SavedTripSource, SavedTripTimelineRow } f
 // ── 백엔드 (/itineraries) ──
 
 interface BackendItinerary {
+  revision?: number;
+  travelDate?: string | null;
+  planningRequestId?: string | null;
+  legs?: import('../types/neareast').TripLeg[];
   id: string;
   source: SavedTripSource;
   title: string;
@@ -16,12 +20,16 @@ interface BackendItinerary {
   stations?: string[];
   trains?: string[];
   activities?: string[];
-  timeline?: { time: string; icon?: string | null; description: string }[];
+  timeline?: (SavedTripTimelineRow & { icon: string })[];
   createdAt: string;
 }
 
 function toSavedTrip(itinerary: BackendItinerary): SavedTrip {
   return {
+    revision: itinerary.revision,
+    travelDate: itinerary.travelDate,
+    planningRequestId: itinerary.planningRequestId,
+    legs: itinerary.legs ?? [],
     id: itinerary.id,
     source: itinerary.source,
     title: itinerary.title,
@@ -31,7 +39,7 @@ function toSavedTrip(itinerary: BackendItinerary): SavedTrip {
     trains: itinerary.trains ?? [],
     activities: itinerary.activities ?? [],
     timeline: (itinerary.timeline ?? []).map(
-      (row): SavedTripTimelineRow => ({ time: row.time, icon: row.icon ?? '', description: row.description })
+      (row): SavedTripTimelineRow => ({ ...row, icon: row.icon ?? '' })
     ),
     createdAt: itinerary.createdAt,
   };
@@ -69,6 +77,13 @@ export async function getItineraries(): Promise<SavedTrip[]> {
     return (await apiClient.get<BackendItinerary[]>('/itineraries?limit=100')).map(toSavedTrip);
   }
   return readAll().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export async function getItinerary(itineraryId: string): Promise<SavedTrip> {
+  if (!IS_MOCK_AUTH) return toSavedTrip(await apiClient.get<BackendItinerary>(`/itineraries/${encodeURIComponent(itineraryId)}`));
+  const trip = readAll().find((entry) => entry.id === itineraryId);
+  if (!trip) throw new Error('저장된 일정을 찾지 못했어요.');
+  return trip;
 }
 
 export async function createItinerary(body: NewSavedTrip): Promise<SavedTrip> {

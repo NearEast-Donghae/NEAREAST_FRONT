@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MyTripsView from '../components/myTrips/MyTripsView';
 import { deleteItinerary, getItineraries } from '../api/itineraries';
 import type { SavedTrip } from '../types/neareast';
 import type { MainNavTab } from '../components/main/MapView';
+import { useAuthUser } from '../hooks/useAuthUser';
 
 interface MyTripsPageProps {
   onNavigate: (tab: MainNavTab) => void;
@@ -13,9 +14,15 @@ const MyTripsPage: React.FC<MyTripsPageProps> = ({ onNavigate }) => {
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  const deleteBusy = useRef(false);
+  const user = useAuthUser();
 
   useEffect(() => {
     let isCancelled = false;
+    setTrips([]); setLoadError(null); setIsLoading(true);
+    if (!user) { setIsLoading(false); return; }
     getItineraries()
       .then((loadedTrips) => {
         if (isCancelled) return;
@@ -33,17 +40,21 @@ const MyTripsPage: React.FC<MyTripsPageProps> = ({ onNavigate }) => {
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [attempt, user?.email]);
 
   const handleDeleteTrip = async (tripId: string) => {
+    if (deleteBusy.current) return;
     const trip = trips.find((item) => item.id === tripId);
     if (!window.confirm(`'${trip?.title ?? '이 여행'}'을(를) 삭제할까요?`)) return;
 
+    deleteBusy.current = true; setDeleting(true);
     try {
       await deleteItinerary(tripId);
     } catch {
       alert('삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
       return;
+    } finally {
+      deleteBusy.current = false; setDeleting(false);
     }
     const remainingTrips = trips.filter((item) => item.id !== tripId);
     setTrips(remainingTrips);
@@ -60,6 +71,8 @@ const MyTripsPage: React.FC<MyTripsPageProps> = ({ onNavigate }) => {
       onDeleteTrip={handleDeleteTrip}
       onStartPlanning={() => onNavigate('여행 계획하기')}
       onStartAiPlanner={() => onNavigate('AI 여행 플래너')}
+      onRetry={() => setAttempt((value) => value + 1)}
+      deleting={deleting}
     />
   );
 };

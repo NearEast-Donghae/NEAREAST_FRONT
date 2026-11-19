@@ -8,10 +8,13 @@ interface SavedPlacesCardProps {
   trains: SavedTrain[];
   onRemovePlace: (placeId: string) => void;
   onRemoveTrain: (trainId: string) => void;
+  onViewPlace?: (placeId: string) => void;
+  onViewTrain?: (train: SavedTrain) => void;
+  pending?: boolean;
 }
 
 // 다른 화면(AI 여행 플래너, 열차 정보)에서 여행 후보로 담아둔 장소와 열차를 계획하기 화면에 보여준다
-const SavedPlacesCard: React.FC<SavedPlacesCardProps> = ({ places, trains, onRemovePlace, onRemoveTrain }) => {
+const SavedPlacesCard: React.FC<SavedPlacesCardProps> = ({ places, trains, onRemovePlace, onRemoveTrain, onViewPlace, onViewTrain, pending = false }) => {
   const isEmpty = places.length === 0 && trains.length === 0;
 
   return (
@@ -22,7 +25,7 @@ const SavedPlacesCard: React.FC<SavedPlacesCardProps> = ({ places, trains, onRem
       </div>
 
       {!isEmpty && (
-        <p className="SavedPlacesCard__autoNote">여행 계획하기의 역·열차 선택에 자동으로 들어가요.</p>
+        <p className="SavedPlacesCard__autoNote">담은 장소는 여행 계획하기에서 방문 가능 여부를 확인하고 선택할 수 있어요. 열차는 현재 관심 목록에서 별도로 관리해요.</p>
       )}
 
       {isEmpty && (
@@ -39,7 +42,7 @@ const SavedPlacesCard: React.FC<SavedPlacesCardProps> = ({ places, trains, onRem
               <li key={place.id} className="SavedPlacesCard__item">
                 <span className="SavedPlacesCard__dot" aria-hidden="true" />
                 <div className="SavedPlacesCard__text">
-                  <span className="SavedPlacesCard__name">{place.name}</span>
+                  {onViewPlace ? <button className="SavedPlacesCard__detail" onClick={() => onViewPlace(place.id)}>{place.name} →</button> : <span className="SavedPlacesCard__name">{place.name}</span>}
                   <span className="SavedPlacesCard__meta">
                     {place.stationName !== undefined && place.stationName !== place.name
                       ? `${place.stationName} 근처 · `
@@ -50,6 +53,7 @@ const SavedPlacesCard: React.FC<SavedPlacesCardProps> = ({ places, trains, onRem
                 <button
                   className="SavedPlacesCard__remove"
                   onClick={() => onRemovePlace(place.id)}
+                  disabled={pending}
                   aria-label={`${place.name} 빼기`}
                 >
                   ×
@@ -70,12 +74,14 @@ const SavedPlacesCard: React.FC<SavedPlacesCardProps> = ({ places, trains, onRem
                   {TRAIN_PURPOSE_LABELS[train.purpose]}
                 </span>
                 <div className="SavedPlacesCard__text">
-                  <span className="SavedPlacesCard__name">{train.trainName}</span>
+                  {onViewTrain ? <button className="SavedPlacesCard__detail" onClick={() => onViewTrain(train)}>{train.trainName} →</button> : <span className="SavedPlacesCard__name">{train.trainName}</span>}
                   <span className="SavedPlacesCard__meta">{train.route}</span>
+                  {train.stationName && <span className="SavedPlacesCard__meta">{train.stationName}에서 {TRAIN_PURPOSE_LABELS[train.purpose]}</span>}
                 </div>
                 <button
                   className="SavedPlacesCard__remove"
                   onClick={() => onRemoveTrain(train.id)}
+                  disabled={pending}
                   aria-label={`${train.trainName} 빼기`}
                 >
                   ×

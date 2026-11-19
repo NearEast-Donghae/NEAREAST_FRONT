@@ -1,6 +1,7 @@
 import React from 'react';
 import type { SavedTrip, SavedTripSource } from '../../types/neareast';
 import './MyTripsView.css';
+import TripRoute from '../planning/TripRoute';
 
 interface MyTripsViewProps {
   trips: SavedTrip[];
@@ -11,6 +12,8 @@ interface MyTripsViewProps {
   onDeleteTrip: (tripId: string) => void;
   onStartPlanning: () => void;
   onStartAiPlanner: () => void;
+  onRetry?: () => void;
+  deleting?: boolean;
 }
 
 const SOURCE_LABELS: Record<SavedTripSource, string> = {
@@ -37,6 +40,8 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
   onDeleteTrip,
   onStartPlanning,
   onStartAiPlanner,
+  onRetry,
+  deleting = false,
 }) => {
   const selectedTrip = trips.find((trip) => trip.id === selectedTripId) ?? null;
 
@@ -54,6 +59,7 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
       {!isLoading && loadError !== null && (
         <p className="MyTripsView-Status motion-toast" role="alert">
           {loadError}
+          {onRetry && <button onClick={onRetry}>다시 불러오기</button>}
         </p>
       )}
 
@@ -61,7 +67,7 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
         <section className="MyTripsView-Empty">
           <p className="MyTripsView-EmptyTitle">아직 저장한 여행이 없어요.</p>
           <p className="MyTripsView-EmptyText">
-            여행 계획하기나 AI 여행 플래너에서 일정을 만들고 ‘여행 계획 저장’을 눌러 보세요.
+            여행 계획하기나 AI 여행 플래너에서 일정을 만들면 여기에 저장돼요.
           </p>
           <div className="MyTripsView-EmptyActions">
             <button className="MyTripsView-Button MyTripsView-Button--primary" onClick={onStartPlanning}>
@@ -111,8 +117,9 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
                 <button
                   className="MyTripsView-Button MyTripsView-Button--danger"
                   onClick={() => onDeleteTrip(selectedTrip.id)}
+                  disabled={deleting}
                 >
-                  삭제
+                  {deleting ? '삭제 중…' : '삭제'}
                 </button>
               </div>
 
@@ -145,6 +152,7 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
                   ))}
                 </ol>
               )}
+              <TripRoute trip={selectedTrip} />
             </article>
           )}
         </div>
