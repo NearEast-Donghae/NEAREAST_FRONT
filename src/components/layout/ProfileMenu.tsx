@@ -23,6 +23,8 @@ const MENU_EXIT_MS = 200;
 // 헤더 오른쪽 프로필 동그라미 — 누르면 아래로 작은 메뉴가 펼쳐진다
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, isMyPageActive = false }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
   // 닫을 때 나가는 애니메이션(Ease in)이 끝날 때까지 메뉴를 남겨 둔다
   const [isClosing, setIsClosing] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
@@ -103,8 +105,11 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, isMyPageActive = false 
   };
 
   const handleSignOut = async () => {
-    closeMenu();
-    await signOut();
+    if (signingOut) return;
+    setSigningOut(true); setSignOutError(null);
+    try { await signOut(); closeMenu(); }
+    catch { setSignOutError('로그아웃하지 못했어요. 연결 상태를 확인하고 다시 시도해 주세요.'); }
+    finally { setSigningOut(false); }
   };
 
   return (
@@ -148,9 +153,10 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user, isMyPageActive = false 
 
             <div className="ProfileMenu-Divider" role="separator" />
 
-            <button className="ProfileMenu-Item" role="menuitem" onClick={handleSignOut}>
-              로그아웃
+            <button className="ProfileMenu-Item" role="menuitem" onClick={handleSignOut} disabled={signingOut}>
+              {signingOut ? '로그아웃 중…' : '로그아웃'}
             </button>
+            {signOutError && <p role="alert">{signOutError}</p>}
           </div>,
           document.body
         )}

@@ -27,11 +27,8 @@ export const changePassword = (request: ChangePasswordRequest): Promise<void> =>
 export const deleteAccount = (): Promise<void> =>
   IS_MOCK_AUTH ? mockDeleteAccount(requireUser().email) : apiClient.delete<void>('/users/me');
 
-// 헤더와 마이페이지가 같이 쓰는 로그아웃 — 서버 로그아웃이 실패해도 이 브라우저에서는 로그아웃 상태로 만든다
+// HttpOnly 쿠키를 서버가 해제한 뒤 화면의 인증 상태도 지운다.
 export async function signOut(): Promise<void> {
-  try {
-    await logout();
-  } finally {
-    authStore.setUser(null);
-  }
+  await logout();
+  authStore.setUser(null);
 }

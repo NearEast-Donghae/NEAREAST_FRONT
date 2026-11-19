@@ -10,8 +10,7 @@ interface LoginGateProps {
   children: ReactNode;
 }
 
-// 로그인해야 쓸 수 있는 화면을 감싼다 — 로그인 전이면 내용을 흐리게 막고 로그인 안내를 띄운다.
-// 헤더는 감싸지 않아서 다른 탭으로는 자유롭게 이동할 수 있다.
+// 다른 계정으로 전환하면 보호된 화면의 입력·결과 상태도 새로 만든다.
 const LoginGate: React.FC<LoginGateProps> = ({ serviceName, returnTo, children }) => {
   const user = useAuthUser();
   const isLocked = user === null;
@@ -38,11 +37,12 @@ const LoginGate: React.FC<LoginGateProps> = ({ serviceName, returnTo, children }
   return (
     <>
       <div
+        key={user?.id ?? user?.email ?? 'anonymous'}
         ref={contentRef}
         className={isLocked ? 'LoginGate-Content LoginGate-Content--locked' : 'LoginGate-Content'}
         aria-hidden={isLocked ? true : undefined}
       >
-        {children}
+        {!isLocked && children}
       </div>
 
       {isLocked && (

@@ -17,7 +17,7 @@ interface BackendAuthResponse {
 
 function toAuthUser(response: BackendAuthResponse): AuthUser {
   setCsrfToken(response.csrfToken);
-  return { email: response.user.email, nickname: response.user.nickname };
+  return { id: response.user.id, email: response.user.email, nickname: response.user.nickname };
 }
 
 export const signup = async (request: SignupRequest): Promise<AuthUser> =>
@@ -28,11 +28,8 @@ export const login = async (request: LoginRequest): Promise<AuthUser> =>
 
 export const logout = async (): Promise<void> => {
   if (USE_MOCK_AUTH) return;
-  try {
-    await apiClient.post<void>('/auth/logout');
-  } finally {
-    setCsrfToken(null);
-  }
+  await apiClient.post<void>('/auth/logout');
+  setCsrfToken(null);
 };
 
 // 새로고침 뒤 로그인 상태 되살리기 — 쿠키가 살아 있으면 사용자와 새 CSRF 토큰을 받는다.
@@ -46,6 +43,6 @@ export async function restoreSession(): Promise<AuthUser | null | undefined> {
       setCsrfToken(null);
       return null;
     }
-    throw error; // 서버가 꺼져 있는 등 — 화면에 남은 로그인 표시는 건드리지 않는다
+    throw error;
   }
 }
