@@ -1,0 +1,63 @@
+/* 헤더 오른쪽 끝 — 헤더가 flex라 margin-left: auto로 밀어낸다 */
+.HeaderActions {
+  margin-left: auto;
+  align-self: center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.HeaderActions-LoginButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border: 1px solid #333;
+  border-radius: 100px;
+  background-color: #333;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.HeaderActions-LoginButton:hover {
+  background-color: #444;
+}
+
+.HeaderActions-LoginButton--active,
+.HeaderActions-LoginButton--active:hover {
+  background-color: #4a6070;
+  border-color: #4a6070;
+}
+
+.HeaderActions-User {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Noto Sans KR', sans-serif;
+  white-space: nowrap;
+}
+
+.HeaderActions-Nickname {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.HeaderActions-LogoutButton {
+  padding: 6px 12px;
+  border: 1px solid #d6d6d6;
+  border-radius: 100px;
+  background: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #575757;
+  cursor: pointer;
+}
+
+.HeaderActions-LogoutButton:hover {
+  background-color: #f5f5f5;
+}

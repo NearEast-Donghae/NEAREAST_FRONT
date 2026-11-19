@@ -1,0 +1,135 @@
+import React, { useState } from 'react';
+import AuthField from './AuthField';
+import { ROUTES } from '../../routes';
+import type { SignupRequest } from '../../types/neareast';
+import './AuthView.css';
+
+interface SignupViewProps {
+  isDemoMode: boolean;
+  // 실패하면 화면에 보여줄 문구를 던진다
+  onSignup: (request: SignupRequest) => Promise<void>;
+}
+
+interface SignupErrors {
+  email?: string;
+  nickname?: string;
+  password?: string;
+  passwordConfirm?: string;
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+
+function validateSignup(email: string, nickname: string, password: string, passwordConfirm: string): SignupErrors {
+  const errors: SignupErrors = {};
+  if (!EMAIL_PATTERN.test(email.trim())) errors.email = '이메일 형식을 확인해 주세요.';
+
+  const trimmedNickname = nickname.trim();
+  if (trimmedNickname.length < 2 || trimmedNickname.length > 12) errors.nickname = '닉네임은 2~12자로 입력해 주세요.';
+
+  if (password.length < MIN_PASSWORD_LENGTH || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+    errors.password = `영문과 숫자를 섞어 ${MIN_PASSWORD_LENGTH}자 이상 입력해 주세요.`;
+  }
+  if (passwordConfirm !== password) errors.passwordConfirm = '비밀번호가 서로 달라요.';
+  return errors;
+}
+
+const SignupView: React.FC<SignupViewProps> = ({ isDemoMode, onSignup }) => {
+  const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<SignupErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const errors = validateSignup(email, nickname, password, passwordConfirm);
+    setFieldErrors(errors);
+    setFormError(null);
+    if (Object.keys(errors).length > 0) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSignup({ email: email.trim(), nickname: nickname.trim(), password });
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : '가입하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="AuthView">
+      <div className="AuthView-Card">
+        <h1 className="AuthView-Title">회원가입</h1>
+        <p className="AuthView-Subtitle">가입하면 여행 일정을 저장하고 언제든 다시 볼 수 있어요.</p>
+
+        {isDemoMode && (
+          <p className="AuthView-DemoNotice">
+            데모 모드예요. 이메일과 닉네임만 이 브라우저에 기억하고, 비밀번호는 저장하지 않아요.
+          </p>
+        )}
+
+        <form className="AuthView-Form" onSubmit={handleSubmit} noValidate>
+          <AuthField
+            id="signup-email"
+            label="이메일"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            autoComplete="email"
+            placeholder="you@example.com"
+            error={fieldErrors.email}
+          />
+          <AuthField
+            id="signup-nickname"
+            label="닉네임"
+            type="text"
+            value={nickname}
+            onChange={setNickname}
+            autoComplete="nickname"
+            hint="2~12자, 헤더에 ‘OOO님’으로 보여요."
+            error={fieldErrors.nickname}
+          />
+          <AuthField
+            id="signup-password"
+            label="비밀번호"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+            hint={`영문과 숫자를 섞어 ${MIN_PASSWORD_LENGTH}자 이상`}
+            error={fieldErrors.password}
+          />
+          <AuthField
+            id="signup-password-confirm"
+            label="비밀번호 확인"
+            type="password"
+            value={passwordConfirm}
+            onChange={setPasswordConfirm}
+            autoComplete="new-password"
+            error={fieldErrors.passwordConfirm}
+          />
+
+          {formError !== null && (
+            <p className="AuthView-FormError" role="alert">
+              {formError}
+            </p>
+          )}
+
+          <button type="submit" className="AuthView-SubmitButton" disabled={isSubmitting}>
+            {isSubmitting ? '가입하는 중…' : '가입하기'}
+          </button>
+        </form>
+
+        <p className="AuthView-Switch">
+          이미 회원이신가요? <a href={ROUTES.login}>로그인</a>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default SignupView;

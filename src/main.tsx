@@ -2,10 +2,12 @@ import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import MainPage from './pages/MainPage';
 import PlanningPage from './pages/PlanningPage';
-import MyTripsPage from './pages/MyTripsPage';
+import MyPage from './pages/MyPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import AppHeader from './components/layout/AppHeader';
 import type { MainNavTab } from './components/main/MapView';
-import { ROUTES, navigateTo } from './routes';
+import { LEGACY_MY_TRIPS_HASH, ROUTES, navigateTo } from './routes';
 import './index.css';
 
 // 스크롤바가 생기고 사라질 때도 폭이 바뀌므로 resize 이벤트 대신 ResizeObserver 사용
@@ -31,7 +33,7 @@ function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // 메인 뷰 밖(계획하기·나의 여행 일정)의 헤더에서 탭을 눌렀을 때
+  // 메인 뷰 밖(계획하기·마이페이지·로그인)의 헤더에서 탭을 눌렀을 때
   const handleNavigate = (tab: MainNavTab) => {
     if (tab === '여행 계획하기') {
       navigateTo(ROUTES.planning);
@@ -50,11 +52,20 @@ function App() {
     );
   }
 
-  if (hash === ROUTES.myTrips) {
+  if (hash === ROUTES.login || hash === ROUTES.signup) {
     return (
       <>
-        <AppHeader isMyTripsActive onNavigate={handleNavigate} />
-        <MyTripsPage onNavigate={handleNavigate} />
+        <AppHeader isAuthPageActive onNavigate={handleNavigate} />
+        {hash === ROUTES.login ? <LoginPage /> : <SignupPage />}
+      </>
+    );
+  }
+
+  if (hash === ROUTES.myPage || hash === ROUTES.myPageSaved || hash === LEGACY_MY_TRIPS_HASH) {
+    return (
+      <>
+        <AppHeader isMyPageActive onNavigate={handleNavigate} />
+        <MyPage activeTab={hash === ROUTES.myPageSaved ? 'saved' : 'trips'} onNavigate={handleNavigate} />
       </>
     );
   }
