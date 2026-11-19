@@ -226,3 +226,10 @@
 .MyPageView-Notice {
   animation: motion-fade-in var(--motion-short) var(--ease-out) both;
 }
+
+/* 서버가 아직 지원하지 않는 기능 자리 */
+.MyPageView-ComingSoon {
+  margin: 0;
+  font-size: 13px;
+  color: #aaa;
+}

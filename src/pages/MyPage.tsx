@@ -1,7 +1,7 @@
 import React from 'react';
 import MyPageView from '../components/myPage/MyPageView';
 import { IS_MOCK_AUTH } from '../api/auth';
-import { changePassword, deleteAccount, signOut, updateProfile } from '../api/account';
+import { IS_ACCOUNT_EDIT_SUPPORTED, changePassword, deleteAccount, signOut, updateProfile } from '../api/account';
 import { ApiError } from '../api/client';
 import { authStore } from '../store/auth';
 import { useAuthUser } from '../hooks/useAuthUser';
@@ -56,6 +56,7 @@ const MyPage: React.FC = () => {
     <MyPageView
       user={user}
       isDemoMode={IS_MOCK_AUTH}
+      isAccountEditSupported={IS_ACCOUNT_EDIT_SUPPORTED}
       onUpdateNickname={handleUpdateNickname}
       onChangePassword={handleChangePassword}
       onLogout={handleLogout}

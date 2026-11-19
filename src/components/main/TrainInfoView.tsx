@@ -50,10 +50,13 @@ export default function TrainInfoView({
     arrivalStation: '묵호역',
   });
   const [results] = useState<TrainResult[]>(EXAMPLE_RESULTS);
+  // 검색할 때마다 결과 목록을 새로 그려서, 카드가 다시 차례로 나타나게 한다
+  const [searchCount, setSearchCount] = useState(0);
 
   function handleSearch(event: React.FormEvent) {
     event.preventDefault();
     // 실제 구현에서는 API 호출
+    setSearchCount((count) => count + 1);
   }
 
   function handleFieldChange(field: keyof TrainSearchParams, value: string) {
@@ -80,10 +83,10 @@ export default function TrainInfoView({
       </header>
 
       {/* 본문 */}
-      <main className="TrainInfoView-Main">
+      <main className="TrainInfoView-Main motion-stagger">
 
         {/* 검색 제목 */}
-        <div className="TrainInfoView-TitleBlock">
+        <div className="TrainInfoView-TitleBlock motion-stagger">
           <h1 className="TrainInfoView-Title">열차 정보</h1>
           <p className="TrainInfoView-Subtitle">날짜와 구간을 선택해 운행하는 열차를 찾아보세요.</p>
         </div>
@@ -126,13 +129,17 @@ export default function TrainInfoView({
         </form>
 
         {/* 검색 결과 */}
-        <div className="TrainInfoView-Results">
+        <div key={searchCount} className="TrainInfoView-Results">
           <div className="TrainInfoView-ResultsHeader">
             <span className="TrainInfoView-ResultCount">검색 결과 {results.length}건</span>
             <span className="TrainInfoView-ResultNote">예시 시간표</span>
           </div>
-          {results.map((result) => (
-            <div key={result.id} className="TrainInfoView-ResultCard">
+          {results.map((result, index) => (
+            <div
+              key={result.id}
+              className="TrainInfoView-ResultCard"
+              style={{ '--card-index': index } as React.CSSProperties}
+            >
               <div className="TrainInfoView-ResultInfo">
                 <span className="TrainInfoView-TrainName">{result.trainName}</span>
                 <span className="TrainInfoView-TrainRoute">{result.route}</span>

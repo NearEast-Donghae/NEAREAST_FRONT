@@ -10,6 +10,8 @@ interface MyPageViewProps {
   // 로그인 전에도 흐림 처리된 채로 그려지므로 null일 수 있다
   user: AuthUser | null;
   isDemoMode: boolean;
+  // 닉네임·비밀번호 변경, 탈퇴를 서버가 지원하는지 — 아니면 '준비 중'으로 막아 둔다
+  isAccountEditSupported: boolean;
   // 실패하면 화면에 보여줄 문구를 던진다
   onUpdateNickname: (nickname: string) => Promise<void>;
   onChangePassword: (request: ChangePasswordRequest) => Promise<void>;
@@ -21,7 +23,11 @@ const errorMessageOf = (error: unknown, fallback: string) => (error instanceof E
 
 // ── 내 정보 ──
 
-const ProfileSection: React.FC<Pick<MyPageViewProps, 'user' | 'onUpdateNickname'>> = ({ user, onUpdateNickname }) => {
+const ProfileSection: React.FC<Pick<MyPageViewProps, 'user' | 'isAccountEditSupported' | 'onUpdateNickname'>> = ({
+  user,
+  isAccountEditSupported,
+  onUpdateNickname,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | undefined>();
@@ -99,9 +105,13 @@ const ProfileSection: React.FC<Pick<MyPageViewProps, 'user' | 'onUpdateNickname'
             ) : (
               <div className="MyPageView-ValueWithAction">
                 <span>{user?.nickname ?? '-'}</span>
-                <button className="MyPageView-TextButton" onClick={handleStartEdit} disabled={user === null}>
-                  수정
-                </button>
+                {isAccountEditSupported ? (
+                  <button className="MyPageView-TextButton" onClick={handleStartEdit} disabled={user === null}>
+                    수정
+                  </button>
+                ) : (
+                  <span className="MyPageView-ComingSoon">수정은 준비 중이에요</span>
+                )}
               </div>
             )}
           </dd>
@@ -125,8 +135,9 @@ interface PasswordErrors {
   newPasswordConfirm?: string;
 }
 
-const PasswordSection: React.FC<Pick<MyPageViewProps, 'isDemoMode' | 'onChangePassword'>> = ({
+const PasswordSection: React.FC<Pick<MyPageViewProps, 'isDemoMode' | 'isAccountEditSupported' | 'onChangePassword'>> = ({
   isDemoMode,
+  isAccountEditSupported,
   onChangePassword,
 }) => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -174,6 +185,9 @@ const PasswordSection: React.FC<Pick<MyPageViewProps, 'isDemoMode' | 'onChangePa
         </p>
       )}
 
+      {!isAccountEditSupported ? (
+        <p className="MyPageView-ComingSoon">비밀번호 변경은 준비 중이에요.</p>
+      ) : (
       <form className="MyPageView-Form" onSubmit={handleSubmit} noValidate>
         <AuthField
           id="mypage-current-password"
@@ -219,13 +233,15 @@ const PasswordSection: React.FC<Pick<MyPageViewProps, 'isDemoMode' | 'onChangePa
           <LoadingLabel isLoading={isSubmitting} loadingText="바꾸는 중…">비밀번호 변경</LoadingLabel>
         </button>
       </form>
+      )}
     </section>
   );
 };
 
 // ── 계정 ──
 
-const AccountSection: React.FC<Pick<MyPageViewProps, 'onLogout' | 'onDeleteAccount'>> = ({
+const AccountSection: React.FC<Pick<MyPageViewProps, 'isAccountEditSupported' | 'onLogout' | 'onDeleteAccount'>> = ({
+  isAccountEditSupported,
   onLogout,
   onDeleteAccount,
 }) => {
@@ -263,9 +279,13 @@ const AccountSection: React.FC<Pick<MyPageViewProps, 'onLogout' | 'onDeleteAccou
           <p className="MyPageView-AccountLabel">회원 탈퇴</p>
           <p className="MyPageView-AccountText">계정을 삭제해요. 탈퇴하면 되돌릴 수 없어요.</p>
         </div>
-        <button className="MyPageView-Button MyPageView-Button--danger" onClick={handleDelete} disabled={isDeleting}>
-          <LoadingLabel isLoading={isDeleting} loadingText="탈퇴하는 중…">회원 탈퇴</LoadingLabel>
-        </button>
+        {isAccountEditSupported ? (
+          <button className="MyPageView-Button MyPageView-Button--danger" onClick={handleDelete} disabled={isDeleting}>
+            <LoadingLabel isLoading={isDeleting} loadingText="탈퇴하는 중…">회원 탈퇴</LoadingLabel>
+          </button>
+        ) : (
+          <span className="MyPageView-ComingSoon">준비 중이에요</span>
+        )}
       </div>
 
       {error !== null && (
@@ -284,9 +304,21 @@ const MyPageView: React.FC<MyPageViewProps> = (props) => {
     <div className="MyPageView motion-stagger">
       <h1 className="MyPageView-Title">마이페이지</h1>
       <div className="MyPageView-Sections">
-        <ProfileSection user={props.user} onUpdateNickname={props.onUpdateNickname} />
-        <PasswordSection isDemoMode={props.isDemoMode} onChangePassword={props.onChangePassword} />
-        <AccountSection onLogout={props.onLogout} onDeleteAccount={props.onDeleteAccount} />
+        <ProfileSection
+          user={props.user}
+          isAccountEditSupported={props.isAccountEditSupported}
+          onUpdateNickname={props.onUpdateNickname}
+        />
+        <PasswordSection
+          isDemoMode={props.isDemoMode}
+          isAccountEditSupported={props.isAccountEditSupported}
+          onChangePassword={props.onChangePassword}
+        />
+        <AccountSection
+          isAccountEditSupported={props.isAccountEditSupported}
+          onLogout={props.onLogout}
+          onDeleteAccount={props.onDeleteAccount}
+        />
       </div>
     </div>
   );

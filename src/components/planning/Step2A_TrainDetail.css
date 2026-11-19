@@ -146,23 +146,23 @@
 
 .Step2A_TrainDetail__routeMap {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start; /* 역 이름이 두 줄이 돼도 원은 모두 같은 높이에 */
   gap: 0;
   overflow-x: auto;
   padding: 12px 0;
   position: relative;
 }
 
-/* 역 사이 선 */
-.Step2A_TrainDetail__routeMap::before {
+/* 역 사이 선 — 각 역의 원 가운데에서 다음 역의 원 가운데까지 (역 칸 너비가 모두 같아서 100%) */
+.Step2A_TrainDetail__routeStop:not(:last-child)::after {
   content: '';
   position: absolute;
-  left: 24px;
-  right: 24px;
-  top: 50%;
+  top: 6px; /* 원(14px) 가운데 7px - 선 두께 절반 1px */
+  left: 50%;
+  width: 100%;
   height: 2px;
   background: #d7d7d7;
-  z-index: 0;
+  z-index: -1;
 }
 
 .Step2A_TrainDetail__routeStop {
@@ -181,6 +181,8 @@
   height: 14px;
   border-radius: 50%;
   border: 2px solid #333;
+  box-sizing: border-box; /* 테두리까지 14px — 역 사이 선(top: 6px)이 원 한가운데를 지나게 */
+  flex-shrink: 0;
 }
 
 .Step2A_TrainDetail__stopDot--stop {
@@ -216,4 +218,13 @@
 
 .Step2A_TrainDetail__panel {
   animation: motion-scale-in var(--motion-medium) var(--ease-out) both;
+}
+
+/* 닫힐 때: 배경이 걷히고(Fade out) 창이 100% → 90% (Ease in) */
+.Step2A_TrainDetail__overlay[data-state='closing'] {
+  animation: motion-fade-out var(--motion-short) var(--ease-in) both;
+}
+
+.Step2A_TrainDetail__overlay[data-state='closing'] .Step2A_TrainDetail__panel {
+  animation: motion-scale-out var(--motion-short) var(--ease-in) both;
 }

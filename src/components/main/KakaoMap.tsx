@@ -161,6 +161,7 @@ const KakaoMap: React.FC<KakaoMapProps> = ({ onStationClick }) => {
     }
 
     let isCancelled = false;
+    let resizeObserver: ResizeObserver | null = null;
 
     loadKakaoSdk(appKey)
       .then(async () => {
@@ -186,8 +187,17 @@ const KakaoMap: React.FC<KakaoMapProps> = ({ onStationClick }) => {
         const fullViewLevel = map.getLevel();
         // 동해시 서비스라 동해시 전체가 보이는 배율보다 더 축소하지는 않는다
         map.setMaxLevel(fullViewLevel);
-        // 동해시는 세로로 길어서 전체를 넣으면 지도 좌우가 빈다 — 한 단계 더 확대해 좌우를 채우고 위아래는 끌어서 보게 한다.
-        map.setLevel(fullViewLevel - 1);
+        // 동해시는 세로로 길어서 전체를 넣으면 지도 좌우가 빈다 — 처음 화면은 동해시가 좌우를 꽉 채우는 배율로 열고, 위아래는 끌어서 보게 한다.
+        // 지도 높이는 화면에 따라 바뀌지만 폭(1260px)은 같아서, 폭 기준으로 정해야 어느 화면에서나 같은 배율로 열린다
+        const donghaeLngSpan = boundaryBounds.getNorthEast().getLng() - boundaryBounds.getSouthWest().getLng();
+        const visibleLngSpan = () => map.getBounds().getNorthEast().getLng() - map.getBounds().getSouthWest().getLng();
+        let initialLevel = fullViewLevel;
+        for (let level = fullViewLevel - 1; level >= MIN_ZOOM_LEVEL; level -= 1) {
+          map.setLevel(level);
+          if (visibleLngSpan() < donghaeLngSpan) break; // 더 확대하면 동해시 좌우가 잘린다
+          initialLevel = level;
+        }
+        map.setLevel(initialLevel);
         map.setCenter(new maps.LatLng(INITIAL_CENTER.lat, INITIAL_CENTER.lng));
 
         const southWest = boundaryBounds.getSouthWest();
@@ -208,6 +218,11 @@ const KakaoMap: React.FC<KakaoMapProps> = ({ onStationClick }) => {
         };
 
         mapRef.current = map;
+
+        // 지도 영역은 화면 높이에 맞춰 크기가 바뀌는데, 카카오 지도는 스스로 알아채지 못해서 직접 다시 그리게 한다.
+        // (알려진 한계: 창 크기를 바꾸면 중심이 처음 위치에서 조금 밀릴 수 있다 — 처음 열 때는 정확하다)
+        resizeObserver = new ResizeObserver(() => map.relayout());
+        resizeObserver.observe(containerRef.current);
         setZoomLimits({ min: MIN_ZOOM_LEVEL, max: fullViewLevel });
 
         // 가장 축소했을 때는 가까운 역 이름이 겹쳐서, 화물역·폐역은 점만 보이게 한다 (CSS가 처리)
@@ -257,6 +272,7 @@ const KakaoMap: React.FC<KakaoMapProps> = ({ onStationClick }) => {
 
     return () => {
       isCancelled = true;
+      resizeObserver?.disconnect();
     };
   }, []);
 

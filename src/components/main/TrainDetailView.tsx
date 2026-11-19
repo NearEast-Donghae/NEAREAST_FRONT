@@ -60,7 +60,7 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
       </header>
 
       {/* 본문 */}
-      <main className="TrainDetailView-Main">
+      <main className="TrainDetailView-Main motion-stagger">
         {/* 뒤로가기 + 타이틀 */}
         <div className="TrainDetailView-TitleRow">
           <button className="TrainDetailView-BackButton" onClick={onBack}>
@@ -68,7 +68,7 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
           </button>
         </div>
 
-        <div className="TrainDetailView-TitleBlock">
+        <div className="TrainDetailView-TitleBlock motion-stagger">
           <h1 className="TrainDetailView-Title">{trainName}</h1>
           <p className="TrainDetailView-Subtitle">{route}</p>
           <span className="TrainDetailView-OperationDays">{operationDays}</span>
@@ -81,6 +81,8 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
           <div className="TrainDetailView-StopsTable">
             {/* 테이블 헤더 */}
             <div className="TrainDetailView-TableHeader">
+              {/* 첫 칸은 행의 정차·통과 아이콘 자리 — 비워 둬야 머리글이 아래 칸과 맞는다 */}
+              <span aria-hidden="true" />
               <span className="TrainDetailView-ColStation">역명</span>
               <span className="TrainDetailView-ColType">구분</span>
               <span className="TrainDetailView-ColArrival">도착</span>
@@ -92,6 +94,7 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
               <div
                 key={`${stop.stationName}-${index}`}
                 className={`TrainDetailView-StopRow${!stop.isStop ? ' TrainDetailView-StopRow--pass' : ''}`}
+                style={{ '--row-index': index } as React.CSSProperties}
               >
                 {/* 역 연결선 */}
                 <div className="TrainDetailView-StopLine">
@@ -138,7 +141,8 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
               {savedPurpose === 'watch' ? '✓ 관찰할 열차로 담음' : '관찰할 열차로 담기'}
             </button>
           </div>
-          <p className="TrainDetailView-SaveHint" role="status">
+          {/* 안내 문구가 바뀔 때 토스트처럼 살짝 Fade in */}
+          <p key={savedPurpose ?? 'none'} className="TrainDetailView-SaveHint motion-toast" role="status">
             {savedPurpose === null
               ? '직접 탈 열차인지, 지나가는 모습을 볼 열차인지 골라 여행에 담아 두세요.'
               : '담은 열차는 ‘여행 계획하기’에서 확인할 수 있어요. 한 번 더 누르면 빠져요.'}

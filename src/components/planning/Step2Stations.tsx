@@ -20,8 +20,6 @@ const ALL_STATIONS: StationItem[] = [
   { name: '태백역',    status: '운영역' },
 ];
 
-type ActiveTab = 'stations' | 'trains';
-
 interface Step2StationsProps {
   selectedStations: string[];
   selectedTrains: string[];
@@ -41,7 +39,6 @@ const Step2Stations = ({
   onNextToTrains,
   savedStationNames = [],
 }: Step2StationsProps) => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('stations');
   const [searchQuery, setSearchQuery] = useState('');
 
   // 담아둔 역이 고정 목록에 없으면(예: 추암역) 맨 위에 붙여서 체크된 채로 보이게 한다
@@ -82,17 +79,12 @@ const Step2Stations = ({
       {/* 역/열차 선택 영역 */}
       <div className="Step2Stations__selectionArea">
         {/* 탭 */}
+        {/* 탭 — 이 화면은 '방문할 역'이고, '방문할 열차'를 누르면 열차 고르기 단계(2.1)로 넘어간다 */}
         <div className="Step2Stations__tabs">
-          <button
-            className={`Step2Stations__tab ${activeTab === 'stations' ? 'Step2Stations__tab--active' : ''}`}
-            onClick={() => setActiveTab('stations')}
-          >
+          <button className="Step2Stations__tab Step2Stations__tab--active" aria-current="page">
             방문할 역 ({selectedStations.length})
           </button>
-          <button
-            className={`Step2Stations__tab ${activeTab === 'trains' ? 'Step2Stations__tab--active' : ''}`}
-            onClick={() => setActiveTab('trains')}
-          >
+          <button className="Step2Stations__tab" onClick={onNextToTrains}>
             방문할 열차 ({selectedTrains.length})
           </button>
         </div>

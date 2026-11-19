@@ -1,4 +1,8 @@
+import { useCallback, useEffect, useState } from 'react';
 import './Step2A_TrainDetail.css';
+
+// 나가는 애니메이션 길이 — Step2A_TrainDetail.css의 퇴장 애니메이션(var(--motion-short))과 같게
+const POPUP_EXIT_MS = 200;
 
 interface RouteStop {
   stationName: string;
@@ -35,11 +39,42 @@ const Step2A_TrainDetail = ({
     return mins === 0 ? `${hours}시간` : `${hours}시간 ${mins}분`;
   };
 
+  // 닫을 때 나가는 애니메이션(Ease in)을 보여준 뒤 실제로 닫는다 — 철도 지도의 역 팝업과 같은 방식
+  const [isClosing, setIsClosing] = useState(false);
+
+  const requestClose = useCallback(() => {
+    if (isClosing) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      onBack();
+      return;
+    }
+    setIsClosing(true);
+    window.setTimeout(onBack, POPUP_EXIT_MS);
+  }, [isClosing, onBack]);
+
+  // Esc로도 닫는다
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') requestClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [requestClose]);
+
   return (
-    <div className="Step2A_TrainDetail__overlay" role="dialog" aria-modal="true">
+    // 팝업 바깥(어두운 영역)을 누르면 닫힌다 — 팝업 안을 누른 건 무시
+    <div
+      className="Step2A_TrainDetail__overlay"
+      role="dialog"
+      aria-modal="true"
+      data-state={isClosing ? 'closing' : 'open'}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) requestClose();
+      }}
+    >
       <div className="Step2A_TrainDetail__panel">
         {/* 뒤로가기 헤더 */}
-        <button className="Step2A_TrainDetail__backButton" onClick={onBack}>
+        <button className="Step2A_TrainDetail__backButton" onClick={requestClose}>
           〈&nbsp; 열차 상세정보
         </button>
 

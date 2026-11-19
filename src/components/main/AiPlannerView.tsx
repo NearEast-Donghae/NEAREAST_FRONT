@@ -3,18 +3,21 @@ import { MainNavTab } from './MapView';
 import HeaderActions from '../layout/HeaderActions';
 import LoginGate from '../layout/LoginGate';
 import { ROUTES } from '../../routes';
-import { sendChatMessage } from '../../api/chat';
+import {
+  ConversationSummary,
+  IS_SERVER_CHAT,
+  deleteConversation,
+  listConversations,
+  loadConversation,
+  saveLocalConversationSnapshot,
+  sendConversationMessage,
+} from '../../api/conversations';
 import { CREATE_ITINERARY_OPTION, PLANNER_QUESTIONS } from '../../data/plannerQuestions';
 import { useSavedPlaces } from '../../hooks/useSavedPlaces';
 import { savedPlacesStore } from '../../store/savedPlaces';
 import { useAuthUser } from '../../hooks/useAuthUser';
-import {
-  createConversationTitle,
-  formatConversationDate,
-  loadConversations,
-  saveConversations,
-} from '../../store/chatHistory';
-import type { ChatConversation, ChatMessage, ChatPlace, ChatRequest, PlanConditions } from '../../types/neareast';
+import { formatConversationDate } from '../../store/chatHistory';
+import type { ChatMessage, ChatPlace, ChatRequest, PlanConditions } from '../../types/neareast';
 import './AiPlannerView.css';
 
 const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
@@ -54,48 +57,36 @@ export default function AiPlannerView({
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [inputText, setInputText] = useState('');
 
-  // 대화 목록 — 로그인한 계정별로 저장된다 (로그인 전에는 화면이 잠겨 있어 빈 목록)
+  // 대화 목록 — 백엔드 연결 시 서버에, 데모 모드면 브라우저에 계정별로 저장된다 (api/conversations.ts)
   const user = useAuthUser();
   const userEmail = user?.email ?? null;
-  const [conversations, setConversations] = useState<ChatConversation[]>(() =>
-    userEmail === null ? [] : loadConversations(userEmail)
-  );
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   // 지금 화면의 대화 — 첫 메시지를 보내기 전(새 대화)에는 목록에 없어서 null
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
-  // 다른 계정으로 로그인하면 그 계정의 목록으로 바꾸고 새 대화로 시작한다
+  const refreshConversations = (email: string) => {
+    listConversations(email)
+      .then(setConversations)
+      .catch(() => {
+        // 목록을 못 받아도 대화는 할 수 있게 둔다
+      });
+  };
+
+  // 로그인한 계정의 목록을 불러오고, 계정이 바뀌면 새 대화로 시작한다
   useEffect(() => {
-    setConversations(userEmail === null ? [] : loadConversations(userEmail));
     setActiveConversationId(null);
+    if (userEmail === null) {
+      setConversations([]);
+      return;
+    }
+    refreshConversations(userEmail);
   }, [userEmail]);
 
-  // 메시지가 오갈 때마다 지금 대화를 목록 맨 위에 저장한다
+  // 데모 모드에서는 메시지가 오갈 때마다 지금 대화를 브라우저에 저장한다 (백엔드는 서버가 직접 저장)
   useEffect(() => {
-    if (userEmail === null || activeConversationId === null || messages.length === 0) return;
-    setConversations((previous) => {
-      const existing = previous.find((conversation) => conversation.id === activeConversationId);
-      // 목록에서 대화를 열기만 한 경우는 내용이 같으니, 최신순 위치가 바뀌지 않게 저장하지 않는다
-      const isUnchanged =
-        existing !== undefined &&
-        existing.messages.length === messages.length &&
-        existing.messages[existing.messages.length - 1]?.id === messages[messages.length - 1]?.id &&
-        JSON.stringify(existing.conditions) === JSON.stringify(conditions);
-      if (isUnchanged) return previous;
-
-      const now = new Date().toISOString();
-      const firstQuestion = messages.find((message) => message.sender === 'user')?.text ?? '새 대화';
-      const updated: ChatConversation = {
-        id: activeConversationId,
-        title: existing?.title ?? createConversationTitle(firstQuestion),
-        messages,
-        conditions,
-        createdAt: existing?.createdAt ?? now,
-        updatedAt: now,
-      };
-      const next = [updated, ...previous.filter((conversation) => conversation.id !== activeConversationId)];
-      saveConversations(userEmail, next);
-      return next;
-    });
+    if (userEmail === null || activeConversationId === null) return;
+    const next = saveLocalConversationSnapshot(userEmail, activeConversationId, messages, conditions);
+    if (next !== null) setConversations(next);
   }, [messages, conditions, activeConversationId, userEmail]);
 
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -142,16 +133,29 @@ export default function AiPlannerView({
     };
     const conversationId = conversationIdRef.current;
 
-    // 새 대화의 첫 메시지면 목록에 넣을 id를 만든다 (저장은 메시지가 바뀌면 효과(useEffect)가 한다)
-    if (activeConversationId === null) setActiveConversationId(createId('chat'));
+    // 데모 모드에서 새 대화의 첫 메시지면 바로 목록 id를 정해, 답을 기다리는 동안에도 질문이 저장되게 한다.
+    // 백엔드는 대화방을 서버가 만들고 id를 돌려준다
+    let targetConversationId = activeConversationId;
+    if (targetConversationId === null && !IS_SERVER_CHAT) {
+      targetConversationId = createId('chat');
+      setActiveConversationId(targetConversationId);
+    }
 
     setInputText('');
     setMessages((previous) => [...lockQuickReplies(previous, userText), userMessage]);
     setIsAiTyping(true);
 
     try {
-      const response = await sendChatMessage(request);
+      const result = await sendConversationMessage({
+        conversationId: targetConversationId,
+        text: userText,
+        request,
+      });
       if (conversationId !== conversationIdRef.current) return;
+      const { response } = result;
+      setActiveConversationId(result.conversationId);
+      // 백엔드는 제목·최신순이 서버에서 바뀌므로 목록을 다시 받는다
+      if (IS_SERVER_CHAT && userEmail !== null) refreshConversations(userEmail);
 
       if (response.conditionUpdates !== undefined) {
         setConditions((previous) => ({ ...previous, ...response.conditionUpdates }));
@@ -163,9 +167,10 @@ export default function AiPlannerView({
           places: response.places?.length ? response.places : undefined,
         }),
       ]);
-    } catch {
+    } catch (error) {
       if (conversationId !== conversationIdRef.current) return;
-      setMessages((previous) => [...previous, createMessage('ai', '답변을 받지 못했어요. 잠시 후 다시 보내 주세요.')]);
+      const message = error instanceof Error ? error.message : '답변을 받지 못했어요. 잠시 후 다시 보내 주세요.';
+      setMessages((previous) => [...previous, createMessage('ai', message)]);
     } finally {
       if (conversationId === conversationIdRef.current) {
         setIsAiTyping(false);
@@ -198,21 +203,34 @@ export default function AiPlannerView({
   };
 
   // 지난 대화 열기 — 답변을 기다리는 중에는 목록 버튼이 막혀 있어서, 받던 답변이 다른 대화로 섞이지 않는다
-  const handleOpenConversation = (conversation: ChatConversation) => {
+  const handleOpenConversation = async (conversation: ConversationSummary) => {
+    if (userEmail === null) return;
     conversationIdRef.current += 1;
+    const openId = conversationIdRef.current;
     setActiveConversationId(conversation.id);
-    setMessages(conversation.messages);
-    setConditions(conversation.conditions);
     setIsAiTyping(false);
     setInputText('');
+    try {
+      const loaded = await loadConversation(userEmail, conversation.id);
+      if (openId !== conversationIdRef.current) return; // 그 사이 다른 대화를 열었다
+      setMessages(loaded.messages);
+      setConditions(loaded.conditions);
+    } catch {
+      if (openId !== conversationIdRef.current) return;
+      setMessages([createMessage('ai', '대화를 불러오지 못했어요. 잠시 후 다시 열어 주세요.')]);
+    }
   };
 
-  const handleDeleteConversation = (conversation: ChatConversation) => {
+  const handleDeleteConversation = async (conversation: ConversationSummary) => {
     if (userEmail === null) return;
     if (!window.confirm(`‘${conversation.title}’ 대화를 삭제할까요?`)) return;
-    const next = conversations.filter((item) => item.id !== conversation.id);
-    setConversations(next);
-    saveConversations(userEmail, next);
+    try {
+      await deleteConversation(userEmail, conversation.id);
+    } catch {
+      window.alert('대화를 삭제하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
+    setConversations((previous) => previous.filter((item) => item.id !== conversation.id));
     if (conversation.id === activeConversationId) handleNewConversation();
   };
 

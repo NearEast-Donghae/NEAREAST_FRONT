@@ -6,6 +6,7 @@ interface MyTripsViewProps {
   trips: SavedTrip[];
   selectedTripId: string | null;
   isLoading: boolean;
+  loadError?: string | null;
   onSelectTrip: (tripId: string) => void;
   onDeleteTrip: (tripId: string) => void;
   onStartPlanning: () => void;
@@ -31,6 +32,7 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
   trips,
   selectedTripId,
   isLoading,
+  loadError = null,
   onSelectTrip,
   onDeleteTrip,
   onStartPlanning,
@@ -49,7 +51,13 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
         </p>
       )}
 
-      {!isLoading && trips.length === 0 && (
+      {!isLoading && loadError !== null && (
+        <p className="MyTripsView-Status motion-toast" role="alert">
+          {loadError}
+        </p>
+      )}
+
+      {!isLoading && loadError === null && trips.length === 0 && (
         <section className="MyTripsView-Empty">
           <p className="MyTripsView-EmptyTitle">아직 저장한 여행이 없어요.</p>
           <p className="MyTripsView-EmptyText">

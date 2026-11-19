@@ -1,19 +1,51 @@
-import apiClient from './client';
+import apiClient, { ApiError, setCsrfToken } from './client';
 import { mockLogin, mockSignup } from './mockAuth';
 import type { AuthUser, LoginRequest, SignupRequest } from '../types/neareast';
 
-// 백엔드 인증 API가 준비되면 .env에 VITE_USE_MOCK_AUTH=false 를 넣는다. 형식: docs/auth-api.md
-// 그 전(값이 없을 때)에는 데모 인증을 쓴다.
+// .env에 VITE_USE_MOCK_AUTH=false 이면 백엔드(NEAREAST_BACK) 인증 API를 쓴다.
+// 값이 없거나 true면 백엔드 없이 데모 인증을 쓴다.
 const USE_MOCK_AUTH = import.meta.env.VITE_USE_MOCK_AUTH !== 'false';
 
 // 화면에서 '데모 모드' 안내를 보여줄지 정할 때 쓴다
 export const IS_MOCK_AUTH = USE_MOCK_AUTH;
 
-export const signup = (request: SignupRequest): Promise<AuthUser> =>
-  USE_MOCK_AUTH ? mockSignup(request) : apiClient.post<AuthUser>('/auth/signup', request);
+// 백엔드 응답 형식 (POST /auth/signup·/auth/login, GET /users/me)
+interface BackendAuthResponse {
+  user: { id: string; email: string; nickname: string; createdAt: string };
+  csrfToken: string;
+}
 
-export const login = (request: LoginRequest): Promise<AuthUser> =>
-  USE_MOCK_AUTH ? mockLogin(request) : apiClient.post<AuthUser>('/auth/login', request);
+function toAuthUser(response: BackendAuthResponse): AuthUser {
+  setCsrfToken(response.csrfToken);
+  return { email: response.user.email, nickname: response.user.nickname };
+}
 
-export const logout = (): Promise<void> =>
-  USE_MOCK_AUTH ? Promise.resolve() : apiClient.post<void>('/auth/logout', {});
+export const signup = async (request: SignupRequest): Promise<AuthUser> =>
+  USE_MOCK_AUTH ? mockSignup(request) : toAuthUser(await apiClient.post<BackendAuthResponse>('/auth/signup', request));
+
+export const login = async (request: LoginRequest): Promise<AuthUser> =>
+  USE_MOCK_AUTH ? mockLogin(request) : toAuthUser(await apiClient.post<BackendAuthResponse>('/auth/login', request));
+
+export const logout = async (): Promise<void> => {
+  if (USE_MOCK_AUTH) return;
+  try {
+    await apiClient.post<void>('/auth/logout');
+  } finally {
+    setCsrfToken(null);
+  }
+};
+
+// 새로고침 뒤 로그인 상태 되살리기 — 쿠키가 살아 있으면 사용자와 새 CSRF 토큰을 받는다.
+// 로그인돼 있지 않으면(401) null. 데모 인증은 브라우저에 저장된 사용자를 그대로 쓰므로 undefined(확인 안 함).
+export async function restoreSession(): Promise<AuthUser | null | undefined> {
+  if (USE_MOCK_AUTH) return undefined;
+  try {
+    return toAuthUser(await apiClient.get<BackendAuthResponse>('/users/me'));
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      setCsrfToken(null);
+      return null;
+    }
+    throw error; // 서버가 꺼져 있는 등 — 화면에 남은 로그인 표시는 건드리지 않는다
+  }
+}
