@@ -6,7 +6,7 @@
   position: relative;
   width: 1440px;
   margin: 0 auto;
-  min-height: 1024px;
+  min-height: 100vh; /* 지도 높이를 화면에 맞추므로 피그마 높이(1024px) 대신 화면 높이 */
   background-color: #ffffff;
   font-family: 'Noto Sans KR', sans-serif;
 }
@@ -64,7 +64,7 @@
 /* 검색바 */
 .MapView-SearchBar {
   position: absolute;
-  top: 202px;
+  top: 124px; /* 헤더(아래 끝 108px) 바로 아래 — 지도를 한 화면에 넣으려고 피그마(202px)보다 올림 */
   left: 312px;
   width: 800px;
   display: flex;
@@ -134,10 +134,12 @@
 /* 지도 영역 */
 .MapView-MapArea {
   position: absolute;
-  top: 300px;
+  top: 200px;
   left: 90px;
   width: 1260px;
-  height: 660px;
+  /* 스크롤 없이 한 화면에 — 화면 높이에서 위쪽(200px)과 아래 여백(24px)을 뺀 만큼. 너무 낮은 화면에서는 400px 유지 */
+  height: calc(100vh - 224px);
+  min-height: 400px;
   background-color: #d9d9d9;
   border-radius: 20px;
   display: flex;
