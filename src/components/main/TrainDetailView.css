@@ -299,3 +299,34 @@
 .TrainDetailView-SaveButton--saved {
   animation: motion-pop var(--motion-long) var(--ease-spring);
 }
+
+/* ==========================================
+   모션 (styles/motion.css 공통 규칙)
+   - 뒤로가기·타이틀·정차역 표·담기 버튼: motion-stagger로 차례로 등장
+   - 정차역 행: 위에서부터 한 줄씩 등장
+   - 버튼: 상태가 바뀔 때 색이 부드럽게
+   ========================================== */
+
+/* 끝 값을 적지 않아서, 애니메이션이 끝나면 행 원래 투명도(통과역 0.75)로 자연스럽게 돌아간다 */
+@keyframes TrainDetailView-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.TrainDetailView-StopRow {
+  animation: TrainDetailView-row-in var(--motion-medium) var(--ease-out) backwards;
+  /* 표(3번째 줄)가 나타난 뒤부터 한 줄씩 — 행이 많아도 전체가 0.6초 안에 끝나게 간격을 짧게 */
+  animation-delay: calc(var(--motion-stagger-step) * 3 + 0.04s * min(var(--row-index, 0), 8));
+}
+
+.TrainDetailView-BackButton {
+  transition: color var(--motion-short) var(--ease-out);
+}
+
+.TrainDetailView-SaveButton {
+  transition: background-color var(--motion-short) var(--ease-out),
+    border-color var(--motion-short) var(--ease-out),
+    color var(--motion-short) var(--ease-out);
+}

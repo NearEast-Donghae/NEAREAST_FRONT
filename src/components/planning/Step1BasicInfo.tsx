@@ -52,6 +52,7 @@ const Step1BasicInfo = ({ formData, onFormChange, onNext, savedPlaces, savedTrai
       currentStep={1}
       pageTitle="여행 기본 정보"
       pageSubtitle="날짜, 출발·귀환역, 시간을 정해주세요."
+      navigationClassName="Step1BasicInfo__navigation"
       navigationSlot={
         <button className="PlanningButton PlanningButton--primary" onClick={onNext}>
           다음 →
@@ -67,7 +68,6 @@ const Step1BasicInfo = ({ formData, onFormChange, onNext, savedPlaces, savedTrai
             <span className="PlanningField__selectValue">
               {formData.travelDate ? formatDateLabel(formData.travelDate) : '날짜 선택'}
             </span>
-            <span className="PlanningField__selectArrow">⌄</span>
             {/* 접근성을 위한 숨김 date input */}
             <input
               type="date"
@@ -94,7 +94,6 @@ const Step1BasicInfo = ({ formData, onFormChange, onNext, savedPlaces, savedTrai
                   <option key={station} value={station}>{station}</option>
                 ))}
               </select>
-              <span className="PlanningField__selectArrow">⌄</span>
             </div>
           </div>
 
@@ -111,7 +110,6 @@ const Step1BasicInfo = ({ formData, onFormChange, onNext, savedPlaces, savedTrai
                   <option key={station} value={station}>{station}</option>
                 ))}
               </select>
-              <span className="PlanningField__selectArrow">⌄</span>
             </div>
           </div>
         </div>
@@ -131,7 +129,6 @@ const Step1BasicInfo = ({ formData, onFormChange, onNext, savedPlaces, savedTrai
                   <option key={time} value={time}>{time}</option>
                 ))}
               </select>
-              <span className="PlanningField__selectArrow">⌄</span>
             </div>
           </div>
 
@@ -148,7 +145,6 @@ const Step1BasicInfo = ({ formData, onFormChange, onNext, savedPlaces, savedTrai
                   <option key={time} value={time}>{time}</option>
                 ))}
               </select>
-              <span className="PlanningField__selectArrow">⌄</span>
             </div>
           </div>
         </div>

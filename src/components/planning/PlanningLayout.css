@@ -114,6 +114,7 @@
   cursor: pointer;
   background: #fff;
   width: 100%;
+  box-sizing: border-box; /* 안쪽 여백·테두리까지 칸 너비 안에 — 없으면 옆 칸과의 간격을 덮어 버린다 */
   font-family: 'Noto Sans KR', sans-serif;
 }
 
@@ -128,7 +129,3 @@
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-.PlanningField__selectArrow {
-  font-size: 16px;
-  color: #737373;
-}
