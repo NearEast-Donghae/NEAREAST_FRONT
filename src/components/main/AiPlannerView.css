@@ -16,7 +16,7 @@
   position: absolute;
   top: 28px;
   left: calc(95px - var(--page-offset)); /* 캔버스는 가운데, 헤더는 화면 왼쪽 */
-  width: 1250px;
+  width: calc(1250px + 2 * var(--page-offset)); /* 화면 오른쪽 끝까지 — 나의 여행 일정 버튼 자리 */
   display: flex;
   align-items: center;
   gap: 55px;
@@ -71,173 +71,297 @@
   margin: 0;
 }
 
-/* AI 대화 블록 */
-.AiPlannerView-ChatBlock {
+/* 대화창 — 피그마의 대화 영역(left 85, 폭 850)과 하단 단계 탭 자리를 하나의 패널로 묶음 */
+.AiPlannerView-Chat {
   position: absolute;
-  left: 109px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: flex-start;
-  width: 374px;
-}
-
-.AiPlannerView-ChatBlock--date {
-  top: 207px;
-}
-
-.AiPlannerView-ChatBlock--duration {
-  top: 442px;
-}
-
-.AiPlannerView-ChatItem {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.AiPlannerView-AiAvatar {
-  width: 38px;
-  height: 38px;
-  background-color: #d9d9d9;
-  border-radius: 19px;
-  flex-shrink: 0;
-}
-
-.AiPlannerView-ChatBubble {
-  width: 308px;
-  height: 70px;
-  background: #ffffff;
-  border: 1px solid #e0eaf0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.AiPlannerView-ChatBubbleText {
-  font-size: 15px;
-  font-weight: 700;
-  color: #18232d;
-}
-
-/* 선택지 행 */
-.AiPlannerView-ChoiceRow {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.AiPlannerView-ChoiceButton {
-  height: 32px;
-  min-width: 80px;
-  padding: 0 12px;
-  background: #ffffff;
-  border: 1px solid #e0eaf0;
-  border-radius: 7px;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  color: #4a6070;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.AiPlannerView-ChoiceButton--selected {
-  background-color: #333;
-  border-color: #333;
-  color: #ffffff;
-  font-weight: 500;
-}
-
-/* 사용자 답변 */
-.AiPlannerView-UserReply {
-  position: absolute;
-  top: 360px;
-  left: 634px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.AiPlannerView-UserBubble {
-  width: 224px;
-  height: 34px;
-  background: #ffffff;
-  border: 1px solid #e0eaf0;
-  border-radius: 17px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.AiPlannerView-UserBubbleText {
-  font-size: 13px;
-  color: #18232d;
-}
-
-.AiPlannerView-UserAvatar {
-  width: 34px;
-  height: 34px;
-  background-color: #d9d9d9;
-  border-radius: 17px;
-  flex-shrink: 0;
-}
-
-/* 하단 구분선 */
-.AiPlannerView-Divider {
-  position: absolute;
-  top: 791px;
+  top: 177px;
   left: 85px;
   width: 850px;
-  height: 1px;
-  background-color: #e0eaf0;
+  height: 790px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-/* 하위 탭 */
-.AiPlannerView-StepTabs {
-  position: absolute;
-  top: 805px;
-  left: 166px;
+.AiPlannerView-ChatTop {
   display: flex;
-  gap: 128px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0eaf0;
+}
+
+/* 단계 탭 */
+.AiPlannerView-StepTabs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 28px;
   align-items: center;
 }
 
 .AiPlannerView-StepTab {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 
 .AiPlannerView-StepNumber {
-  position: relative;
   width: 22px;
   height: 22px;
-  background-color: #d9d9d9;
   border-radius: 11px;
+  background-color: #eef2f5;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.AiPlannerView-StepNumber span {
-  font-size: 10px;
-  color: #000;
+  font-size: 11px;
+  color: #707070;
 }
 
 .AiPlannerView-StepLabel {
-  font-size: 11px;
-  color: #000;
+  font-size: 13px;
+  color: #aaa;
   white-space: nowrap;
 }
 
+.AiPlannerView-StepTab--active .AiPlannerView-StepNumber {
+  background-color: #333;
+  color: #ffffff;
+}
+
 .AiPlannerView-StepTab--active .AiPlannerView-StepLabel {
-  font-weight: 500;
+  font-weight: 700;
   color: #18232d;
+}
+
+.AiPlannerView-StepTab--done .AiPlannerView-StepNumber {
+  background-color: #4a6070;
+  color: #ffffff;
+}
+
+.AiPlannerView-StepTab--done .AiPlannerView-StepLabel {
+  color: #4a6070;
+}
+
+.AiPlannerView-RestartButton {
+  height: 28px;
+  padding: 0 12px;
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  color: #4a6070;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.AiPlannerView-RestartButton:hover {
+  background-color: #f5f5f5;
+}
+
+/* 메시지 목록 */
+.AiPlannerView-MessageList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #f8fafb;
+}
+
+.AiPlannerView-AiMessage {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  max-width: 78%;
+  animation: AiPlannerView-MessageIn 0.2s ease-out;
+}
+
+.AiPlannerView-AiAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background-color: #333;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.AiPlannerView-AiContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.AiPlannerView-AiBubble {
+  margin: 0;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e0eaf0;
+  border-radius: 4px 14px 14px 14px; /* 꼬리 쪽(왼쪽 위)만 각지게 */
+  font-size: 15px;
+  line-height: 1.55;
+  color: #18232d;
+}
+
+.AiPlannerView-UserMessage {
+  display: flex;
+  justify-content: flex-end;
+  animation: AiPlannerView-MessageIn 0.2s ease-out;
+}
+
+.AiPlannerView-UserBubble {
+  margin: 0;
+  max-width: 70%;
+  padding: 12px 16px;
+  background-color: #333;
+  border-radius: 14px 4px 14px 14px; /* 꼬리 쪽(오른쪽 위)만 각지게 */
+  font-size: 15px;
+  line-height: 1.55;
+  color: #ffffff;
+}
+
+/* 빠른 답변 */
+.AiPlannerView-ChoiceRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.AiPlannerView-ChoiceButton {
+  height: 34px;
+  padding: 0 14px;
+  background: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 100px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.AiPlannerView-ChoiceButton:hover:not(:disabled) {
+  background-color: #eef2f5;
+  border-color: #4a6070;
+}
+
+.AiPlannerView-ChoiceButton:disabled {
+  cursor: default;
+  color: #aaa;
+  border-color: #e0eaf0;
+}
+
+.AiPlannerView-ChoiceButton--selected,
+.AiPlannerView-ChoiceButton--selected:disabled {
+  background-color: #333;
+  border-color: #333;
+  color: #ffffff;
+}
+
+/* 입력 중 표시 */
+.AiPlannerView-Typing {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  height: 24px;
+}
+
+.AiPlannerView-Typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #aaa;
+  animation: AiPlannerView-TypingDot 1s infinite ease-in-out;
+}
+
+.AiPlannerView-Typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.AiPlannerView-Typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes AiPlannerView-TypingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes AiPlannerView-MessageIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .AiPlannerView-AiMessage,
+  .AiPlannerView-UserMessage,
+  .AiPlannerView-Typing span {
+    animation: none;
+  }
+}
+
+/* 입력창 */
+.AiPlannerView-InputBar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 1px solid #e0eaf0;
+  background: #ffffff;
+}
+
+.AiPlannerView-Input {
+  flex: 1;
+  height: 46px;
+  padding: 0 18px;
+  background-color: #f5f5f5;
+  border: 1px solid transparent;
+  border-radius: 100px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+}
+
+.AiPlannerView-Input:focus {
+  border-color: #4a6070;
+  background-color: #ffffff;
+}
+
+.AiPlannerView-Input::placeholder {
+  color: #707070;
+}
+
+.AiPlannerView-SendButton {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: #333;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.AiPlannerView-SendButton:disabled {
+  background-color: #d6d6d6;
+  cursor: default;
 }
 
 /* 우측 사이드바 */
@@ -373,10 +497,15 @@
   margin-left: auto;
 }
 
-.AiPlannerView-ConditionDivider {
-  height: 1px;
-  background-color: #e0eaf0;
-  width: 100%;
+/* ul 안에 div 구분선을 둘 수 없어서 항목 아래 테두리로 대신한다 */
+.AiPlannerView-ConditionItem:not(:last-child) {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0eaf0;
+}
+
+.AiPlannerView-TagPlaceholder {
+  font-size: 12px;
+  color: #aaa;
 }
 
 /* 일정 만들기 버튼 */
@@ -393,6 +522,12 @@
   width: 400px;
 }
 
-.AiPlannerView-CreateButton:hover {
+.AiPlannerView-CreateButton:hover:not(:disabled) {
   background-color: #444;
+}
+
+.AiPlannerView-CreateButton:disabled {
+  background-color: #d6d6d6;
+  color: #707070;
+  cursor: default;
 }
