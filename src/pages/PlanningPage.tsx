@@ -273,7 +273,7 @@ const PlanningPage = () => {
       alert('여행 계획을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
       return;
     }
-    navigateTo(ROUTES.myPage);
+    navigateTo(ROUTES.myTrips);
   };
 
   // 최종 일정 아이템 변환

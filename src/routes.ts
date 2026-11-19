@@ -2,14 +2,15 @@
 export const ROUTES = {
   main: '',
   planning: '#/planning',
-  myPage: '#/mypage', // 마이페이지 — 기본 탭은 나의 여행 일정
-  myPageSaved: '#/mypage/saved', // 마이페이지 — 담아둔 장소·열차 탭
+  myTrips: '#/my-trips', // 헤더 '나의 여행 일정' 탭 — 저장한 여행 일정
+  myTripsSaved: '#/my-trips/saved', // 헤더 '나의 여행 일정' 탭 — 담아둔 장소·열차
+  myPage: '#/mypage', // 마이페이지 — 내 정보, 비밀번호 변경, 로그아웃, 탈퇴
   login: '#/login',
   signup: '#/signup',
 } as const;
 
-// 마이페이지가 생기기 전 '나의 여행 일정' 주소 — 북마크해 둔 사람도 마이페이지로 열리게 받아준다
-export const LEGACY_MY_TRIPS_HASH = '#/my-trips';
+// 한동안 '담아둔 장소·열차'가 마이페이지 안에 있었던 주소 — 북마크해 둔 사람도 열리게 받아준다
+export const LEGACY_MY_PAGE_SAVED_HASH = '#/mypage/saved';
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 

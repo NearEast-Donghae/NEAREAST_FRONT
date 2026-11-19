@@ -1,5 +1,5 @@
 /* ==========================================
-   MyPageView — 마이페이지
+   MyPageView — 마이페이지 (내 정보 · 비밀번호 변경 · 계정)
    ========================================== */
 
 .MyPageView {
@@ -15,21 +15,37 @@
 
 /* 페이지 제목 — 계획하기 페이지 제목과 같은 크기 */
 .MyPageView-Title {
-  margin: 0 0 24px;
+  margin: 0 0 28px;
   font-size: 34px;
   font-weight: 700;
 }
 
-/* 프로필 */
-.MyPageView-Profile {
-  width: 1250px;
-  box-sizing: border-box;
+.MyPageView-Sections {
+  width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.MyPageView-Card {
+  padding: 28px 32px;
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.MyPageView-CardTitle {
+  margin: 0 0 20px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* 내 정보 */
+.MyPageView-ProfileHead {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 22px 28px;
-  border-radius: 12px;
-  background-color: #f5f5f5;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .MyPageView-Avatar {
@@ -46,14 +62,9 @@
   color: #ffffff;
 }
 
-.MyPageView-ProfileText {
-  flex: 1;
-  min-width: 0;
-}
-
 .MyPageView-Nickname {
   margin: 0 0 4px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -63,58 +74,155 @@
   color: #575757;
 }
 
-.MyPageView-LoginLink {
-  flex-shrink: 0;
-  padding: 10px 22px;
-  border-radius: 8px;
-  background-color: #333;
+.MyPageView-InfoList {
+  margin: 0;
+  border-top: 1px solid #e0eaf0;
+}
+
+.MyPageView-InfoRow {
+  display: flex;
+  gap: 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e0eaf0;
   font-size: 15px;
-  font-weight: 700;
-  color: #ffffff;
-  text-decoration: none;
 }
 
-.MyPageView-LoginLink:hover {
-  background-color: #444;
+.MyPageView-InfoRow dt {
+  width: 80px;
+  flex-shrink: 0;
+  padding-top: 2px;
+  color: #707070;
 }
 
-/* 탭 — 계획하기 2단계 탭과 같은 밑줄 형태 */
-.MyPageView-Tabs {
-  width: 1250px;
+.MyPageView-InfoRow dd {
+  flex: 1;
+  margin: 0;
+}
+
+.MyPageView-ValueWithAction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.MyPageView-InlineForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.MyPageView-InlineActions {
   display: flex;
   gap: 8px;
-  margin: 32px 0 28px;
-  border-bottom: 1px solid #d6d6d6;
 }
 
-.MyPageView-Tab {
-  padding: 12px 20px;
-  margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
-  font-size: 17px;
-  color: #737373;
-  text-decoration: none;
+.MyPageView-Form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.MyPageView-Tab:hover {
-  color: #333;
-}
-
-.MyPageView-Tab--active {
-  border-bottom-color: #333;
+/* 버튼 */
+.MyPageView-Button {
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  background: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
   font-weight: 700;
   color: #333;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.MyPageView-Content {
-  width: 1250px;
+.MyPageView-Button:hover:not(:disabled) {
+  background-color: #f5f5f5;
 }
 
-/* 담아둔 장소·열차 탭 — 계획하기 옆 카드(275px)를 탭 내용 폭으로 넓혀 쓴다 */
-.MyPageView-Content .SavedPlacesCard {
-  width: auto;
-  max-width: 640px;
-  padding: 24px 26px;
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
+.MyPageView-Button:disabled {
+  color: #aaa;
+  cursor: default;
+}
+
+.MyPageView-Button--primary,
+.MyPageView-Button--primary:hover:not(:disabled) {
+  border-color: #333;
+  background-color: #333;
+  color: #ffffff;
+}
+
+.MyPageView-Button--primary:disabled {
+  border-color: #aaa;
+  background-color: #aaa;
+  color: #ffffff;
+}
+
+.MyPageView-Button--wide {
+  height: 50px;
+  font-size: 15px;
+}
+
+.MyPageView-Button--danger {
+  border-color: #e8b4ad;
+  color: #c0392b;
+}
+
+.MyPageView-Button--danger:hover:not(:disabled) {
+  background-color: #fdf1ef;
+}
+
+.MyPageView-TextButton {
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a6070;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.MyPageView-TextButton:disabled {
+  color: #aaa;
+  cursor: default;
+}
+
+.MyPageView-Notice {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: #eef2f5;
+  font-size: 13px;
+  color: #4a6070;
+}
+
+/* 계정 */
+.MyPageView-AccountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid #e0eaf0;
+}
+
+.MyPageView-AccountLabel {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.MyPageView-AccountText {
+  margin: 0;
+  font-size: 13px;
+  color: #707070;
+}
+
+/* ── 모션 (styles/motion.css 기준) ── */
+/* 토스트: 저장 완료 안내는 제자리에서 Fade in */
+.MyPageView-Notice {
+  animation: motion-fade-in var(--motion-short) var(--ease-out) both;
 }

@@ -3,7 +3,7 @@ import { MainNavTab } from './MapView';
 import HeaderActions from '../layout/HeaderActions';
 import './TrainInfoView.css';
 
-const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기'];
+const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
 
 // 열차 검색 결과 타입
 export interface TrainResult {

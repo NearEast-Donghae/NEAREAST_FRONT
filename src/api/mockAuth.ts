@@ -40,3 +40,24 @@ export async function mockLogin(request: LoginRequest): Promise<AuthUser> {
   }
   return user;
 }
+
+// ── 마이페이지 (데모) ──
+
+export async function mockUpdateProfile(email: string, nickname: string): Promise<AuthUser> {
+  await wait(MOCK_DELAY_MS);
+  const user: AuthUser = { email, nickname: nickname.trim() };
+  const users = readRegisteredUsers().map((registered) => (registered.email === email ? user : registered));
+  localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(users));
+  return user;
+}
+
+// 데모는 비밀번호를 저장하지 않아서 현재 비밀번호를 확인할 수 없다 — 형식 검사는 화면에서 하고 여기서는 성공만 돌려준다
+export async function mockChangePassword(): Promise<void> {
+  await wait(MOCK_DELAY_MS);
+}
+
+export async function mockDeleteAccount(email: string): Promise<void> {
+  await wait(MOCK_DELAY_MS);
+  const users = readRegisteredUsers().filter((registered) => registered.email !== email);
+  localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(users));
+}
