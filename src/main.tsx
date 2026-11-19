@@ -11,7 +11,18 @@ import LoginGate from './components/layout/LoginGate';
 import type { MainNavTab } from './components/main/MapView';
 import { LEGACY_MY_PAGE_SAVED_HASH, ROUTES, navigateTo } from './routes';
 import { returnToStore } from './store/returnTo';
+import { authStore } from './store/auth';
+import { IS_MOCK_AUTH, restoreSession } from './api/auth';
 import './index.css';
+
+// 백엔드 로그인 쿠키가 살아 있으면 사용자와 CSRF 토큰을 되살린다 (데모 인증이면 아무것도 하지 않음)
+restoreSession()
+  .then((user) => {
+    if (user !== undefined) authStore.setUser(user);
+  })
+  .catch(() => {
+    // 백엔드에 닿지 않으면 화면의 로그인 표시는 그대로 두고, 이후 요청에서 다시 확인한다
+  });
 
 // 스크롤바가 생기고 사라질 때도 폭이 바뀌므로 resize 이벤트 대신 ResizeObserver 사용
 new ResizeObserver(() => {
@@ -85,7 +96,14 @@ function App() {
     return (
       <>
         <AppHeader activeNav="나의 여행 일정" onNavigate={handleNavigate} />
-        <TripsPage activeTab={hash === ROUTES.myTrips ? 'trips' : 'saved'} onNavigate={handleNavigate} />
+        {IS_MOCK_AUTH ? (
+          <TripsPage activeTab={hash === ROUTES.myTrips ? 'trips' : 'saved'} onNavigate={handleNavigate} />
+        ) : (
+          // 백엔드에서는 저장한 여행이 계정에 묶여 있어서 로그인해야 볼 수 있다
+          <LoginGate serviceName="나의 여행 일정" returnTo={{ route: hash === ROUTES.myTrips ? ROUTES.myTrips : ROUTES.myTripsSaved }}>
+            <TripsPage activeTab={hash === ROUTES.myTrips ? 'trips' : 'saved'} onNavigate={handleNavigate} />
+          </LoginGate>
+        )}
       </>
     );
   }
