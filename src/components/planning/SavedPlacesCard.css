@@ -1,0 +1,137 @@
+/* 담아둔 장소 카드 — Step1 오른쪽 안내 카드와 같은 폭 */
+.SavedPlacesCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 275px; /* 안내 카드(Step1BasicInfo__guideCard)와 같은 계산 방식 — 안쪽 여백은 폭 밖에 더해짐 */
+}
+
+.SavedPlacesCard__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.SavedPlacesCard__title {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+}
+
+.SavedPlacesCard__count {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+}
+
+.SavedPlacesCard__empty {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #737373;
+}
+
+.SavedPlacesCard__autoNote {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #737373;
+}
+
+.SavedPlacesCard__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.SavedPlacesCard__groupLabel {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #737373;
+}
+
+/* 탑승 = 진한 배지, 관찰 = 테두리 배지 (열차 상세의 두 버튼 색과 맞춤) */
+.SavedPlacesCard__purpose {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.SavedPlacesCard__purpose--board {
+  background-color: #333;
+  color: #ffffff;
+}
+
+.SavedPlacesCard__purpose--watch {
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  color: #333;
+}
+
+.SavedPlacesCard__list {
+  list-style: none;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.SavedPlacesCard__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.SavedPlacesCard__dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #333;
+}
+
+.SavedPlacesCard__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.SavedPlacesCard__name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.SavedPlacesCard__meta {
+  font-size: 12px;
+  color: #737373;
+}
+
+.SavedPlacesCard__remove {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  font-size: 16px;
+  color: #737373;
+  cursor: pointer;
+}
+
+.SavedPlacesCard__remove:hover {
+  background-color: #e8e8e8;
+}

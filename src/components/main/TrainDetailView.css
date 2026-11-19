@@ -236,3 +236,61 @@
 .TrainDetailView-StopRow--pass .TrainDetailView-ColDeparture {
   color: #aaa;
 }
+
+/* 여행에 담기 버튼 — 정차역 표 아래 */
+.TrainDetailView-SaveSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 48px; /* 페이지 맨 아래에 붙지 않게 */
+}
+
+.TrainDetailView-SaveButtons {
+  display: flex;
+  gap: 16px;
+}
+
+.TrainDetailView-SaveButton {
+  flex: 1;
+  height: 54px;
+  border-radius: 8px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.TrainDetailView-SaveButton--board {
+  background-color: #333;
+  border: 1px solid #333;
+  color: #ffffff;
+}
+
+.TrainDetailView-SaveButton--board:hover {
+  background-color: #444;
+}
+
+.TrainDetailView-SaveButton--watch {
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  color: #333;
+}
+
+.TrainDetailView-SaveButton--watch:hover {
+  background-color: #f5f5f5;
+}
+
+/* 담은 상태 — 어느 버튼이든 진한 배경 + 체크로 통일해서 지금 담긴 용도가 한눈에 보이게 */
+.TrainDetailView-SaveButton--saved,
+.TrainDetailView-SaveButton--saved:hover {
+  background-color: #4a6070;
+  border-color: #4a6070;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.TrainDetailView-SaveHint {
+  margin: 0;
+  font-size: 13px;
+  color: #707070;
+}

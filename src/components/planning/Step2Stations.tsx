@@ -28,6 +28,8 @@ interface Step2StationsProps {
   onPrev: () => void;
   onNextToTrains: () => void;
   onNextToSchedule: () => void;
+  // 다른 화면에서 담아둔 장소의 역 — '담아둔' 배지를 붙이고, 목록에 없는 역이면 추가해서 보여준다
+  savedStationNames?: string[];
 }
 
 const Step2Stations = ({
@@ -36,11 +38,18 @@ const Step2Stations = ({
   onStationsChange,
   onPrev,
   onNextToTrains,
+  savedStationNames = [],
 }: Step2StationsProps) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('stations');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredStations = ALL_STATIONS.filter((station) =>
+  // 담아둔 역이 고정 목록에 없으면(예: 추암역) 맨 위에 붙여서 체크된 채로 보이게 한다
+  const extraSavedStations: StationItem[] = savedStationNames
+    .filter((name) => !ALL_STATIONS.some((station) => station.name === name))
+    .map((name) => ({ name, status: '운영역' }));
+  const stations = [...extraSavedStations, ...ALL_STATIONS];
+
+  const filteredStations = stations.filter((station) =>
     station.name.includes(searchQuery)
   );
 
@@ -113,6 +122,9 @@ const Step2Stations = ({
                     className="Step2Stations__checkbox"
                   />
                   <span className="Step2Stations__stationName">{station.name}</span>
+                  {savedStationNames.includes(station.name) && (
+                    <span className="Step2Stations__savedBadge">담아둔 장소</span>
+                  )}
                   <span className="Step2Stations__stationStatus">{station.status}</span>
                 </label>
               </li>

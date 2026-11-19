@@ -15,6 +15,9 @@ const ALL_TRAINS: TrainItem[] = [
   { id: 'ktx',         name: 'KTX' },
 ];
 
+// 담아둔 열차('무궁화호 1693')를 이 목록의 종류('무궁화호')로 맞출 때 쓴다
+export const PLANNING_TRAIN_TYPES = ALL_TRAINS.map((train) => train.name);
+
 interface Step2_1TrainsProps {
   selectedStations: string[];
   selectedTrains: string[];
@@ -22,6 +25,8 @@ interface Step2_1TrainsProps {
   onPrevToStations: () => void;
   onViewTrainDetail: (trainId: string) => void;
   onNext: () => void;
+  // 열차 정보에서 담아둔 열차 종류 — '담아둔' 배지를 붙인다
+  savedTrainTypes?: string[];
 }
 
 const Step2_1Trains = ({
@@ -31,6 +36,7 @@ const Step2_1Trains = ({
   onPrevToStations,
   onViewTrainDetail,
   onNext,
+  savedTrainTypes = [],
 }: Step2_1TrainsProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -104,6 +110,9 @@ const Step2_1Trains = ({
                     className="Step2_1Trains__checkbox"
                   />
                   <span className="Step2_1Trains__trainName">{train.name}</span>
+                  {savedTrainTypes.includes(train.name) && (
+                    <span className="Step2_1Trains__savedBadge">담아둔 열차</span>
+                  )}
                 </label>
                 <button
                   className="Step2_1Trains__detailLink"
