@@ -12,7 +12,7 @@ export interface Station {
 }
 
 // 열차 종류
-export type TrainType = 'KTX-이음' | '무궁화호' | 'ITX-마음' | '누리로';
+export type TrainType = 'KTX-이음' | '무궁화호' | 'ITX-마음' | 'ITX-새마을' | '새마을호' | '누리로';
 
 // 열차 정차 유형
 export type StopType = 'stop' | 'pass';
@@ -56,6 +56,7 @@ export type MessageSender = 'ai' | 'user';
 
 // 채팅 메시지
 export interface ChatMessage {
+  planningConditions?: import('../api/planning').PlanningConditions;
   id: string;
   sender: MessageSender;
   text: string;
@@ -86,6 +87,7 @@ export interface ChatRequest {
 }
 
 export interface ChatResponse {
+  planningConditions?: import('../api/planning').PlanningConditions;
   reply: string;
   places?: ChatPlace[];
   conditionUpdates?: PlanConditions; // 이번 대화로 새로 알게 된 여행 조건
@@ -138,12 +140,19 @@ export interface SelectedItems {
 export type SavedTripSource = 'planner' | 'ai';
 
 export interface SavedTripTimelineRow {
+  placeId?: string | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
   time: string;
   icon: string; // ▣ ◉ ⌂ ♧ ♨ 등 일정 화면과 같은 기호
   description: string;
 }
 
 export interface SavedTrip {
+  revision?: number;
+  travelDate?: string | null;
+  planningRequestId?: string | null;
+  legs?: TripLeg[];
   id: string;
   source: SavedTripSource;
   title: string;
@@ -160,6 +169,7 @@ export type NewSavedTrip = Omit<SavedTrip, 'id' | 'createdAt'>;
 
 // 여행 후보로 담아둔 장소 — 챗봇·지도 등에서 담고, 여행 계획하기에서 보여준다
 export interface SavedPlace extends ChatPlace {
+  savedId?: string;
   savedFrom: string; // 담은 화면 이름 (예: 'AI 여행 플래너')
   savedAt: string; // ISO 8601
 }
@@ -169,6 +179,11 @@ export type TrainPurpose = 'board' | 'watch';
 
 // 열차 상세에서 담아둔 열차
 export interface SavedTrain {
+  savedId?: string;
+  trainNo?: string;
+  stationId?: string;
+  stationName?: string;
+  available?: boolean;
   id: string;
   trainName: string;
   route: string;
@@ -179,8 +194,20 @@ export interface SavedTrain {
 
 // 로그인한 사용자 — 비밀번호는 프론트에 두지 않는다
 export interface AuthUser {
+  id?: string;
   email: string;
   nickname: string;
+}
+
+export interface TripLeg {
+  fromPlaceId: string;
+  toPlaceId: string;
+  mode: string;
+  durationMinutes: number | null;
+  distanceMeters: number | null;
+  coordinates: [number, number][];
+  certainty: string;
+  source?: string | null;
 }
 
 export interface LoginRequest {
