@@ -1,0 +1,9 @@
+/* 화면들은 피그마 1440px 캔버스 그대로라, 캔버스는 가운데 두고 헤더만 화면 왼쪽에 고정하기 위한 값.
+   --page-width는 main.tsx가 스크롤바를 뺀 실제 화면 폭으로 갱신한다 (100vw는 스크롤바를 포함해서 어긋남) */
+:root {
+  --page-offset: max(0px, calc((var(--page-width, 100vw) - 1440px) / 2));
+}
+
+body {
+  margin: 0;
+}
