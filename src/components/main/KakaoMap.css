@@ -20,3 +20,153 @@
   font-size: 15px;
   color: #737373;
 }
+
+/* ── 역 마커 (카카오 CustomOverlay 안에 들어가는 DOM) ── */
+
+/* 이름표 + 아래쪽 핀. 핀 끝이 역 위치를 가리킨다 (yAnchor: 1) */
+.KakaoMap-Station {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+}
+
+.KakaoMap-StationLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  background-color: #333;
+  box-shadow: 0 2px 6px rgba(24, 35, 45, 0.25);
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.KakaoMap-StationPin {
+  width: 2px;
+  height: 10px;
+  background-color: #333;
+}
+
+.KakaoMap-StationPin::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 8px 0 0 -3px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background-color: #333;
+  box-sizing: border-box;
+}
+
+.KakaoMap-Station:hover .KakaoMap-StationLabel,
+.KakaoMap-Station:focus-visible .KakaoMap-StationLabel {
+  background-color: #4a6070;
+}
+
+.KakaoMap-Station:focus-visible {
+  outline: none;
+}
+
+.KakaoMap-Station:focus-visible .KakaoMap-StationLabel {
+  box-shadow: 0 0 0 3px rgba(74, 96, 112, 0.4);
+}
+
+/* 화물역·폐역 — 기차를 탈 수 없으니 회색으로 작게 */
+.KakaoMap-Station--freight .KakaoMap-StationLabel,
+.KakaoMap-Station--closed .KakaoMap-StationLabel {
+  padding: 3px 8px;
+  border: 1px solid #d6d6d6;
+  background-color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #707070;
+}
+
+.KakaoMap-Station--freight .KakaoMap-StationPin,
+.KakaoMap-Station--closed .KakaoMap-StationPin,
+.KakaoMap-Station--freight .KakaoMap-StationPin::after,
+.KakaoMap-Station--closed .KakaoMap-StationPin::after {
+  background-color: #707070;
+}
+
+.KakaoMap-StationBadge {
+  padding: 0 5px;
+  border-radius: 100px;
+  background-color: #eef2f5;
+  font-size: 10px;
+  color: #4a6070;
+}
+
+/* 가장 축소했을 때 — 화물역·폐역은 이름을 숨기고 점만 (마우스를 올리거나 키보드로 닿으면 이름이 보인다) */
+.KakaoMap--fullView .KakaoMap-Station--freight .KakaoMap-StationLabel,
+.KakaoMap--fullView .KakaoMap-Station--closed .KakaoMap-StationLabel {
+  visibility: hidden;
+}
+
+/* 이름표가 숨으면 세로선과 점이 '!'처럼 보여서 선도 감춘다 — 자리는 남겨 점이 역 위치에 그대로 있게 */
+.KakaoMap--fullView .KakaoMap-Station--freight:not(:hover):not(:focus-visible) .KakaoMap-StationPin,
+.KakaoMap--fullView .KakaoMap-Station--closed:not(:hover):not(:focus-visible) .KakaoMap-StationPin {
+  background-color: transparent;
+}
+
+.KakaoMap--fullView .KakaoMap-Station--freight:hover .KakaoMap-StationLabel,
+.KakaoMap--fullView .KakaoMap-Station--closed:hover .KakaoMap-StationLabel,
+.KakaoMap--fullView .KakaoMap-Station--freight:focus-visible .KakaoMap-StationLabel,
+.KakaoMap--fullView .KakaoMap-Station--closed:focus-visible .KakaoMap-StationLabel {
+  visibility: visible;
+}
+
+/* ── 확대 / 축소 버튼 (지도 오른쪽 위) ── */
+.KakaoMap-ZoomControls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10; /* 카카오 지도 타일·마커 위 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #d6d6d6;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(24, 35, 45, 0.15);
+}
+
+.KakaoMap-ZoomButton {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  color: #333;
+  cursor: pointer;
+}
+
+.KakaoMap-ZoomButton + .KakaoMap-ZoomButton {
+  border-top: 1px solid #e0eaf0;
+}
+
+.KakaoMap-ZoomButton:hover:not(:disabled) {
+  background-color: #f5f5f5;
+}
+
+.KakaoMap-ZoomButton:focus-visible {
+  outline: 2px solid #4a6070;
+  outline-offset: -2px;
+}
+
+.KakaoMap-ZoomButton:disabled {
+  color: #d6d6d6;
+  cursor: default;
+}

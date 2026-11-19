@@ -1,5 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './StationInfoPopup.css';
+
+// 나가는 애니메이션 길이 — StationInfoPopup.css의 퇴장 애니메이션(var(--motion-short))과 같게
+const POPUP_EXIT_MS = 200;
 
 // 열차 종류 타입 — 역을 지나는 열차 목록
 type TrainType = string;
@@ -25,16 +28,28 @@ export default function StationInfoPopup({
   onAddToWishlist,
 }: StationInfoPopupProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // 닫을 때 나가는 애니메이션(Ease in)을 보여준 뒤 실제로 닫는다
+  const [isClosing, setIsClosing] = useState(false);
+
+  const requestClose = useCallback(() => {
+    if (isClosing) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      onClose();
+      return;
+    }
+    setIsClosing(true);
+    window.setTimeout(onClose, POPUP_EXIT_MS);
+  }, [isClosing, onClose]);
 
   // 열리면 닫기 버튼에 포커스를 두고, Esc로 닫는다
   useEffect(() => {
     closeButtonRef.current?.focus();
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') requestClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [requestClose]);
 
   function handleAddToWishlist() {
     onAddToWishlist(stationName);
@@ -44,8 +59,9 @@ export default function StationInfoPopup({
     // 바깥 어두운 영역을 누르면 닫힌다 (팝업 안을 누른 건 무시)
     <div
       className="StationInfoPopup-Overlay"
+      data-state={isClosing ? 'closing' : 'open'}
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget) requestClose();
       }}
     >
       <div
@@ -62,7 +78,7 @@ export default function StationInfoPopup({
             <button
               ref={closeButtonRef}
               className="StationInfoPopup-CloseButton"
-              onClick={onClose}
+              onClick={requestClose}
               aria-label="닫기"
             >
               ×

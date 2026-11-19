@@ -9,20 +9,21 @@
  */
 
 import React, { useState } from 'react';
-import KakaoMap from './KakaoMap';
+import KakaoMap, { StationKind } from './KakaoMap';
 import { findStationByName } from '../../data/stations';
 import HeaderActions from '../layout/HeaderActions';
 import './MapView.css';
 
-export type MainNavTab = '철도 지도' | '열차 정보' | 'AI 여행 플래너' | '여행 계획하기';
+export type MainNavTab = '철도 지도' | '열차 정보' | 'AI 여행 플래너' | '여행 계획하기' | '나의 여행 일정';
 
 export interface MapViewProps {
   activeNav: MainNavTab;
   onNavigate: (tab: MainNavTab) => void;
-  onStationClick: (stationName: string) => void;
+  // 검색으로 열면 종류(kind)를 모른다 — 지도 마커로 열 때만 넘어온다
+  onStationClick: (stationName: string, kind?: StationKind) => void;
 }
 
-const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기'];
+const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
 
 export default function MapView({ activeNav, onNavigate, onStationClick }: MapViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,7 +91,7 @@ export default function MapView({ activeNav, onNavigate, onStationClick }: MapVi
 
       {/* 지도 영역 */}
       <div className="MapView-MapArea">
-        <KakaoMap />
+        <KakaoMap onStationClick={(station) => onStationClick(station.name, station.kind)} />
       </div>
     </div>
   );
