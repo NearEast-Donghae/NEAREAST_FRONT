@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MainNavTab } from './MapView';
-import HeaderActions from '../layout/HeaderActions';
 import LoginGate from '../layout/LoginGate';
-import { ROUTES } from '../../routes';
+import { conversationRoute } from '../../routes';
 import {
   ConversationSummary,
   IS_SERVER_CHAT,
@@ -11,6 +9,7 @@ import {
   loadConversation,
   saveLocalConversationSnapshot,
   sendConversationMessage,
+  createRequestId,
 } from '../../api/conversations';
 import { CREATE_ITINERARY_OPTION, PLANNER_QUESTIONS } from '../../data/plannerQuestions';
 import { useSavedPlaces } from '../../hooks/useSavedPlaces';
@@ -19,8 +18,12 @@ import { useAuthUser } from '../../hooks/useAuthUser';
 import { formatConversationDate } from '../../store/chatHistory';
 import type { ChatMessage, ChatPlace, ChatRequest, PlanConditions } from '../../types/neareast';
 import './AiPlannerView.css';
+import type { PlanningConditions } from '../../api/planning';
+import { authStore } from '../../store/auth';
+import { getPlaces, type PlaceDto } from '../../api/catalog';
+import PlanningSummary from '../planning/PlanningSummary';
+import { getMissingPlanningFields, getUnsupportedPlanningConditions } from '../../utils/planningConditions';
 
-const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
 
 // 첫 화면의 추천 질문 — 마지막 것이 여행 짜기 기능으로 들어가는 입구
 const WELCOME_SUGGESTIONS = [
@@ -40,15 +43,15 @@ function createMessage(sender: ChatMessage['sender'], text: string, extra: Parti
 }
 
 interface AiPlannerViewProps {
-  activeNav: MainNavTab;
-  onNavigate: (tab: MainNavTab) => void;
-  onCreateItinerary: () => void;
+  initialConversationId?: string;
+  onCreateItinerary: (conditions?: PlanningConditions, conversationId?: string) => void;
+  onPlaceDetail?: (placeId: string, conversationId?: string) => void;
 }
 
 export default function AiPlannerView({
-  activeNav,
-  onNavigate,
+  initialConversationId,
   onCreateItinerary,
+  onPlaceDetail,
 }: AiPlannerViewProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conditions, setConditions] = useState<PlanConditions>({});
@@ -56,6 +59,9 @@ export default function AiPlannerView({
   const savedPlaces = useSavedPlaces();
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [inputText, setInputText] = useState('');
+  const sendBusy = useRef(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [failedSend, setFailedSend] = useState<{ text: string; requestId: string; conversationId: string | null } | null>(null);
 
   // 대화 목록 — 백엔드 연결 시 서버에, 데모 모드면 브라우저에 계정별로 저장된다 (api/conversations.ts)
   const user = useAuthUser();
@@ -63,18 +69,40 @@ export default function AiPlannerView({
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   // 지금 화면의 대화 — 첫 메시지를 보내기 전(새 대화)에는 목록에 없어서 null
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<PlaceDto[]>([]);
+  const [historyError, setHistoryError] = useState(false);
+  const [loadingConversation, setLoadingConversation] = useState(false);
+  const [conversationError, setConversationError] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void getPlaces().then((places) => { if (!cancelled) setCatalog(places); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+  const placeName = (identifier: string) => catalog.find((place) => place.id === identifier)?.name ?? '장소 확인 필요';
+  const rememberConversation = (identifier?: string) => {
+    window.history.replaceState(null, '', conversationRoute(identifier));
+  };
 
   const refreshConversations = (email: string) => {
+    setHistoryError(false);
     listConversations(email)
-      .then(setConversations)
-      .catch(() => {
-        // 목록을 못 받아도 대화는 할 수 있게 둔다
-      });
+      .then((result) => { if (authStore.getSnapshot()?.email === email) setConversations(result); })
+      .catch(() => { if (authStore.getSnapshot()?.email === email) setHistoryError(true); });
   };
 
   // 로그인한 계정의 목록을 불러오고, 계정이 바뀌면 새 대화로 시작한다
   useEffect(() => {
+    conversationIdRef.current += 1;
+    setMessages([]);
+    setConditions({});
+    setIsAiTyping(false);
+    setInputText('');
+    setSendError(null);
+    setFailedSend(null);
+    sendBusy.current = false;
     setActiveConversationId(null);
+    setConversations([]);
+    setConversationError(false);
     if (userEmail === null) {
       setConversations([]);
       return;
@@ -95,9 +123,11 @@ export default function AiPlannerView({
   const conversationIdRef = useRef(0);
 
   const filledConditionCount = PLANNER_QUESTIONS.filter((question) => conditions[question.key] !== undefined).length;
-  const isPlanComplete = filledConditionCount === PLANNER_QUESTIONS.length;
+  const latestPlanMessage = [...messages].reverse().find((message) => message.planningConditions);
+  const planningConditions = latestPlanMessage?.planningConditions;
   // 여행 짜기를 시작했거나 장소를 담았을 때만 입력창 위에 여행 계획 바를 보여준다
-  const isPlanTrayVisible = filledConditionCount > 0 || savedPlaces.length > 0;
+  const isPlanTrayVisible = !planningConditions && (filledConditionCount > 0 || savedPlaces.length > 0);
+  const handleCreateItinerary = () => onCreateItinerary(planningConditions, activeConversationId ?? undefined);
 
   // 페이지 전체가 아니라 대화 목록만 아래로 스크롤 (scrollIntoView는 페이지까지 움직임)
   useEffect(() => {
@@ -113,12 +143,13 @@ export default function AiPlannerView({
         : message
     );
 
-  const handleSendMessage = async (rawText: string) => {
+  const handleSendMessage = async (rawText: string, retry = false) => {
     const userText = rawText.trim();
-    if (userText === '' || isAiTyping) return;
+    if (userText === '' || sendBusy.current || loadingConversation || conversationError || userEmail === null) return;
+    if (userText.length > 1000) { setSendError('메시지는 1,000자까지 보낼 수 있어요.'); return; }
 
     if (userText === CREATE_ITINERARY_OPTION) {
-      onCreateItinerary();
+      handleCreateItinerary();
       return;
     }
 
@@ -135,14 +166,17 @@ export default function AiPlannerView({
 
     // 데모 모드에서 새 대화의 첫 메시지면 바로 목록 id를 정해, 답을 기다리는 동안에도 질문이 저장되게 한다.
     // 백엔드는 대화방을 서버가 만들고 id를 돌려준다
-    let targetConversationId = activeConversationId;
+    let targetConversationId = retry ? failedSend?.conversationId ?? activeConversationId : activeConversationId;
+    const requestId = retry && failedSend ? failedSend.requestId : createRequestId();
     if (targetConversationId === null && !IS_SERVER_CHAT) {
       targetConversationId = createId('chat');
       setActiveConversationId(targetConversationId);
     }
 
     setInputText('');
-    setMessages((previous) => [...lockQuickReplies(previous, userText), userMessage]);
+    if (!retry) setMessages((previous) => [...lockQuickReplies(previous, userText), userMessage]);
+    sendBusy.current = true;
+    setSendError(null);
     setIsAiTyping(true);
 
     try {
@@ -150,10 +184,17 @@ export default function AiPlannerView({
         conversationId: targetConversationId,
         text: userText,
         request,
+        requestId,
+        onConversationCreated: (identifier) => {
+          targetConversationId = identifier;
+          if (conversationId === conversationIdRef.current) { setActiveConversationId(identifier); rememberConversation(identifier); }
+        },
       });
       if (conversationId !== conversationIdRef.current) return;
       const { response } = result;
       setActiveConversationId(result.conversationId);
+      rememberConversation(result.conversationId);
+      setFailedSend(null);
       // 백엔드는 제목·최신순이 서버에서 바뀌므로 목록을 다시 받는다
       if (IS_SERVER_CHAT && userEmail !== null) refreshConversations(userEmail);
 
@@ -165,15 +206,18 @@ export default function AiPlannerView({
         createMessage('ai', response.reply, {
           options: response.quickReplies?.length ? response.quickReplies : undefined,
           places: response.places?.length ? response.places : undefined,
+          planningConditions: response.planningConditions,
         }),
       ]);
     } catch (error) {
       if (conversationId !== conversationIdRef.current) return;
       const message = error instanceof Error ? error.message : '답변을 받지 못했어요. 잠시 후 다시 보내 주세요.';
-      setMessages((previous) => [...previous, createMessage('ai', message)]);
+      setSendError(message);
+      setFailedSend({ text: userText, requestId, conversationId: targetConversationId });
     } finally {
       if (conversationId === conversationIdRef.current) {
         setIsAiTyping(false);
+        sendBusy.current = false;
         inputRef.current?.focus();
       }
     }
@@ -195,10 +239,16 @@ export default function AiPlannerView({
   const handleNewConversation = () => {
     conversationIdRef.current += 1;
     setActiveConversationId(null);
+    rememberConversation();
+    setConversationError(false);
+    setLoadingConversation(false);
     setMessages([]);
     setConditions({});
     setIsAiTyping(false);
     setInputText('');
+    setSendError(null);
+    setFailedSend(null);
+    sendBusy.current = false;
     inputRef.current?.focus();
   };
 
@@ -208,8 +258,15 @@ export default function AiPlannerView({
     conversationIdRef.current += 1;
     const openId = conversationIdRef.current;
     setActiveConversationId(conversation.id);
+    rememberConversation(conversation.id);
+    setLoadingConversation(true);
+    setConversationError(false);
     setIsAiTyping(false);
     setInputText('');
+    setMessages([]);
+    setConditions({});
+    setSendError(null);
+    setFailedSend(null);
     try {
       const loaded = await loadConversation(userEmail, conversation.id);
       if (openId !== conversationIdRef.current) return; // 그 사이 다른 대화를 열었다
@@ -217,9 +274,17 @@ export default function AiPlannerView({
       setConditions(loaded.conditions);
     } catch {
       if (openId !== conversationIdRef.current) return;
-      setMessages([createMessage('ai', '대화를 불러오지 못했어요. 잠시 후 다시 열어 주세요.')]);
+      setConversationError(true);
+    } finally {
+      if (openId === conversationIdRef.current) setLoadingConversation(false);
     }
   };
+
+  useEffect(() => {
+    if (userEmail && initialConversationId) {
+      void handleOpenConversation({ id: initialConversationId, title: '', updatedAt: '' });
+    }
+  }, [userEmail, initialConversationId]);
 
   const handleDeleteConversation = async (conversation: ConversationSummary) => {
     if (userEmail === null) return;
@@ -244,25 +309,9 @@ export default function AiPlannerView({
 
   return (
     <div className="AiPlannerView">
-      {/* 상단 메뉴 */}
-      <header className="AiPlannerView-Header">
-        <button className="AiPlannerView-Logo" onClick={() => onNavigate('철도 지도')}>NEAREAST</button>
-        <nav className="AiPlannerView-Nav">
-          {NAV_TABS.map((tab) => (
-            <button
-              key={tab}
-              className={`AiPlannerView-NavItem${activeNav === tab ? ' AiPlannerView-NavItem--active' : ''}`}
-              onClick={() => onNavigate(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </nav>
-        <HeaderActions />
-      </header>
 
       {/* 로그인해야 쓸 수 있다 — 헤더는 감싸지 않아서 다른 탭으로 이동은 된다 */}
-      <LoginGate serviceName="AI 여행 플래너" returnTo={{ route: ROUTES.main, mainNav: 'AI 여행 플래너' }}>
+      <LoginGate serviceName="AI 여행 플래너" returnTo={{ route: conversationRoute(initialConversationId ?? activeConversationId ?? undefined) }}>
         <section className="AiPlannerView-Chat" aria-label="AI 여행 플래너 대화">
           {/* 대화 목록 */}
           <aside className="AiPlannerView-History" aria-label="대화 목록">
@@ -274,6 +323,7 @@ export default function AiPlannerView({
               + 새 대화
             </button>
             <p className="AiPlannerView-HistoryTitle">대화 목록</p>
+            {historyError && <p role="status">대화 목록을 불러오지 못했어요. <button onClick={() => userEmail && refreshConversations(userEmail)}>목록 다시 불러오기</button></p>}
             {conversations.length === 0 ? (
               <p className="AiPlannerView-HistoryEmpty">아직 대화가 없어요. 질문을 보내면 여기에 쌓여요.</p>
             ) : (
@@ -322,12 +372,15 @@ export default function AiPlannerView({
 
             <div className="AiPlannerView-MessageList" ref={messageListRef} aria-live="polite">
               <div className="AiPlannerView-MessageColumn">
-                {messages.length === 0 ? (
+                {loadingConversation ? <p role="status">대화를 불러오고 있어요…</p> : conversationError ? <div role="alert">
+                  <p>대화를 불러오지 못했어요. 삭제된 대화이거나 연결에 문제가 있을 수 있어요.</p>
+                  <button onClick={() => activeConversationId && handleOpenConversation({ id: activeConversationId, title: '', updatedAt: '' })}>대화 다시 불러오기</button>
+                </div> : messages.length === 0 ? (
                   <div className="AiPlannerView-Welcome motion-stagger">
                     <span className="AiPlannerView-WelcomeAvatar" aria-hidden="true">AI</span>
                     <h2 className="AiPlannerView-WelcomeTitle">동해선 여행, 무엇이든 물어보세요</h2>
                     <p className="AiPlannerView-WelcomeText">
-                      역과 가볼 곳을 찾아 드리고, 원하면 열차 여행 일정까지 같이 짜 드려요.
+                      동해시 철도와 관광을 이야기하고, 날짜와 가고 싶은 곳을 정해 여행 계획을 시작해 보세요.
                     </p>
 
                     {savedPlaces.length > 0 && (
@@ -392,6 +445,7 @@ export default function AiPlannerView({
                                       <p className="AiPlannerView-PlaceStation">가까운 역 · {place.stationName}</p>
                                     )}
                                     <p className="AiPlannerView-PlaceDescription">{place.description}</p>
+                                    {onPlaceDetail && <button className="AiPlannerView-ChoiceButton" onClick={() => onPlaceDetail(place.id, activeConversationId ?? undefined)}>상세 보기 →</button>}
                                     {place.notice !== undefined && (
                                       <p className="AiPlannerView-PlaceNotice">{place.notice}</p>
                                     )}
@@ -425,6 +479,19 @@ export default function AiPlannerView({
                               ))}
                             </div>
                           )}
+                          {message.planningConditions && <section className="ChatPlanCard" aria-label="대화에서 정리한 여행 조건">
+                            <h2>대화에서 정리한 여행 조건</h2>
+                            <PlanningSummary conditions={message.planningConditions} placeName={placeName} />
+                            {!!getMissingPlanningFields(message.planningConditions).length && <p className="Integration-Note">더 필요한 정보: {getMissingPlanningFields(message.planningConditions).join(', ')}. 대화로 알려 주거나 다음 화면에서 입력할 수 있어요.</p>}
+                            {!!getUnsupportedPlanningConditions(message.planningConditions).length && <p className="Integration-Note">현재 자동 생성에서 지원하지 않는 조건: {getUnsupportedPlanningConditions(message.planningConditions).join(', ')}. 다음 화면에서 변경 여부를 확인해요.</p>}
+                            {message.id === latestPlanMessage?.id ? <>
+                              <button className="AiPlannerView-PlanCreateButton" disabled={isAiTyping || !!failedSend}
+                                onClick={() => onCreateItinerary(message.planningConditions, activeConversationId ?? undefined)}>
+                                {getMissingPlanningFields(message.planningConditions).length ? '부족한 조건 입력하기 →' : '이 조건으로 일정 확인하기 →'}
+                              </button>
+                              <p className="Integration-Note">일정은 다음 화면에서 생성해요. 대화를 더 나눈 경우 위 조건에 반영됐는지 확인해 주세요.</p>
+                            </> : <p className="Integration-Note">이후에 정리한 조건이 있어요. 가장 최근 조건으로 진행해 주세요.</p>}
+                          </section>}
                         </div>
                       </div>
                     ) : (
@@ -454,10 +521,10 @@ export default function AiPlannerView({
                 <div className="AiPlannerView-PlanTray" aria-label="여행 계획 현황">
                   <div className="AiPlannerView-PlanTrayInfo">
                     <span className="AiPlannerView-PlanTrayTitle">
-                      여행 계획 {filledConditionCount}/{PLANNER_QUESTIONS.length}
+                      관심 목록의 장소 · 아직 필수 방문지는 아니에요
                     </span>
                     <div className="AiPlannerView-PlanChips">
-                      {PLANNER_QUESTIONS.map((question) => {
+                      {!IS_SERVER_CHAT && PLANNER_QUESTIONS.map((question) => {
                         const value = conditions[question.key];
                         return (
                           <span
@@ -481,8 +548,8 @@ export default function AiPlannerView({
                       ))}
                     </div>
                   </div>
-                  <button className="AiPlannerView-PlanCreateButton" onClick={onCreateItinerary} disabled={!isPlanComplete}>
-                    일정 만들기 →
+                  <button className="AiPlannerView-PlanCreateButton" onClick={() => handleSendMessage(SAVED_PLACES_PLANNING_QUESTION)} disabled={isAiTyping || loadingConversation || conversationError}>
+                    이 장소로 여행 의논하기
                   </button>
                 </div>
               )}
@@ -492,6 +559,8 @@ export default function AiPlannerView({
                   ref={inputRef}
                   className="AiPlannerView-Input"
                   rows={1}
+                  maxLength={1000}
+                  disabled={loadingConversation || conversationError}
                   value={inputText}
                   onChange={(event) => setInputText(event.target.value)}
                   onKeyDown={handleInputKeyDown}
@@ -501,12 +570,13 @@ export default function AiPlannerView({
                 <button
                   type="submit"
                   className="AiPlannerView-SendButton"
-                  disabled={inputText.trim() === '' || isAiTyping}
+                  disabled={inputText.trim() === '' || isAiTyping || loadingConversation || conversationError}
                   aria-label="보내기"
                 >
                   ↑
                 </button>
               </form>
+              {sendError && <p role="alert">{sendError} {failedSend && <button disabled={isAiTyping} onClick={() => { void handleSendMessage(failedSend.text, true); }}>같은 메시지 다시 보내기</button>}</p>}
               <p className="AiPlannerView-Disclaimer">AI 답변은 틀릴 수 있어요. 운행 시간과 장소 정보는 출발 전에 꼭 확인하세요.</p>
             </div>
           </div>
