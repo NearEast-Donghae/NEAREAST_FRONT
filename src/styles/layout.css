@@ -1,0 +1,98 @@
+:root {
+  --app-max-width: 1440px;
+  --app-gutter: clamp(24px, 6.6vw, 95px);
+  --app-header-height: 110px;
+}
+
+html { scrollbar-gutter: stable; }
+body { font-family: 'Noto Sans KR', sans-serif; color: #333; }
+button, input, select, textarea { font-family: inherit; }
+
+.AppHeader {
+  position: relative;
+  width: 100%;
+  max-width: var(--app-max-width);
+  height: var(--app-header-height);
+  margin: 0 auto;
+  padding: 28px var(--app-gutter);
+  gap: clamp(16px, 2.4vw, 35px);
+  box-sizing: border-box;
+}
+.AppHeader-Nav { gap: clamp(14px, 2.4vw, 35px); }
+.AppHeader-NavItem { display: inline-grid; text-align: center; }
+/* 활성 탭의 글씨가 굵어져도 옆 메뉴 위치는 바뀌지 않는다. */
+.AppHeader-NavItem::after { content: attr(data-label); font-weight: 700; visibility: hidden; height: 0; }
+.HeaderActions { min-width: 80px; justify-content: flex-end; }
+
+.MapView, .TrainInfoView, .TrainDetailView, .AiPlannerView,
+.PlanningLayout, .MyTripsLayout, .MyPageView, .AuthView, .AppPage {
+  width: 100%;
+  max-width: var(--app-max-width);
+  box-sizing: border-box;
+  min-height: calc(100dvh - var(--app-header-height));
+  margin: 0 auto;
+}
+
+.MapView, .TrainInfoView, .TrainDetailView, .PlanningLayout,
+.MyTripsLayout, .MyPageView, .AuthView, .AppPage {
+  padding: 28px var(--app-gutter) 48px;
+}
+.MapView-SearchBar { position: static; width: min(800px, 100%); margin: 0 auto 28px; }
+.MapView-Catalog { padding: 0; }
+.MapView-Catalog .MapView-MapArea { height: clamp(360px, 48vh, 540px); }
+.MapView-Catalog .Integration-Panel { margin-top: 24px; }
+.TrainInfoView-Main, .TrainDetailView-Main { position: static; width: 100%; gap: 22px; }
+.PlanningLayout__header, .PlanningLayout__content, .PlanningLayout__navigation,
+.MyTripsLayout-Tabs, .MyTripsLayout-Content, .MyTripsView-Body, .MyTripsView-Empty,
+.StepIndicator { width: 100%; box-sizing: border-box; }
+.PlanningLayout__content > .Integration-Panel { max-width: none; }
+.MyTripsView-Body { grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); }
+.MyTripsView-Detail { min-width: 0; }
+.MyPageView-Sections { width: min(720px, 100%); }
+.TrainInfoView-Title, .TrainDetailView-Title { font-size: 34px; line-height: 1.4; }
+.TrainInfoView-Subtitle { white-space: normal; }
+.TrainInfoView-ResultCard, .TrainDetailView-StopsSection, .TrainDetailView-StopsTable,
+.TrainDetailView-SaveSection { width: 100%; box-sizing: border-box; }
+.TrainInfoView-Results { width: 100%; }
+.TrainInfoView-ResultInfo { width: auto; flex: 1; min-width: 0; }
+.TrainInfoView-DepartureInfo { width: auto; min-width: 170px; }
+.StationInfoPopup { width: min(760px, calc(100vw - 48px)); box-sizing: border-box; min-height: 0; padding: 32px; display: flex; flex-direction: column; gap: 24px; }
+.StationInfoPopup-Content { position: static; width: 100%; gap: 20px; }
+.StationInfoPopup-Header, .StationInfoPopup-Body, .StationInfoPopup-Divider, .StationInfoPopup-Description { width: 100%; }
+.StationInfoPopup-WishlistButton { position: static; width: 100%; box-sizing: border-box; flex-shrink: 0; }
+.StationInfoPopup-NameRow { flex-wrap: wrap; }
+.StationInfoPopup-Info { min-width: 0; width: 100%; }
+
+.AiPlannerView-Chat { position: static; width: 100%; height: calc(100dvh - var(--app-header-height)); min-height: 620px; }
+.AiPlannerView-ChatBar, .AiPlannerView-MessageColumn, .AiPlannerView-Footer { width: min(820px, calc(100% - 48px)); }
+.AiPlannerView-History { flex-shrink: 0; }
+.LoginGate-Content--locked { min-height: calc(100dvh - var(--app-header-height)); }
+.AppSession-Status { max-width: var(--app-max-width); margin: 0 auto; padding: 28px var(--app-gutter); box-sizing: border-box; }
+.ChatPlanCard { width: 100%; box-sizing: border-box; border: 1px solid #d6d6d6; border-radius: 16px; padding: 20px; background: #fafafa; }
+.ChatPlanCard h2 { margin: 0 0 16px; font-size: 17px; }
+.ChatPlanCard .Integration-Note { margin-bottom: 0; }
+.PlanningSummary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin: 20px 0; }
+.PlanningSummary div { min-width: 0; }
+.PlanningSummary dt { font-size: 13px; color: #666; margin-bottom: 5px; }
+.PlanningSummary dd { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
+.PlanningReview-Notice { padding: 14px 18px; border: 1px solid #ccc; border-radius: 12px; margin: 20px 0; line-height: 1.6; }
+.PlanningReview-Notice p:first-child { margin-top: 0; }
+.PlanningReview-Notice p:last-child { margin-bottom: 0; }
+.PlanningReview-Places { margin: 20px 0; }
+.PlanningReview-Places summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+.PlanningLayout__header .Integration-Actions { margin: 0; }
+.Integration-Panel .PlanningButton--primary { background: #333; color: #fff; border-color: #333; }
+.Integration-Panel .PlanningButton--primary:disabled { background: #e5e5e5; color: #666; border-color: #ddd; }
+.AiPlannerView-ChatTitle { min-width: 0; overflow-wrap: anywhere; }
+.SavedPlacesCard__detail { border: none; padding: 0; background: none; font: inherit; font-weight: 600; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+/* 페이지 골격은 정지시키고 팝업·상태 변화의 모션만 유지한다. */
+.motion-stagger > * { animation: none; }
+
+@media (max-width: 1100px) {
+  .AppHeader { flex-wrap: wrap; height: auto; min-height: var(--app-header-height); gap: 14px; }
+  .AppHeader-Nav { order: 3; width: 100%; justify-content: space-between; gap: 10px; }
+  .AppHeader-NavItem { font-size: 15px; }
+  .MyTripsView-Body { grid-template-columns: minmax(200px, 280px) minmax(0, 1fr); }
+  .AiPlannerView-History { width: 220px; }
+}

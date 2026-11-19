@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState } from 'react';
+import { StrictMode, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import MainPage from './pages/MainPage';
 import PlanningPage from './pages/PlanningPage';
@@ -8,124 +8,94 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AppHeader from './components/layout/AppHeader';
 import LoginGate from './components/layout/LoginGate';
+import SavedStatus from './components/layout/SavedStatus';
 import type { MainNavTab } from './components/main/MapView';
 import { LEGACY_MY_PAGE_SAVED_HASH, ROUTES, navigateTo } from './routes';
 import { returnToStore } from './store/returnTo';
 import { authStore } from './store/auth';
 import { IS_MOCK_AUTH, restoreSession } from './api/auth';
 import './index.css';
+import './components/integration.css';
+import './styles/layout.css';
 
-// 백엔드 로그인 쿠키가 살아 있으면 사용자와 CSRF 토큰을 되살린다 (데모 인증이면 아무것도 하지 않음)
-restoreSession()
-  .then((user) => {
-    if (user !== undefined) authStore.setUser(user);
-  })
-  .catch(() => {
-    // 백엔드에 닿지 않으면 화면의 로그인 표시는 그대로 두고, 이후 요청에서 다시 확인한다
-  });
+let sessionRefreshId = 0;
+function refreshSession() {
+  const refreshId = ++sessionRefreshId;
+  return restoreSession()
+    .then((user) => {
+      if (refreshId === sessionRefreshId && user !== undefined) authStore.setUser(user);
+    })
+    .catch(() => { if (refreshId === sessionRefreshId) authStore.setUser(null); });
+}
+const sessionRestored = refreshSession();
+window.addEventListener('neareast:restore-session', () => { void refreshSession(); });
+window.addEventListener('neareast:session-expired', () => {
+  sessionRefreshId += 1;
+  authStore.setUser(null);
+});
 
-// 스크롤바가 생기고 사라질 때도 폭이 바뀌므로 resize 이벤트 대신 ResizeObserver 사용
-new ResizeObserver(() => {
-  document.documentElement.style.setProperty(
-    '--page-width',
-    `${document.documentElement.clientWidth}px`
-  );
-}).observe(document.documentElement);
+const MAIN_ROUTES = {
+  '철도 지도': '#/map', '열차 정보': '#/trains', 'AI 여행 플래너': '#/chat',
+  '여행 계획하기': ROUTES.planning, '나의 여행 일정': ROUTES.myTrips,
+} as const;
+function activeTab(hash: string): MainNavTab | undefined {
+  if (hash === ROUTES.login || hash === ROUTES.signup || hash === ROUTES.myPage) return undefined;
+  if (hash.startsWith('#/trains')) return '열차 정보';
+  if (hash.split('?')[0] === '#/chat') return 'AI 여행 플래너';
+  if (hash === ROUTES.planning) return '여행 계획하기';
+  if (hash.startsWith(ROUTES.myTrips) || hash === LEGACY_MY_PAGE_SAVED_HASH) return '나의 여행 일정';
+  return '철도 지도';
+}
+function isMapRoute(hash: string) {
+  return !hash || hash === '#/map' || hash.startsWith('#/places/');
+}
 
-// 라우터 라이브러리 없이 해시(routes.ts)로 페이지 전환 — 브라우저 뒤로가기도 동작
 function App() {
+  const [sessionReady, setSessionReady] = useState(IS_MOCK_AUTH);
   const [hash, setHash] = useState(window.location.hash);
-  const [mainNav, setMainNav] = useState<MainNavTab>('철도 지도');
-
+  const previousHash = useRef(hash);
+  useEffect(() => { void sessionRestored.finally(() => setSessionReady(true)); }, []);
   useEffect(() => {
-    const handleHashChange = () => {
-      setHash(window.location.hash);
-      // 해시만 바뀌면 브라우저가 스크롤을 그대로 둬서, 새 페이지가 중간부터 보이지 않게
-      window.scrollTo(0, 0);
-    };
+    const handleHashChange = () => setHash(window.location.hash);
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+  useLayoutEffect(() => {
+    if (!(isMapRoute(previousHash.current) && isMapRoute(hash))) window.scrollTo(0, 0);
+    previousHash.current = hash;
+  }, [hash]);
 
-  // 메인 뷰 밖(계획하기·마이페이지·로그인)의 헤더에서 탭을 눌렀을 때
-  const handleNavigate = (tab: MainNavTab) => {
-    if (tab === '여행 계획하기') {
-      navigateTo(ROUTES.planning);
-      return;
-    }
-    if (tab === '나의 여행 일정') {
-      navigateTo(ROUTES.myTrips);
-      return;
-    }
-    setMainNav(tab);
-    navigateTo(ROUTES.main);
-  };
-
-  // 로그인·가입에 성공하면, 로그인 안내를 띄웠던 화면(LoginGate가 기억해 둔 곳)으로 돌려보낸다
+  const handleNavigate = (tab: MainNavTab) => navigateTo(MAIN_ROUTES[tab]);
   const handleAuthenticated = () => {
+    sessionRefreshId += 1;
     const target = returnToStore.consume();
-    if (target?.mainNav !== undefined) setMainNav(target.mainNav);
-    navigateTo(target?.route ?? ROUTES.main);
+    navigateTo(target?.mainNav ? MAIN_ROUTES[target.mainNav] : target?.route ?? '#/map');
   };
 
-  if (hash === ROUTES.planning) {
-    return (
-      <>
-        <AppHeader activeNav="여행 계획하기" onNavigate={handleNavigate} />
-        <LoginGate serviceName="여행 계획하기" returnTo={{ route: ROUTES.planning }}>
-          <PlanningPage />
-        </LoginGate>
-      </>
-    );
+  let content: ReactNode;
+  if (!sessionReady) {
+    content = <p className="AppSession-Status" role="status">로그인 상태를 확인하고 있어요…</p>;
+  } else if (hash === ROUTES.planning) {
+    content = <LoginGate serviceName="여행 계획하기" returnTo={{ route: ROUTES.planning }}><PlanningPage /></LoginGate>;
+  } else if (hash === ROUTES.login || hash === ROUTES.signup) {
+    content = hash === ROUTES.login ? <LoginPage onAuthenticated={handleAuthenticated} /> : <SignupPage onAuthenticated={handleAuthenticated} />;
+  } else if (hash === ROUTES.myTrips || hash === ROUTES.myTripsSaved || hash === LEGACY_MY_PAGE_SAVED_HASH) {
+    content = <LoginGate serviceName="나의 여행 일정" returnTo={{ route: hash === ROUTES.myTrips ? ROUTES.myTrips : ROUTES.myTripsSaved }}>
+      <TripsPage activeTab={hash === ROUTES.myTrips ? 'trips' : 'saved'} onNavigate={handleNavigate} />
+    </LoginGate>;
+  } else if (hash === ROUTES.myPage) {
+    content = <LoginGate serviceName="마이페이지" returnTo={{ route: ROUTES.myPage }}><MyPage /></LoginGate>;
+  } else {
+    content = <MainPage routeHash={hash} />;
   }
 
-  if (hash === ROUTES.login || hash === ROUTES.signup) {
-    return (
-      <>
-        <AppHeader isAuthPageActive onNavigate={handleNavigate} />
-        {hash === ROUTES.login ? (
-          <LoginPage onAuthenticated={handleAuthenticated} />
-        ) : (
-          <SignupPage onAuthenticated={handleAuthenticated} />
-        )}
-      </>
-    );
-  }
-
-  if (hash === ROUTES.myTrips || hash === ROUTES.myTripsSaved || hash === LEGACY_MY_PAGE_SAVED_HASH) {
-    return (
-      <>
-        <AppHeader activeNav="나의 여행 일정" onNavigate={handleNavigate} />
-        {IS_MOCK_AUTH ? (
-          <TripsPage activeTab={hash === ROUTES.myTrips ? 'trips' : 'saved'} onNavigate={handleNavigate} />
-        ) : (
-          // 백엔드에서는 저장한 여행이 계정에 묶여 있어서 로그인해야 볼 수 있다
-          <LoginGate serviceName="나의 여행 일정" returnTo={{ route: hash === ROUTES.myTrips ? ROUTES.myTrips : ROUTES.myTripsSaved }}>
-            <TripsPage activeTab={hash === ROUTES.myTrips ? 'trips' : 'saved'} onNavigate={handleNavigate} />
-          </LoginGate>
-        )}
-      </>
-    );
-  }
-
-  if (hash === ROUTES.myPage) {
-    return (
-      <>
-        <AppHeader isMyPageActive onNavigate={handleNavigate} />
-        <LoginGate serviceName="마이페이지" returnTo={{ route: ROUTES.myPage }}>
-          <MyPage />
-        </LoginGate>
-      </>
-    );
-  }
-
-  // key: 로그인 후 복귀처럼 주소 변경(hashchange)이 탭 지정(setMainNav)보다 먼저 반영되면
-  // 메인이 이전 탭으로 먼저 열려 버린다. 탭 값이 바뀌면 그 탭으로 다시 열리게 한다.
-  return <MainPage key={mainNav} initialNav={mainNav} />;
+  return <>
+    <AppHeader activeNav={activeTab(hash)} onNavigate={handleNavigate}
+      isMyPageActive={hash === ROUTES.myPage} isAuthPageActive={hash === ROUTES.login || hash === ROUTES.signup} />
+    {content}
+  </>;
 }
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+  <StrictMode><App /><SavedStatus /></StrictMode>
 );
