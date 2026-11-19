@@ -12,6 +12,7 @@ const MyTripsPage: React.FC<MyTripsPageProps> = ({ onNavigate }) => {
   const [trips, setTrips] = useState<SavedTrip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let isCancelled = false;
@@ -21,6 +22,10 @@ const MyTripsPage: React.FC<MyTripsPageProps> = ({ onNavigate }) => {
         setTrips(loadedTrips);
         // 가장 최근에 저장한 여행(방금 저장하고 넘어온 경우 포함)을 바로 보여준다
         setSelectedTripId(loadedTrips[0]?.id ?? null);
+      })
+      .catch(() => {
+        // 빈 목록으로 보이면 저장한 여행이 사라진 줄 알 수 있어서, 불러오지 못했다고 따로 알린다
+        if (!isCancelled) setLoadError('저장한 여행을 불러오지 못했어요. 잠시 후 다시 열어 주세요.');
       })
       .finally(() => {
         if (!isCancelled) setIsLoading(false);
@@ -50,6 +55,7 @@ const MyTripsPage: React.FC<MyTripsPageProps> = ({ onNavigate }) => {
       trips={trips}
       selectedTripId={selectedTripId}
       isLoading={isLoading}
+      loadError={loadError}
       onSelectTrip={setSelectedTripId}
       onDeleteTrip={handleDeleteTrip}
       onStartPlanning={() => onNavigate('여행 계획하기')}
