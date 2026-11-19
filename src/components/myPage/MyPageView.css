@@ -1,0 +1,120 @@
+/* ==========================================
+   MyPageView — 마이페이지
+   ========================================== */
+
+.MyPageView {
+  box-sizing: border-box;
+  width: 1440px; /* 다른 화면과 같은 캔버스, 넓은 화면에서는 가운데 */
+  margin: 0 auto;
+  min-height: calc(100vh - 110px); /* AppHeader 높이 제외 */
+  padding: 28px 95px 64px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+}
+
+/* 페이지 제목 — 계획하기 페이지 제목과 같은 크기 */
+.MyPageView-Title {
+  margin: 0 0 24px;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+/* 프로필 */
+.MyPageView-Profile {
+  width: 1250px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 28px;
+  border-radius: 12px;
+  background-color: #f5f5f5;
+}
+
+.MyPageView-Avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.MyPageView-ProfileText {
+  flex: 1;
+  min-width: 0;
+}
+
+.MyPageView-Nickname {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.MyPageView-Email {
+  margin: 0;
+  font-size: 14px;
+  color: #575757;
+}
+
+.MyPageView-LoginLink {
+  flex-shrink: 0;
+  padding: 10px 22px;
+  border-radius: 8px;
+  background-color: #333;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.MyPageView-LoginLink:hover {
+  background-color: #444;
+}
+
+/* 탭 — 계획하기 2단계 탭과 같은 밑줄 형태 */
+.MyPageView-Tabs {
+  width: 1250px;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 28px;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.MyPageView-Tab {
+  padding: 12px 20px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font-size: 17px;
+  color: #737373;
+  text-decoration: none;
+}
+
+.MyPageView-Tab:hover {
+  color: #333;
+}
+
+.MyPageView-Tab--active {
+  border-bottom-color: #333;
+  font-weight: 700;
+  color: #333;
+}
+
+.MyPageView-Content {
+  width: 1250px;
+}
+
+/* 담아둔 장소·열차 탭 — 계획하기 옆 카드(275px)를 탭 내용 폭으로 넓혀 쓴다 */
+.MyPageView-Content .SavedPlacesCard {
+  width: auto;
+  max-width: 640px;
+  padding: 24px 26px;
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+}

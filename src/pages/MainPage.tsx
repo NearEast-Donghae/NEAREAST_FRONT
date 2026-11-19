@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   MapView,
   StationInfoPopup,
@@ -11,6 +11,12 @@ import {
 import { createItinerary } from '../api/itineraries';
 import { ROUTES, navigateTo } from '../routes';
 import { splitDotList } from '../utils/format';
+import { useSavedTrains } from '../hooks/useSavedTrains';
+import { savedTrainsStore } from '../store/savedTrains';
+import { useSavedPlaces } from '../hooks/useSavedPlaces';
+import { savedPlacesStore } from '../store/savedPlaces';
+
+const stationPlaceId = (stationName: string) => `station-${stationName}`;
 import type {
   MainNavTab,
   TrainResult,
@@ -113,6 +119,26 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
   const [activeNav, setActiveNav] = useState<MainNavTab>(initialNav);
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
   const [selectedTrain, setSelectedTrain] = useState<TrainResult | null>(null);
+  const savedTrains = useSavedTrains();
+  const savedPlaces = useSavedPlaces();
+
+  // 팝업의 Esc 처리(useEffect)가 렌더마다 다시 걸리지 않도록 같은 함수를 유지
+  const handleCloseStationPopup = useCallback(() => setSelectedStation(null), []);
+
+  // 관심 목록 = 담아둔 장소. AI 플래너에서 담은 역 카드와 같은 id를 써서 중복으로 담기지 않게 한다
+  const handleToggleStationWishlist = (stationName: string) => {
+    const placeId = stationPlaceId(stationName);
+    if (savedPlaces.some((place) => place.id === placeId)) {
+      savedPlacesStore.remove(placeId);
+      return;
+    }
+    savedPlacesStore.add(
+      { id: placeId, name: stationName, category: '역', stationName, description: `${stationName} 역 정보` },
+      '철도 지도'
+    );
+  };
+  const selectedTrainPurpose =
+    savedTrains.find((train) => train.id === selectedTrain?.id)?.purpose ?? null;
 
   const handleSaveAiItinerary = async () => {
     try {
@@ -130,7 +156,7 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
       alert('여행 계획을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
       return;
     }
-    navigateTo(ROUTES.myTrips);
+    navigateTo(ROUTES.myPage);
   };
 
   const handleNavigate = (tab: MainNavTab) => {
@@ -163,8 +189,9 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
               operationStatus="운영 중"
               description="동해안 해안선을 따라 운행하는 동해선의 주요 역입니다."
               trains={['동해산타열차', '바다열차', 'S-train']}
-              onClose={() => setSelectedStation(null)}
-              onAddToWishlist={() => {}}
+              isSaved={savedPlaces.some((place) => place.id === stationPlaceId(selectedStation))}
+              onClose={handleCloseStationPopup}
+              onAddToWishlist={handleToggleStationWishlist}
             />
           )}
         </>
@@ -187,6 +214,18 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
           stops={DUMMY_STOPS}
           operationDays="매일 운행"
           onBack={() => setCurrentView('trainInfo')}
+          savedPurpose={selectedTrainPurpose}
+          onSaveTrain={(purpose) =>
+            savedTrainsStore.toggle(
+              {
+                id: selectedTrain.id,
+                trainName: selectedTrain.trainName,
+                route: selectedTrain.route,
+                savedFrom: '열차 정보',
+              },
+              purpose
+            )
+          }
         />
       )}
 

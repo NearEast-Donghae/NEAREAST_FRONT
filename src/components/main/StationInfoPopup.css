@@ -2,8 +2,22 @@
    StationInfoPopup — 역 상세정보 팝업
    ========================================== */
 
+/* 화면 전체를 덮는 어두운 배경 — 팝업을 지도 위 가운데에 띄운다 */
+.StationInfoPopup-Overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: rgba(24, 35, 45, 0.45);
+}
+
 .StationInfoPopup {
   position: relative;
+  max-height: calc(100vh - 48px);
+  box-shadow: 0 12px 40px rgba(24, 35, 45, 0.25);
   width: 800px;
   min-height: 530px;
   background-color: #ffffff;
@@ -181,4 +195,9 @@
 
 .StationInfoPopup-WishlistButton:hover {
   background-color: #444;
+}
+
+.StationInfoPopup-WishlistButton--saved,
+.StationInfoPopup-WishlistButton--saved:hover {
+  background-color: #4a6070;
 }

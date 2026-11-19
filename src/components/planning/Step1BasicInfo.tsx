@@ -1,5 +1,7 @@
 import PlanningLayout from './PlanningLayout';
 import './PlanningLayout.css';
+import SavedPlacesCard from './SavedPlacesCard';
+import type { SavedPlace, SavedTrain } from '../../types/neareast';
 import './Step1BasicInfo.css';
 
 interface TravelBasicInfo {
@@ -14,6 +16,10 @@ interface Step1BasicInfoProps {
   formData: TravelBasicInfo;
   onFormChange: (updated: Partial<TravelBasicInfo>) => void;
   onNext: () => void;
+  savedPlaces: SavedPlace[];
+  savedTrains: SavedTrain[];
+  onRemoveSavedPlace: (placeId: string) => void;
+  onRemoveSavedTrain: (trainId: string) => void;
 }
 
 const DONGHAI_STATIONS = [
@@ -36,7 +42,7 @@ const formatDateLabel = (dateString: string): string => {
   return `${year}.${month}.${day} (${dayLabel})`;
 };
 
-const Step1BasicInfo = ({ formData, onFormChange, onNext }: Step1BasicInfoProps) => {
+const Step1BasicInfo = ({ formData, onFormChange, onNext, savedPlaces, savedTrains, onRemoveSavedPlace, onRemoveSavedTrain }: Step1BasicInfoProps) => {
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFormChange({ travelDate: e.target.value });
   };
@@ -148,12 +154,20 @@ const Step1BasicInfo = ({ formData, onFormChange, onNext }: Step1BasicInfoProps)
         </div>
       </div>
 
-      {/* 안내 카드 */}
-      <div className="PlanningCard Step1BasicInfo__guideCard">
-        <p className="Step1BasicInfo__guideTitle">어디서부터 시작하나요?</p>
-        <p className="Step1BasicInfo__guideText">
-          정해진 시간 안에서 방문할 역과 열차를 골라 일정을 만들어요.
-        </p>
+      {/* 오른쪽 — 안내 카드 + 다른 화면에서 담아둔 장소 */}
+      <div className="Step1BasicInfo__sideColumn">
+        <div className="PlanningCard Step1BasicInfo__guideCard">
+          <p className="Step1BasicInfo__guideTitle">어디서부터 시작하나요?</p>
+          <p className="Step1BasicInfo__guideText">
+            정해진 시간 안에서 방문할 역과 열차를 골라 일정을 만들어요.
+          </p>
+        </div>
+        <SavedPlacesCard
+          places={savedPlaces}
+          trains={savedTrains}
+          onRemovePlace={onRemoveSavedPlace}
+          onRemoveTrain={onRemoveSavedTrain}
+        />
       </div>
     </PlanningLayout>
   );

@@ -10,7 +10,8 @@
 
 import React, { useState } from 'react';
 import KakaoMap from './KakaoMap';
-import MyTripsButton from '../layout/MyTripsButton';
+import { findStationByName } from '../../data/stations';
+import HeaderActions from '../layout/HeaderActions';
 import './MapView.css';
 
 export type MainNavTab = '철도 지도' | '열차 정보' | 'AI 여행 플래너' | '여행 계획하기';
@@ -25,12 +26,20 @@ const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플
 
 export default function MapView({ activeNav, onNavigate, onStationClick }: MapViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchError, setSearchError] = useState<string | null>(null);
 
+  // 없는 역 이름으로 역 상세가 열리지 않게, 아는 역일 때만 연다
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (searchQuery.trim()) {
-      onStationClick(searchQuery.trim());
+    if (searchQuery.trim() === '') return;
+
+    const stationName = findStationByName(searchQuery);
+    if (stationName === undefined) {
+      setSearchError(`‘${searchQuery.trim()}’ 역을 찾지 못했어요. 예: 묵호역, 동해역, 정동진역`);
+      return;
     }
+    setSearchError(null);
+    onStationClick(stationName);
   }
 
   return (
@@ -49,7 +58,7 @@ export default function MapView({ activeNav, onNavigate, onStationClick }: MapVi
             </button>
           ))}
         </nav>
-        <MyTripsButton />
+        <HeaderActions />
       </header>
 
       {/* 검색바 */}
@@ -61,12 +70,22 @@ export default function MapView({ activeNav, onNavigate, onStationClick }: MapVi
             className="MapView-SearchField"
             placeholder="역 이름으로 검색하세요."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSearchError(null);
+            }}
+            aria-invalid={searchError !== null}
+            aria-describedby={searchError !== null ? 'MapView-SearchError' : undefined}
           />
         </div>
         <button type="submit" className="MapView-SearchButton">
           SEARCH
         </button>
+        {searchError !== null && (
+          <p id="MapView-SearchError" className="MapView-SearchError" role="alert">
+            {searchError}
+          </p>
+        )}
       </form>
 
       {/* 지도 영역 */}

@@ -3,6 +3,8 @@
 interface ImportMetaEnv {
   readonly VITE_KAKAO_MAP_KEY?: string;
   readonly VITE_API_BASE_URL?: string;
+  readonly VITE_USE_MOCK_CHAT?: string; // 'false'면 백엔드 POST /chat 호출, 그 외에는 데모 응답
+  readonly VITE_USE_MOCK_AUTH?: string; // 'false'면 백엔드 /auth API 호출, 그 외에는 데모 인증
 }
 
 interface Window {

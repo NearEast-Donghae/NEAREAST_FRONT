@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Step1BasicInfo, { TravelBasicInfo } from '../components/planning/Step1BasicInfo';
 import Step2Stations from '../components/planning/Step2Stations';
-import Step2_1Trains from '../components/planning/Step2_1Trains';
+import Step2_1Trains, { PLANNING_TRAIN_TYPES } from '../components/planning/Step2_1Trains';
 import Step2A_TrainDetail, { TrainDetailInfo } from '../components/planning/Step2A_TrainDetail';
 import Step3Schedule, { ScheduleItem } from '../components/planning/Step3Schedule';
 import Step4FreeTime, { FreeTimeSlot } from '../components/planning/Step4FreeTime';
@@ -9,6 +9,10 @@ import Step5Confirm, { FINAL_ICON, FinalScheduleItem, TravelSummary } from '../c
 import { createItinerary } from '../api/itineraries';
 import { ROUTES, navigateTo } from '../routes';
 import { formatTravelDate } from '../utils/format';
+import { useSavedPlaces } from '../hooks/useSavedPlaces';
+import { savedPlacesStore } from '../store/savedPlaces';
+import { useSavedTrains } from '../hooks/useSavedTrains';
+import { savedTrainsStore } from '../store/savedTrains';
 
 type PlanningView =
   | 'step1'
@@ -118,8 +122,23 @@ const buildDefaultSchedule = (
   return items;
 };
 
+function uniqueValues(values: (string | undefined)[]): string[] {
+  return values.filter((value, index): value is string => value !== undefined && values.indexOf(value) === index);
+}
+
+// 담은 목록이 previousSaved → nextSaved로 바뀌었을 때 선택 목록에 반영
+function syncSavedSelection(current: string[], previousSaved: string[], nextSaved: string[]): string[] {
+  const removed = previousSaved.filter((item) => !nextSaved.includes(item));
+  const added = nextSaved.filter((item) => !previousSaved.includes(item) && !current.includes(item));
+  if (removed.length === 0 && added.length === 0) return current;
+  return [...current.filter((item) => !removed.includes(item)), ...added];
+}
+
 const PlanningPage = () => {
   const [currentView, setCurrentView] = useState<PlanningView>('step1');
+  // AI 여행 플래너 등 다른 화면에서 담아둔 장소
+  const savedPlaces = useSavedPlaces();
+  const savedTrains = useSavedTrains();
   const [viewingTrainId, setViewingTrainId] = useState<string>('');
 
   // 폼 상태
@@ -133,6 +152,29 @@ const PlanningPage = () => {
   const [selectedStations, setSelectedStations] = useState<string[]>(['묵호역', '정동진역']);
   const [selectedTrains,   setSelectedTrains]   = useState<string[]>([]);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+
+  // 담아둔 장소·열차를 2단계 선택에 자동으로 넣는다
+  // 장소는 가까운 역으로, 열차는 '무궁화호 1693' → '무궁화호'처럼 종류로 바꿔서 넣는다
+  const savedStationNames = uniqueValues(
+    savedPlaces.map((place) => place.stationName ?? (place.category === '역' ? place.name : undefined))
+  );
+  const savedTrainTypes = uniqueValues(
+    savedTrains.map(
+      (train) => PLANNING_TRAIN_TYPES.find((type) => train.trainName.startsWith(type)) ?? train.trainName
+    )
+  );
+  const savedStationsKey = savedStationNames.join('|');
+  const savedTrainsKey = savedTrainTypes.join('|');
+  // 직전에 반영한 담은 목록 — 새로 담긴 것만 추가하고, 빠진 것만 제거해서 사용자가 직접 고른 선택은 건드리지 않는다
+  const appliedSavedRef = useRef<{ stations: string[]; trains: string[] }>({ stations: [], trains: [] });
+
+  useEffect(() => {
+    const applied = appliedSavedRef.current;
+    setSelectedStations((current) => syncSavedSelection(current, applied.stations, savedStationNames));
+    setSelectedTrains((current) => syncSavedSelection(current, applied.trains, savedTrainTypes));
+    appliedSavedRef.current = { stations: savedStationNames, trains: savedTrainTypes };
+    // 배열은 매번 새로 만들어지므로 내용이 바뀔 때만 실행되도록 문자열 키로 비교
+  }, [savedStationsKey, savedTrainsKey]);
 
   // 일정 아이템 (step3에서 편집)
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
@@ -231,7 +273,7 @@ const PlanningPage = () => {
       alert('여행 계획을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
       return;
     }
-    navigateTo(ROUTES.myTrips);
+    navigateTo(ROUTES.myPage);
   };
 
   // 최종 일정 아이템 변환
@@ -261,6 +303,10 @@ const PlanningPage = () => {
           formData={basicInfo}
           onFormChange={handleBasicInfoChange}
           onNext={handleStep1Next}
+          savedPlaces={savedPlaces}
+          onRemoveSavedPlace={savedPlacesStore.remove}
+          savedTrains={savedTrains}
+          onRemoveSavedTrain={savedTrainsStore.remove}
         />
       );
 
@@ -272,6 +318,7 @@ const PlanningPage = () => {
           onStationsChange={setSelectedStations}
           onPrev={() => setCurrentView('step1')}
           onNextToTrains={handleStep2ToTrains}
+          savedStationNames={savedStationNames}
           onNextToSchedule={handleStep2_1Next}
         />
       );
@@ -285,6 +332,7 @@ const PlanningPage = () => {
           onPrevToStations={() => setCurrentView('step2')}
           onViewTrainDetail={handleViewTrainDetail}
           onNext={handleStep2_1Next}
+          savedTrainTypes={savedTrainTypes}
         />
       );
 
@@ -299,6 +347,7 @@ const PlanningPage = () => {
             onPrevToStations={() => setCurrentView('step2')}
             onViewTrainDetail={handleViewTrainDetail}
             onNext={handleStep2_1Next}
+            savedTrainTypes={savedTrainTypes}
           />
           <Step2A_TrainDetail
             trainDetail={SAMPLE_TRAIN_DETAILS[viewingTrainId] ?? SAMPLE_TRAIN_DETAILS['itx-maum']}

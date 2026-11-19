@@ -5,6 +5,12 @@
   width: 910px;
 }
 
+.Step1BasicInfo__sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .Step1BasicInfo__guideCard {
   display: flex;
   flex-direction: column;

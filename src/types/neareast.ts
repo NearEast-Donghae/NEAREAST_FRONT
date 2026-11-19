@@ -61,6 +61,35 @@ export interface ChatMessage {
   text: string;
   options?: string[];
   selectedOption?: string;
+  places?: ChatPlace[]; // AI 답변에 붙는 장소 카드
+}
+
+// ── 채팅 API (POST /chat) — 형식 설명은 docs/chat-api.md ──
+
+// AI가 답변과 함께 추천하는 장소
+export interface ChatPlace {
+  id: string;
+  name: string;
+  category: string; // '역' | '관광지' | '출사 포인트' | '식당·카페' 등
+  stationName?: string; // 가장 가까운 역
+  description: string;
+  notice?: string; // 주의 사항 (예: 선로 접근 금지)
+  source?: string; // 데이터 출처 (예: 공공데이터 역 정보)
+}
+
+export type PlanConditions = Partial<Record<PlanConditionKey, string>>;
+
+export interface ChatRequest {
+  messages: { role: 'user' | 'assistant'; text: string }[]; // 지금까지의 대화, 마지막이 방금 보낸 질문
+  conditions: PlanConditions; // 지금까지 채워진 여행 조건
+  savedPlaces: ChatPlace[]; // 사용자가 여행 후보로 담아둔 장소 — 일정을 짤 때 반영
+}
+
+export interface ChatResponse {
+  reply: string;
+  places?: ChatPlace[];
+  conditionUpdates?: PlanConditions; // 이번 대화로 새로 알게 된 여행 조건
+  quickReplies?: string[]; // 답변 아래 빠른 답변 버튼
 }
 
 // 일정 타입
@@ -128,3 +157,39 @@ export interface SavedTrip {
 }
 
 export type NewSavedTrip = Omit<SavedTrip, 'id' | 'createdAt'>;
+
+// 여행 후보로 담아둔 장소 — 챗봇·지도 등에서 담고, 여행 계획하기에서 보여준다
+export interface SavedPlace extends ChatPlace {
+  savedFrom: string; // 담은 화면 이름 (예: 'AI 여행 플래너')
+  savedAt: string; // ISO 8601
+}
+
+// 열차를 담는 용도 — 직접 타는 열차 / 지나가는 모습을 보는 열차
+export type TrainPurpose = 'board' | 'watch';
+
+// 열차 상세에서 담아둔 열차
+export interface SavedTrain {
+  id: string;
+  trainName: string;
+  route: string;
+  purpose: TrainPurpose;
+  savedFrom: string;
+  savedAt: string; // ISO 8601
+}
+
+// 로그인한 사용자 — 비밀번호는 프론트에 두지 않는다
+export interface AuthUser {
+  email: string;
+  nickname: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface SignupRequest {
+  email: string;
+  password: string;
+  nickname: string;
+}

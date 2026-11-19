@@ -121,6 +121,16 @@
   background-color: #c0c0c0;
 }
 
+/* 검색바 바로 아래 — 지도(top 300) 위의 빈 공간에 들어간다 */
+.MapView-SearchError {
+  position: absolute;
+  top: 54px;
+  left: 16px;
+  margin: 0;
+  font-size: 13px;
+  color: #c0392b;
+}
+
 /* 지도 영역 */
 .MapView-MapArea {
   position: absolute;

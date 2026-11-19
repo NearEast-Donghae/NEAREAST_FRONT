@@ -40,10 +40,7 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
 
   return (
     <div className="MyTripsView">
-      <header className="MyTripsView-PageHeader">
-        <h1 className="MyTripsView-Title">나의 여행 일정</h1>
-        <p className="MyTripsView-Subtitle">저장한 여행 계획을 다시 확인하고 관리하세요.</p>
-      </header>
+      <p className="MyTripsView-Subtitle">저장한 여행 계획을 다시 확인하고 관리하세요.</p>
 
       {isLoading && <p className="MyTripsView-Status">불러오는 중…</p>}
 

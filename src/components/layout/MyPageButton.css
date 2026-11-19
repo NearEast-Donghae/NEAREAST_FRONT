@@ -1,7 +1,4 @@
-/* 헤더 오른쪽 끝 — 헤더가 flex라 margin-left: auto로 밀어낸다 */
-.MyTripsButton {
-  margin-left: auto;
-  align-self: center;
+.MyPageButton {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -19,17 +16,15 @@
   cursor: pointer;
 }
 
-.MyTripsButton:hover {
+.MyPageButton:hover {
   background-color: #f5f5f5;
 }
 
-.MyTripsButton--active,
-.MyTripsButton--active:hover {
-  background-color: #333;
-  border-color: #333;
-  color: #ffffff;
+/* 지금 보고 있는 페이지 — 옆의 검은 로그인 버튼과 헷갈리지 않게 채우지 않고 테두리·굵기로 표시 */
+.MyPageButton--active,
+.MyPageButton--active:hover {
+  border: 2px solid #333;
+  padding: 7px 17px;
+  font-weight: 700;
 }
 
-.MyTripsButton-Icon {
-  font-size: 14px;
-}

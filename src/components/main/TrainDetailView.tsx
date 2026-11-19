@@ -1,7 +1,8 @@
 import React from 'react';
-import MyTripsButton from '../layout/MyTripsButton';
+import HeaderActions from '../layout/HeaderActions';
 import './TrainDetailView.css';
 import type { MainNavTab } from './MapView';
+import type { TrainPurpose } from '../../types/neareast';
 import stationStopIcon from '../../assets/icons/station-stop.svg';
 import stationPassIcon from '../../assets/icons/station-pass.svg';
 
@@ -21,6 +22,9 @@ interface TrainDetailViewProps {
   stops: StopInfo[];
   operationDays: string;
   onBack: () => void;
+  // 이 열차를 담아둔 용도 (담지 않았으면 null)
+  savedPurpose: TrainPurpose | null;
+  onSaveTrain: (purpose: TrainPurpose) => void;
 }
 
 const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기'];
@@ -33,6 +37,8 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
   stops,
   operationDays,
   onBack,
+  savedPurpose,
+  onSaveTrain,
 }) => {
   return (
     <div className="TrainDetailView">
@@ -50,7 +56,7 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
             </button>
           ))}
         </nav>
-        <MyTripsButton />
+        <HeaderActions />
       </header>
 
       {/* 본문 */}
@@ -112,6 +118,31 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
               </div>
             ))}
           </div>
+        </section>
+
+        {/* 여행에 담기 — 한 열차는 탑승·관찰 중 하나로만 담긴다 */}
+        <section className="TrainDetailView-SaveSection" aria-label="이 열차를 여행에 담기">
+          <div className="TrainDetailView-SaveButtons">
+            <button
+              className={`TrainDetailView-SaveButton TrainDetailView-SaveButton--board${savedPurpose === 'board' ? ' TrainDetailView-SaveButton--saved' : ''}`}
+              onClick={() => onSaveTrain('board')}
+              aria-pressed={savedPurpose === 'board'}
+            >
+              {savedPurpose === 'board' ? '✓ 탑승할 열차로 담음' : '탑승할 열차로 담기'}
+            </button>
+            <button
+              className={`TrainDetailView-SaveButton TrainDetailView-SaveButton--watch${savedPurpose === 'watch' ? ' TrainDetailView-SaveButton--saved' : ''}`}
+              onClick={() => onSaveTrain('watch')}
+              aria-pressed={savedPurpose === 'watch'}
+            >
+              {savedPurpose === 'watch' ? '✓ 관찰할 열차로 담음' : '관찰할 열차로 담기'}
+            </button>
+          </div>
+          <p className="TrainDetailView-SaveHint" role="status">
+            {savedPurpose === null
+              ? '직접 탈 열차인지, 지나가는 모습을 볼 열차인지 골라 여행에 담아 두세요.'
+              : '담은 열차는 ‘여행 계획하기’에서 확인할 수 있어요. 한 번 더 누르면 빠져요.'}
+          </p>
         </section>
       </main>
     </div>
