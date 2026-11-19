@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AuthField from './AuthField';
+import LoadingLabel from '../common/LoadingLabel';
 import { ROUTES } from '../../routes';
 import type { LoginRequest } from '../../types/neareast';
 import './AuthView.css';
@@ -48,7 +49,7 @@ const LoginView: React.FC<LoginViewProps> = ({ isDemoMode, onLogin }) => {
 
   return (
     <div className="AuthView">
-      <div className="AuthView-Card">
+      <div className="AuthView-Card motion-stagger">
         <h1 className="AuthView-Title">로그인</h1>
         <p className="AuthView-Subtitle">저장한 여행 일정과 담아둔 장소를 이어서 볼 수 있어요.</p>
 
@@ -86,7 +87,7 @@ const LoginView: React.FC<LoginViewProps> = ({ isDemoMode, onLogin }) => {
           )}
 
           <button type="submit" className="AuthView-SubmitButton" disabled={isSubmitting}>
-            {isSubmitting ? '로그인 중…' : '로그인'}
+            <LoadingLabel isLoading={isSubmitting} loadingText="로그인 중…">로그인</LoadingLabel>
           </button>
         </form>
 

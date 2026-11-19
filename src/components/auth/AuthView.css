@@ -144,3 +144,10 @@
   font-weight: 700;
   color: #333;
 }
+
+/* ── 모션 (styles/motion.css 기준) ── */
+/* 토스트: 오류 문구는 제자리에서 Fade in (마이페이지 입력칸도 이 스타일을 같이 쓴다) */
+.AuthView-FieldError,
+.AuthView-FormError {
+  animation: motion-fade-in var(--motion-short) var(--ease-out) both;
+}

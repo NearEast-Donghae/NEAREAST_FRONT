@@ -1,8 +1,6 @@
 import React from 'react';
-import MyPageButton from './MyPageButton';
+import ProfileMenu from './ProfileMenu';
 import { useAuthUser } from '../../hooks/useAuthUser';
-import { logout } from '../../api/auth';
-import { authStore } from '../../store/auth';
 import { ROUTES } from '../../routes';
 import './HeaderActions.css';
 
@@ -11,22 +9,12 @@ interface HeaderActionsProps {
   isAuthPageActive?: boolean;
 }
 
-// 모든 헤더 오른쪽 끝 — 마이페이지 + 로그인(로그인 후에는 닉네임·로그아웃)
+// 모든 헤더 오른쪽 끝 — 로그인 전에는 로그인 버튼, 로그인 후에는 프로필 메뉴(마이페이지·로그아웃 등)
 const HeaderActions: React.FC<HeaderActionsProps> = ({ isMyPageActive = false, isAuthPageActive = false }) => {
   const user = useAuthUser();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } finally {
-      // 서버 로그아웃이 실패해도 이 브라우저에서는 로그아웃 상태로 만든다
-      authStore.setUser(null);
-    }
-  };
-
   return (
     <div className="HeaderActions">
-      <MyPageButton isActive={isMyPageActive} />
       {user === null ? (
         <a
           href={ROUTES.login}
@@ -36,12 +24,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({ isMyPageActive = false, i
           로그인
         </a>
       ) : (
-        <div className="HeaderActions-User">
-          <span className="HeaderActions-Nickname">{user.nickname}님</span>
-          <button className="HeaderActions-LogoutButton" onClick={handleLogout}>
-            로그아웃
-          </button>
-        </div>
+        <ProfileMenu user={user} isMyPageActive={isMyPageActive} />
       )}
     </div>
   );
