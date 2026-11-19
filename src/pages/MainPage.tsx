@@ -15,6 +15,7 @@ import { useSavedTrains } from '../hooks/useSavedTrains';
 import { savedTrainsStore } from '../store/savedTrains';
 import { useSavedPlaces } from '../hooks/useSavedPlaces';
 import { savedPlacesStore } from '../store/savedPlaces';
+import type { StationKind } from '../components/main/KakaoMap';
 
 const stationPlaceId = (stationName: string) => `station-${stationName}`;
 import type {
@@ -118,6 +119,8 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
   const [currentView, setCurrentView] = useState<MainView>(INITIAL_VIEW_BY_NAV[initialNav] ?? 'map');
   const [activeNav, setActiveNav] = useState<MainNavTab>(initialNav);
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
+  // 지도 마커로 연 역의 종류 — 폐역이면 팝업에 '운영 중단'으로 표시
+  const [selectedStationKind, setSelectedStationKind] = useState<StationKind | null>(null);
   const [selectedTrain, setSelectedTrain] = useState<TrainResult | null>(null);
   const savedTrains = useSavedTrains();
   const savedPlaces = useSavedPlaces();
@@ -156,7 +159,7 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
       alert('여행 계획을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
       return;
     }
-    navigateTo(ROUTES.myPage);
+    navigateTo(ROUTES.myTrips);
   };
 
   const handleNavigate = (tab: MainNavTab) => {
@@ -166,6 +169,7 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
       case '열차 정보':     setCurrentView('trainInfo');   break;
       case 'AI 여행 플래너': setCurrentView('aiPlanner');   break;
       case '여행 계획하기':  navigateTo(ROUTES.planning); break;
+      case '나의 여행 일정': navigateTo(ROUTES.myTrips); break;
     }
   };
 
@@ -181,12 +185,15 @@ const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => 
           <MapView
             activeNav={activeNav}
             onNavigate={handleNavigate}
-            onStationClick={(name) => setSelectedStation(name)}
+            onStationClick={(name, kind) => {
+              setSelectedStation(name);
+              setSelectedStationKind(kind ?? null);
+            }}
           />
           {selectedStation !== null && (
             <StationInfoPopup
               stationName={selectedStation}
-              operationStatus="운영 중"
+              operationStatus={selectedStationKind === 'closed' ? '운영 중단' : '운영 중'}
               description="동해안 해안선을 따라 운행하는 동해선의 주요 역입니다."
               trains={['동해산타열차', '바다열차', 'S-train']}
               isSaved={savedPlaces.some((place) => place.id === stationPlaceId(selectedStation))}

@@ -11,7 +11,7 @@ interface AppHeaderProps {
   onNavigate: (tab: MainNavTab) => void;
 }
 
-const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기'];
+const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
 
 // 메인 뷰들은 각자 헤더를 갖고 있지만, 계획하기·나의 여행 일정 페이지는 헤더가 없어서 같은 모양으로 위에 붙인다
 const AppHeader: React.FC<AppHeaderProps> = ({ activeNav, isMyPageActive = false, isAuthPageActive = false, onNavigate }) => {

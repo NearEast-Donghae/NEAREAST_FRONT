@@ -1,0 +1,62 @@
+/* ==========================================
+   MyTripsLayout — 헤더 '나의 여행 일정' 탭 화면
+   ========================================== */
+
+.MyTripsLayout {
+  box-sizing: border-box;
+  width: 1440px; /* 다른 화면과 같은 캔버스, 넓은 화면에서는 가운데 */
+  margin: 0 auto;
+  min-height: calc(100vh - 110px); /* AppHeader 높이 제외 */
+  padding: 28px 95px 64px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+}
+
+/* 페이지 제목 — 계획하기 페이지 제목과 같은 크기 */
+.MyTripsLayout-Title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+/* 탭 — 계획하기 2단계 탭과 같은 밑줄 형태 */
+.MyTripsLayout-Tabs {
+  width: 1250px;
+  display: flex;
+  gap: 8px;
+  margin: 24px 0 28px;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.MyTripsLayout-Tab {
+  padding: 12px 20px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font-size: 17px;
+  color: #737373;
+  text-decoration: none;
+}
+
+.MyTripsLayout-Tab:hover {
+  color: #333;
+}
+
+.MyTripsLayout-Tab--active {
+  border-bottom-color: #333;
+  font-weight: 700;
+  color: #333;
+}
+
+.MyTripsLayout-Content {
+  width: 1250px;
+}
+
+/* 담아둔 장소·열차 탭 — 계획하기 옆 카드(275px)를 탭 내용 폭으로 넓혀 쓴다 */
+.MyTripsLayout-Content .SavedPlacesCard {
+  width: auto;
+  max-width: 640px;
+  padding: 24px 26px;
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+}

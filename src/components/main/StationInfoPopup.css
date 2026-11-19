@@ -201,3 +201,27 @@
 .StationInfoPopup-WishlistButton--saved:hover {
   background-color: #4a6070;
 }
+
+/* ── 모션 (styles/motion.css 기준: 팝업) ──
+   들어올 때: 배경이 어두워지고(Fade) 팝업이 90% → 100% (Ease out)
+   나갈 때: 반대로 (Ease in) — 닫기 처리는 StationInfoPopup.tsx가 애니메이션 길이만큼 기다린다 */
+.StationInfoPopup-Overlay {
+  animation: motion-fade-in var(--motion-short) var(--ease-out) both;
+}
+
+.StationInfoPopup-Overlay > .StationInfoPopup {
+  animation: motion-scale-in var(--motion-medium) var(--ease-out) both;
+}
+
+.StationInfoPopup-Overlay[data-state='closing'] {
+  animation: motion-fade-out var(--motion-short) var(--ease-in) both;
+}
+
+.StationInfoPopup-Overlay[data-state='closing'] > .StationInfoPopup {
+  animation: motion-scale-out var(--motion-short) var(--ease-in) both;
+}
+
+/* 좋아요 기준: 담으면 톡 튕긴다 (Scale + Spring) */
+.StationInfoPopup-WishlistButton--saved {
+  animation: motion-pop var(--motion-long) var(--ease-spring);
+}

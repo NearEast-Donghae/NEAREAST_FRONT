@@ -42,7 +42,12 @@ const MyTripsView: React.FC<MyTripsViewProps> = ({
     <div className="MyTripsView">
       <p className="MyTripsView-Subtitle">저장한 여행 계획을 다시 확인하고 관리하세요.</p>
 
-      {isLoading && <p className="MyTripsView-Status">불러오는 중…</p>}
+      {isLoading && (
+        <p className="MyTripsView-Status motion-loading-label" role="status">
+          <span className="motion-spinner" aria-hidden="true" />
+          불러오는 중…
+        </p>
+      )}
 
       {!isLoading && trips.length === 0 && (
         <section className="MyTripsView-Empty">

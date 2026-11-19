@@ -73,6 +73,14 @@
   min-height: 620px;
   box-sizing: border-box;
   display: flex;
+  /* 왼쪽 대화 목록 + 오른쪽 대화 */
+  flex-direction: row;
+}
+
+.AiPlannerView-ChatMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
 }
 
@@ -123,19 +131,26 @@
 }
 
 .AiPlannerView-NewChatButton {
-  height: 32px;
+  width: 100%;
+  height: 40px;
   padding: 0 14px;
   background: #ffffff;
   border: 1px solid #d6d6d6;
-  border-radius: 100px;
+  border-radius: 10px;
+  font-weight: 700;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   color: #333;
   cursor: pointer;
 }
 
-.AiPlannerView-NewChatButton:hover {
+.AiPlannerView-NewChatButton:hover:not(:disabled) {
   background-color: #f5f5f5;
+}
+
+.AiPlannerView-NewChatButton:disabled {
+  color: #aaa;
+  cursor: default;
 }
 
 /* 메시지 목록 — 스크롤바는 화면 가장자리, 내용은 가운데 열 */
@@ -309,7 +324,7 @@
   display: flex;
   gap: 14px;
   align-items: flex-start;
-  animation: AiPlannerView-MessageIn 0.2s ease-out;
+  animation: AiPlannerView-MessageIn var(--motion-short) var(--ease-out);
 }
 
 .AiPlannerView-AiAvatar {
@@ -340,7 +355,7 @@
 .AiPlannerView-UserMessage {
   display: flex;
   justify-content: flex-end;
-  animation: AiPlannerView-MessageIn 0.2s ease-out;
+  animation: AiPlannerView-MessageIn var(--motion-short) var(--ease-out);
 }
 
 .AiPlannerView-UserBubble {
@@ -664,4 +679,131 @@
   text-align: center;
   font-size: 11px;
   color: #aaa;
+}
+
+/* ==========================================
+   대화 목록 (왼쪽 사이드바)
+   ========================================== */
+
+.AiPlannerView-History {
+  width: 260px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 12px;
+  overflow-y: auto;
+  border-right: 1px solid #e0eaf0;
+  background-color: #f8fafb;
+}
+
+.AiPlannerView-HistoryTitle {
+  margin: 10px 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #707070;
+}
+
+.AiPlannerView-HistoryEmpty {
+  margin: 0 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #aaa;
+}
+
+.AiPlannerView-HistoryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.AiPlannerView-HistoryItem {
+  position: relative;
+  border-radius: 8px;
+}
+
+.AiPlannerView-HistoryItem:hover,
+.AiPlannerView-HistoryItem--active {
+  background-color: #eef2f5;
+}
+
+.AiPlannerView-HistoryOpen {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 32px 9px 10px; /* 오른쪽은 삭제 버튼 자리 */
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+}
+
+.AiPlannerView-HistoryOpen:disabled {
+  cursor: default;
+}
+
+.AiPlannerView-HistoryItemTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #18232d;
+}
+
+.AiPlannerView-HistoryItem--active .AiPlannerView-HistoryItemTitle {
+  font-weight: 700;
+}
+
+.AiPlannerView-HistoryItemDate {
+  font-size: 11px;
+  color: #aaa;
+}
+
+/* 삭제 버튼 — 평소에는 숨기고, 항목에 마우스를 올리거나 키보드로 닿으면 보인다 */
+.AiPlannerView-HistoryDelete {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  font-size: 15px;
+  color: #707070;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.AiPlannerView-HistoryItem:hover .AiPlannerView-HistoryDelete,
+.AiPlannerView-HistoryItem--active .AiPlannerView-HistoryDelete,
+.AiPlannerView-HistoryDelete:focus-visible {
+  opacity: 1;
+}
+
+.AiPlannerView-HistoryDelete:hover:not(:disabled) {
+  background-color: #e0eaf0;
+  color: #c0392b;
+}
+
+/* ==========================================
+   모션 (styles/motion.css 기준)
+   ========================================== */
+
+/* 스낵바: 여행 짜기를 시작하면 여행 계획 바가 아래에서 올라온다 (Ease out) */
+.AiPlannerView-PlanTray {
+  animation: motion-slide-up-in var(--motion-medium) var(--ease-out) both;
+}
+
+/* 좋아요: 장소를 담으면 버튼이 톡 튕긴다 (Scale + Spring) */
+.AiPlannerView-PlaceButton--saved {
+  animation: motion-pop var(--motion-long) var(--ease-spring);
 }

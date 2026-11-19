@@ -126,3 +126,18 @@ VITE_USE_MOCK_CHAT=false
 - **AI API 키는 백엔드에만 둡니다.** 프론트 코드에 넣으면 브라우저에서 누구나 볼 수 있습니다.
 - 응답이 위 JSON 형식을 항상 지키도록 모델의 **구조화된 출력(JSON 스키마 지정)** 기능을 쓰는 것을 권장합니다. Claude를 쓴다면 Messages API의 `output_config.format`에 이 응답 형식의 JSON 스키마를 넣으면 됩니다. 별도 요청이 없으면 모델은 `claude-opus-5-5`를 기본으로 하세요.
 - 장소 데이터는 모델에 요청과 함께 넣거나 도구(tool)로 조회하게 해서, 모델이 데이터 밖의 장소를 만들지 않도록 시스템 프롬프트에 위 "챗봇이 지켜야 할 동작"을 적어 주세요.
+
+---
+
+## 참고: 대화 목록 저장
+
+AI 여행 플래너 왼쪽의 **대화 목록**은 지금 브라우저 `localStorage`에 계정(이메일)별로 저장됩니다. 코드는 `src/store/chatHistory.ts`입니다.
+다른 기기에서도 같은 목록을 보려면 백엔드에 아래 API가 필요합니다. 형식은 `src/types/neareast.ts`의 `ChatConversation`을 따릅니다.
+
+| 기능 | 요청 |
+|------|------|
+| 목록 | `GET /chats` → `ChatConversation[]` (최근 수정 순) |
+| 저장(생성·수정) | `PUT /chats/{id}` + `ChatConversation` |
+| 삭제 | `DELETE /chats/{id}` |
+
+`POST /chat`이 답변을 줄 때 서버에서 대화를 바로 저장하는 방식으로 정해도 됩니다. 그 경우 프론트는 목록 조회와 삭제만 부르면 됩니다.

@@ -150,3 +150,8 @@
   font-size: 20px;
   color: #737373;
 }
+
+/* 토스트 기준: 검색 오류는 제자리에서 Fade in (styles/motion.css) */
+.MapView-SearchError {
+  animation: motion-fade-in var(--motion-short) var(--ease-out) both;
+}

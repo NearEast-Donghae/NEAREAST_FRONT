@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PlanningLayout from './PlanningLayout';
+import CheckboxMark from '../common/CheckboxMark';
 import './PlanningLayout.css';
 import './Step2Stations.css';
 
@@ -119,8 +120,9 @@ const Step2Stations = ({
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleStation(station.name)}
-                    className="Step2Stations__checkbox"
+                    className="motion-checkbox-input"
                   />
+                  <CheckboxMark />
                   <span className="Step2Stations__stationName">{station.name}</span>
                   {savedStationNames.includes(station.name) && (
                     <span className="Step2Stations__savedBadge">담아둔 장소</span>

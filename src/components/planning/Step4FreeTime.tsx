@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PlanningLayout from './PlanningLayout';
+import CheckboxMark from '../common/CheckboxMark';
 import './PlanningLayout.css';
 import './Step4FreeTime.css';
 
@@ -97,8 +98,9 @@ const Step4FreeTime = ({
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => onActivityToggle(activity.id)}
-                          className="Step4FreeTime__checkbox"
+                          className="motion-checkbox-input"
                         />
+                        <CheckboxMark />
                         <span className="Step4FreeTime__activityName">
                           {activity.name}&nbsp; · &nbsp;약 {activity.durationMinutes}분
                         </span>

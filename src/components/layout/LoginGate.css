@@ -1,0 +1,100 @@
+/* ==========================================
+   LoginGate — 로그인 전 흐림 처리 + 로그인 안내
+   ========================================== */
+
+.LoginGate-Content--locked {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 화면 가운데 고정 — 어두운 배경을 깔지 않아서 헤더는 그대로 보이고 눌린다 */
+.LoginGate-Dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 50;
+  transform: translate(-50%, -40%);
+  width: 400px;
+  box-sizing: border-box;
+  padding: 36px 36px 32px;
+  border: 1px solid #e0eaf0;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 16px 48px rgba(24, 35, 45, 0.18);
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+}
+
+.LoginGate-Icon {
+  display: block;
+  font-size: 32px;
+}
+
+.LoginGate-Title {
+  margin: 14px 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.LoginGate-Text {
+  margin: 0 0 26px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #575757;
+}
+
+.LoginGate-Actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.LoginGate-Button {
+  height: 50px;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  cursor: pointer;
+}
+
+.LoginGate-Button:hover {
+  background-color: #f5f5f5;
+}
+
+.LoginGate-Button--primary,
+.LoginGate-Button--primary:hover {
+  border-color: #333;
+  background-color: #333;
+  color: #ffffff;
+}
+
+.LoginGate-Button--primary:hover {
+  background-color: #444;
+}
+
+/* ── 모션 (styles/motion.css 기준: 팝업) ──
+   뒤 화면은 어둡게 하는 대신 흐려진다 — 흐림이 서서히(Fade) 들어오고, 안내 창은 90% → 100% (Ease out) */
+.LoginGate-Content--locked {
+  animation: LoginGate-blur-in var(--motion-medium) var(--ease-out) both;
+}
+
+.LoginGate-Dialog {
+  animation: LoginGate-dialog-in var(--motion-medium) var(--ease-out) both;
+}
+
+@keyframes LoginGate-blur-in {
+  from { filter: blur(0); }
+  to { filter: blur(6px); }
+}
+
+/* 가운데 정렬에 transform을 쓰고 있어서, 정렬값을 유지한 채 크기만 바꾼다 */
+@keyframes LoginGate-dialog-in {
+  from { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, -40%) scale(1); }
+}

@@ -22,7 +22,7 @@ const PlanningLayout = ({
     <div className="PlanningLayout">
       <StepIndicator currentStep={currentStep} />
 
-      <header className="PlanningLayout__header">
+      <header className="PlanningLayout__header motion-stagger">
         <h1 className="PlanningLayout__title">{pageTitle}</h1>
         <p className="PlanningLayout__subtitle">{pageSubtitle}</p>
       </header>

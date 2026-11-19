@@ -193,3 +193,22 @@ export interface SignupRequest {
   password: string;
   nickname: string;
 }
+
+export interface UpdateProfileRequest {
+  nickname: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+// AI 여행 플래너의 지난 대화 하나 — 대화 목록에서 다시 열 수 있다
+export interface ChatConversation {
+  id: string;
+  title: string; // 첫 질문으로 만든 제목
+  messages: ChatMessage[];
+  conditions: PlanConditions;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+}

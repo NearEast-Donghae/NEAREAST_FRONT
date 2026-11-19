@@ -208,3 +208,12 @@
 .Step2A_TrainDetail__addButton {
   width: 100%;
 }
+
+/* ── 모션 (styles/motion.css 기준: 팝업) — 배경이 어두워지고(Fade) 창이 90% → 100% (Ease out) ── */
+.Step2A_TrainDetail__overlay {
+  animation: motion-fade-in var(--motion-short) var(--ease-out) both;
+}
+
+.Step2A_TrainDetail__panel {
+  animation: motion-scale-in var(--motion-medium) var(--ease-out) both;
+}

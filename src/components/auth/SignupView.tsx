@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import AuthField from './AuthField';
+import LoadingLabel from '../common/LoadingLabel';
+import { PASSWORD_RULE_TEXT, getEmailError, getNicknameError, getPasswordError } from '../../utils/validation';
 import { ROUTES } from '../../routes';
 import type { SignupRequest } from '../../types/neareast';
 import './AuthView.css';
@@ -17,19 +19,15 @@ interface SignupErrors {
   passwordConfirm?: string;
 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_PASSWORD_LENGTH = 8;
-
 function validateSignup(email: string, nickname: string, password: string, passwordConfirm: string): SignupErrors {
+  // 오류가 있는 칸만 키를 넣는다 — 호출하는 쪽이 Object.keys로 오류 개수를 센다
   const errors: SignupErrors = {};
-  if (!EMAIL_PATTERN.test(email.trim())) errors.email = '이메일 형식을 확인해 주세요.';
-
-  const trimmedNickname = nickname.trim();
-  if (trimmedNickname.length < 2 || trimmedNickname.length > 12) errors.nickname = '닉네임은 2~12자로 입력해 주세요.';
-
-  if (password.length < MIN_PASSWORD_LENGTH || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-    errors.password = `영문과 숫자를 섞어 ${MIN_PASSWORD_LENGTH}자 이상 입력해 주세요.`;
-  }
+  const emailError = getEmailError(email);
+  const nicknameError = getNicknameError(nickname);
+  const passwordError = getPasswordError(password);
+  if (emailError !== undefined) errors.email = emailError;
+  if (nicknameError !== undefined) errors.nickname = nicknameError;
+  if (passwordError !== undefined) errors.password = passwordError;
   if (passwordConfirm !== password) errors.passwordConfirm = '비밀번호가 서로 달라요.';
   return errors;
 }
@@ -62,7 +60,7 @@ const SignupView: React.FC<SignupViewProps> = ({ isDemoMode, onSignup }) => {
 
   return (
     <div className="AuthView">
-      <div className="AuthView-Card">
+      <div className="AuthView-Card motion-stagger">
         <h1 className="AuthView-Title">회원가입</h1>
         <p className="AuthView-Subtitle">가입하면 여행 일정을 저장하고 언제든 다시 볼 수 있어요.</p>
 
@@ -100,7 +98,7 @@ const SignupView: React.FC<SignupViewProps> = ({ isDemoMode, onSignup }) => {
             value={password}
             onChange={setPassword}
             autoComplete="new-password"
-            hint={`영문과 숫자를 섞어 ${MIN_PASSWORD_LENGTH}자 이상`}
+            hint={PASSWORD_RULE_TEXT}
             error={fieldErrors.password}
           />
           <AuthField
@@ -120,7 +118,7 @@ const SignupView: React.FC<SignupViewProps> = ({ isDemoMode, onSignup }) => {
           )}
 
           <button type="submit" className="AuthView-SubmitButton" disabled={isSubmitting}>
-            {isSubmitting ? '가입하는 중…' : '가입하기'}
+            <LoadingLabel isLoading={isSubmitting} loadingText="가입하는 중…">가입하기</LoadingLabel>
           </button>
         </form>
 

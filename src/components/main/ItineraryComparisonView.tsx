@@ -21,7 +21,7 @@ interface ItineraryComparisonViewProps {
   onBack: () => void;
 }
 
-const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기'];
+const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
 
 const ItineraryComparisonView: React.FC<ItineraryComparisonViewProps> = ({
   activeNav,
