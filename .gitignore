@@ -1,0 +1,35 @@
+# 의존성 — npm install 로 복원
+node_modules/
+
+# 빌드 결과물 — npm run build 로 재생성
+dist/
+dist-ssr/
+*.local
+
+# 환경변수 — API 키가 들어 있으므로 절대 커밋 금지 (.env.example 만 커밋)
+.env
+.env.*
+!.env.example
+
+# 백업 폴더
+src_backup_*/
+
+# 로그
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 에디터 / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# Claude Code 로컬 설정
+.claude/settings.local.json
