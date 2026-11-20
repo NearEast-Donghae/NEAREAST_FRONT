@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import MapView, { type MainNavTab } from '../components/main/MapView';
+import { type MainNavTab } from '../components/main/MapView';
+import LiveMapView from '../components/main/LiveMapView';
 import AiPlannerView from '../components/main/AiPlannerView';
 import TrainInfoView from '../components/main/TrainInfoView';
 import TrainDetail from '../components/main/TrainDetail';
@@ -36,8 +37,10 @@ export default function MainPage({ initialNav = '철도 지도', routeHash }: Ma
     onPlaceDetail={(placeId, conversationId) => navigateTo(`#/places/${encodeURIComponent(placeId)}${conversationId ? `?conversation=${encodeURIComponent(conversationId)}` : ''}`)} />;
   const placeId = path.startsWith('#/places/') ? decodeURIComponent(path.slice('#/places/'.length)) : null;
   return <>
-    <MapView
-      onStationClick={(identifier) => navigateTo(`#/places/${encodeURIComponent(identifier)}`)} />
+    {/* 첫 화면: 시간표 기반으로 열차가 움직이는 철도 지도 (시안 J). 예전 장소 목록 지도는 MapView */}
+    <LiveMapView
+      onOpenPlace={(identifier) => navigateTo(`#/places/${encodeURIComponent(identifier)}`)}
+      onOpenTrains={(identifier) => navigateTo(`#/trains?station=${encodeURIComponent(identifier)}`)} />
     {placeId && <PlaceDetail key={placeId} placeId={placeId} onClose={closePlace}
       onPlan={(identifier) => startPlan({ requiredPlaceIds: [identifier] })}
       onTrains={(identifier) => navigateTo(`#/trains?station=${encodeURIComponent(identifier)}`)} />}

@@ -16,9 +16,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 /* ── 역 마커 (카카오 CustomOverlay 안에 들어가는 DOM) ── */
@@ -31,7 +31,7 @@
   padding: 0;
   border: none;
   background: none;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   cursor: pointer;
 }
 
@@ -41,7 +41,7 @@
   gap: 4px;
   padding: 5px 10px;
   border-radius: 100px;
-  background-color: #333;
+  background-color: #0E4D3E;
   box-shadow: 0 2px 6px rgba(24, 35, 45, 0.25);
   font-size: 13px;
   font-weight: 700;
@@ -52,7 +52,7 @@
 .KakaoMap-StationPin {
   width: 2px;
   height: 10px;
-  background-color: #333;
+  background-color: #0E4D3E;
 }
 
 .KakaoMap-StationPin::after {
@@ -63,13 +63,13 @@
   margin: 8px 0 0 -3px;
   border: 2px solid #ffffff;
   border-radius: 50%;
-  background-color: #333;
+  background-color: #0E4D3E;
   box-sizing: border-box;
 }
 
 .KakaoMap-Station:hover .KakaoMap-StationLabel,
 .KakaoMap-Station:focus-visible .KakaoMap-StationLabel {
-  background-color: #4a6070;
+  background-color: #13896F;
 }
 
 .KakaoMap-Station:focus-visible {
@@ -84,26 +84,26 @@
 .KakaoMap-Station--freight .KakaoMap-StationLabel,
 .KakaoMap-Station--closed .KakaoMap-StationLabel {
   padding: 3px 8px;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   background-color: #ffffff;
   font-size: 12px;
   font-weight: 500;
-  color: #707070;
+  color: #5F6F69;
 }
 
 .KakaoMap-Station--freight .KakaoMap-StationPin,
 .KakaoMap-Station--closed .KakaoMap-StationPin,
 .KakaoMap-Station--freight .KakaoMap-StationPin::after,
 .KakaoMap-Station--closed .KakaoMap-StationPin::after {
-  background-color: #707070;
+  background-color: #5F6F69;
 }
 
 .KakaoMap-StationBadge {
   padding: 0 5px;
   border-radius: 100px;
-  background-color: #eef2f5;
+  background-color: #E6F4EF;
   font-size: 10px;
-  color: #4a6070;
+  color: #13896F;
 }
 
 /* 가장 축소했을 때 — 화물역·폐역은 이름을 숨기고 점만 (마우스를 올리거나 키보드로 닿으면 이름이 보인다) */
@@ -134,7 +134,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 10px;
   background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(24, 35, 45, 0.15);
@@ -146,27 +146,27 @@
   padding: 0;
   border: none;
   background: none;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 22px;
   line-height: 1;
-  color: #333;
+  color: #0F2E26;
   cursor: pointer;
 }
 
 .KakaoMap-ZoomButton + .KakaoMap-ZoomButton {
-  border-top: 1px solid #e0eaf0;
+  border-top: 1px solid #E6EBE8;
 }
 
 .KakaoMap-ZoomButton:hover:not(:disabled) {
-  background-color: #f5f5f5;
+  background-color: #F2F6F3;
 }
 
 .KakaoMap-ZoomButton:focus-visible {
-  outline: 2px solid #4a6070;
+  outline: 2px solid #13896F;
   outline-offset: -2px;
 }
 
 .KakaoMap-ZoomButton:disabled {
-  color: #d6d6d6;
+  color: #DCE3DF;
   cursor: default;
 }

@@ -7,7 +7,7 @@
   width: 1440px; /* 넓은 화면에서 가운데 정렬 */
   margin: 0 auto;
   min-height: calc(100vh - 110px); /* 헤더 높이 제외 */
-  background: #fff;
+  background: transparent; /* 페이지 바탕(딥그린 시안)이 보이게 */
 }
 
 .PlanningLayout__header {
@@ -18,19 +18,19 @@
 }
 
 .PlanningLayout__title {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 34px;
-  color: #333;
+  color: #0F2E26;
   margin: 0;
   line-height: normal;
 }
 
 .PlanningLayout__subtitle {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 17px;
-  color: #737373;
+  color: #5F6F69;
   margin: 0;
   line-height: normal;
 }
@@ -57,7 +57,7 @@
   justify-content: center;
   padding: 13px 22px;
   border-radius: 6px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 17px;
   min-width: 220px;
@@ -72,20 +72,20 @@
 }
 
 .PlanningButton--primary {
-  background: #333;
+  background: #0E4D3E;
   color: #fff;
 }
 
 .PlanningButton--secondary {
   background: #fff;
-  color: #333;
-  border: 1px solid #d7d7d7;
+  color: #0F2E26;
+  border: 1px solid #DCE3DF;
 }
 
 /* ── 공용 카드 ─────────────────────────────── */
 .PlanningCard {
   background: #fff;
-  border: 1px solid #d7d7d7;
+  border: 1px solid #DCE3DF;
   border-radius: 8px;
   padding: 24px 26px;
 }
@@ -98,10 +98,10 @@
 }
 
 .PlanningField__label {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 14px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 .PlanningField__select {
@@ -109,23 +109,66 @@
   align-items: center;
   gap: 10px;
   padding: 11px 12px 11px 14px;
-  border: 1px solid #d7d7d7;
+  border: 1px solid #DCE3DF;
   border-radius: 6px;
   cursor: pointer;
   background: #fff;
   width: 100%;
   box-sizing: border-box; /* 안쪽 여백·테두리까지 칸 너비 안에 — 없으면 옆 칸과의 간격을 덮어 버린다 */
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
 }
 
 .PlanningField__selectValue {
   font-size: 18px;
-  color: #333;
+  color: #0F2E26;
   flex: 1;
   text-align: left;
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
 }
 
+
+/* ── 단계 표시와 단계 사이 전환 ─────────────── */
+.PlanningLayout__steps { margin-bottom: 4px; }
+/* 단계가 바뀌면 내용이 진행 방향에서 살짝 밀려 들어온다 (Ease out, 0.3초) */
+.PlanningStep-Enter { animation: PlanningStep-in var(--motion-medium, .3s) var(--ease-out, ease-out) both; }
+.PlanningStep-Enter--forward { --step-from: 24px; }
+.PlanningStep-Enter--back { --step-from: -24px; }
+@keyframes PlanningStep-in { from { opacity: 0; transform: translateX(var(--step-from)); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .PlanningStep-Enter { animation: none; } }
+
+/* ── 1단계 입력: 열차 정보 검색칸과 같은 모양 (작은 이름표 + 큰 값, 테두리 없음) ── */
+.PlanBar { display: flex; align-items: center; flex-wrap: wrap; gap: 20px 24px; padding: 18px 0; border-bottom: 1px solid var(--ng-line); }
+.PlanBar:first-of-type { padding-top: 6px; }
+.PlanBar-Kicker { width: 56px; flex-shrink: 0; font-size: 14px; font-weight: 700; color: var(--ng-teal); }
+.PlanBar-Field { display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+.PlanBar-Field > span:first-child { font-size: 13px; font-weight: 400; color: var(--ng-gray); }
+.PlanBar-Field input {
+  appearance: none; -webkit-appearance: none;
+  border: none; background: transparent; padding: 2px 0; margin: 0;
+  font-family: var(--font-body); font-size: 20px; font-weight: 700; color: var(--ng-ink);
+  cursor: pointer; border-radius: 6px; font-variant-numeric: tabular-nums;
+}
+.PlanBar-Field input[type='number'] { width: 110px; cursor: text; -moz-appearance: textfield; }
+.PlanBar-Field input[type='number']::-webkit-inner-spin-button { display: none; }
+.PlanBar-Field input::placeholder { color: #9AA7A2; font-weight: 500; }
+.PlanBar-Field input::-webkit-calendar-picker-indicator { opacity: .4; cursor: pointer; }
+.PlanBar-Field input:focus-visible { outline: 2px solid var(--ng-teal); outline-offset: 4px; }
+.PlanBar-Unit { display: inline-flex; align-items: baseline; gap: 4px; }
+.PlanBar-Unit em { font-style: normal; font-size: 16px; font-weight: 600; color: var(--ng-gray); }
+.PlanBar-Arrow { align-self: flex-end; margin-bottom: 4px; font-size: 20px; color: #9AA7A2; }
+.PlanBar-Divider { width: 1px; height: 40px; background: var(--ng-line); margin: 0 4px; }
+.PlanBar-Foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 18px; }
+.PlanBar-Button {
+  height: 52px; padding: 0 28px; border: none; border-radius: 14px;
+  background: var(--ng-green); color: #fff; font-family: var(--font-body); font-size: 16px; font-weight: 700; cursor: pointer;
+  transition: background-color var(--motion-short, .2s) var(--ease-out, ease-out), transform var(--motion-short, .2s) var(--ease-out, ease-out);
+}
+.PlanBar-Button:hover { background: #176A55; }
+.PlanBar-Button:active { transform: scale(.97); }
+/* 패널 공통 버튼 모양(.Integration-Panel button)이 덮어쓰지 않게 */
+.Integration-Panel .PlanBar .Dropdown-Button { padding: 2px 0; border: none; border-radius: 6px; background: none; font-size: 20px; font-weight: 700; }
+.Integration-Panel .PlanBar-Button { height: 52px; padding: 0 28px; border: none; border-radius: 14px; background: var(--ng-green); color: #fff; font-size: 16px; font-weight: 700; }
+.Integration-Panel .PlanBar-Button:hover { background: #176A55; }

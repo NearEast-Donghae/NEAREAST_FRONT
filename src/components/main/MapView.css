@@ -8,7 +8,7 @@
   margin: 0 auto;
   min-height: 100vh; /* 지도 높이를 화면에 맞추므로 피그마 높이(1024px) 대신 화면 높이 */
   background-color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
 }
 
 /* 상단 헤더 */
@@ -31,11 +31,11 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   color: inherit;
   font-size: 23px;
   font-weight: 700;
-  color: #333;
+  color: #0F2E26;
   flex-shrink: 0;
 }
 
@@ -49,10 +49,10 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
   font-weight: 400;
-  color: #333;
+  color: #0F2E26;
   padding: 0;
   flex-shrink: 0;
 }
@@ -75,7 +75,7 @@
 .MapView-SearchInput {
   flex: 1;
   height: 45px;
-  background-color: #f5f5f5;
+  background-color: #F2F6F3;
   border-radius: 100px;
   display: flex;
   align-items: center;
@@ -85,7 +85,7 @@
 
 .MapView-SearchIcon {
   font-size: 16px;
-  color: #737373;
+  color: #5F6F69;
   flex-shrink: 0;
 }
 
@@ -93,26 +93,26 @@
   flex: 1;
   border: none;
   background: transparent;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
-  color: #333;
+  color: #0F2E26;
   outline: none;
 }
 
 .MapView-SearchField::placeholder {
-  color: #737373;
+  color: #5F6F69;
 }
 
 .MapView-SearchButton {
   height: 26px;
   padding: 0 16px;
-  background-color: #d7d7d7;
+  background-color: #DCE3DF;
   border: none;
   border-radius: 100px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 500;
-  color: #333;
+  color: #0F2E26;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -150,7 +150,7 @@
 
 .MapView-MapPlaceholder {
   font-size: 20px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 /* 토스트 기준: 검색 오류는 제자리에서 Fade in (styles/motion.css) */

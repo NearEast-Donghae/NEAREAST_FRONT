@@ -17,6 +17,7 @@ import { IS_MOCK_AUTH, restoreSession } from './api/auth';
 import './index.css';
 import './components/integration.css';
 import './styles/layout.css';
+import './styles/mobile.css'; // 스마트폰 화면 — 맨 마지막에 불러와야 다른 CSS를 덮는다
 
 let sessionRefreshId = 0;
 function refreshSession() {

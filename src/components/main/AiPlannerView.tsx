@@ -17,7 +17,11 @@ import { savedPlacesStore } from '../../store/savedPlaces';
 import { useAuthUser } from '../../hooks/useAuthUser';
 import { formatConversationDate } from '../../store/chatHistory';
 import type { ChatMessage, ChatPlace, ChatRequest, PlanConditions } from '../../types/neareast';
+import { readSessionState, writeSessionState } from '../../utils/sessionState';
 import './AiPlannerView.css';
+
+const CHAT_SCROLL_KEY = 'neareast.chatScroll.v1';
+type ChatScrollState = { conversationId: string; top: number };
 import type { PlanningConditions } from '../../api/planning';
 import { authStore } from '../../store/auth';
 import { getPlaces, type PlaceDto } from '../../api/catalog';
@@ -129,11 +133,29 @@ export default function AiPlannerView({
   const isPlanTrayVisible = !planningConditions && (filledConditionCount > 0 || savedPlaces.length > 0);
   const handleCreateItinerary = () => onCreateItinerary(planningConditions, activeConversationId ?? undefined);
 
+  // 상세 보기 등으로 나갔다 돌아오면 보던 자리로: 대화를 열 때 저장해 둔 스크롤 위치를 한 번만 되살린다
+  // (서버 캐시가 아니라 이 브라우저 탭의 sessionStorage에 대화별로 기억)
+  const pendingScrollRestore = useRef(readSessionState<ChatScrollState | null>(CHAT_SCROLL_KEY, null));
+  const handleMessageListScroll = () => {
+    const messageList = messageListRef.current;
+    if (messageList === null || activeConversationId === null || loadingConversation || pendingScrollRestore.current) return;
+    writeSessionState(CHAT_SCROLL_KEY, { conversationId: activeConversationId, top: messageList.scrollTop });
+  };
+
   // 페이지 전체가 아니라 대화 목록만 아래로 스크롤 (scrollIntoView는 페이지까지 움직임)
   useEffect(() => {
     const messageList = messageListRef.current;
-    if (messageList !== null) messageList.scrollTop = messageList.scrollHeight;
-  }, [messages, isAiTyping]);
+    if (messageList === null || loadingConversation) return;
+    const saved = pendingScrollRestore.current;
+    if (saved && messages.length > 0) {
+      pendingScrollRestore.current = null;
+      if (saved.conversationId === activeConversationId) {
+        messageList.scrollTop = saved.top;
+        return;
+      }
+    }
+    messageList.scrollTop = messageList.scrollHeight;
+  }, [messages, isAiTyping, loadingConversation, activeConversationId]);
 
   // 답한 질문의 빠른 답변은 잠가서, 지난 버튼을 눌러 대화 순서가 꼬이지 않게 한다
   const lockQuickReplies = (previous: ChatMessage[], answerText: string): ChatMessage[] =>
@@ -370,7 +392,7 @@ export default function AiPlannerView({
               </h1>
             </div>
 
-            <div className="AiPlannerView-MessageList" ref={messageListRef} aria-live="polite">
+            <div className="AiPlannerView-MessageList" ref={messageListRef} aria-live="polite" onScroll={handleMessageListScroll}>
               <div className="AiPlannerView-MessageColumn">
                 {loadingConversation ? <p role="status">대화를 불러오고 있어요…</p> : conversationError ? <div role="alert">
                   <p>대화를 불러오지 못했어요. 삭제된 대화이거나 연결에 문제가 있을 수 있어요.</p>

@@ -12,7 +12,8 @@ export function loadKakaoSdk(): Promise<void> {
       script.remove();
       reject(new Error('지도를 불러오지 못했어요. 잠시 후 다시 시도하거나 장소 목록을 이용해 주세요.'));
     };
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(appKey)}&autoload=false`;
+    // services: 역 이름으로 좌표를 찾는 장소 검색(움직이는 철도 지도에서 사용)
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(appKey)}&autoload=false&libraries=services`;
     script.onload = () => {
       if (!window.kakao?.maps?.load) { fail(); return; }
       window.kakao.maps.load(() => { window.clearTimeout(timeout); resolve(); });

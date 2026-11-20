@@ -1,0 +1,306 @@
+/* ==========================================
+   LiveMapView — 움직이는 철도 지도 (첫 화면, 시안 J)
+   지도는 화면 가득, 패널은 지도 위에 떠 있다
+   ========================================== */
+
+.LiveMap {
+  /* 딥그린 시안 색 — navy=글자/진한 면, rail=선택·강조(청록), blue-50=옅은 청록 */
+  --lm-navy: #0F2E26;
+  --lm-deep: #0E4D3E;
+  --lm-rail: #13896F;
+  --lm-blue-50: #E6F4EF;
+  --lm-ground: #F6F8F6;
+  --lm-line: #E6EBE8;
+  --lm-muted: #5F6F69;
+  --lm-faint: #9AA7A2;
+  --lm-ok: #13A36B;
+  --lm-shadow: 0 1px 2px rgba(15, 46, 38, .05), 0 8px 24px rgba(15, 46, 38, .10);
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 110px); /* 공통 헤더(110px) 아래를 꽉 채운다 */
+  min-height: 560px;
+  overflow: hidden;
+  font-family: var(--font-body);
+  color: var(--lm-navy);
+  background: var(--lm-ground);
+}
+
+.LiveMap-Map { position: absolute; inset: 0; }
+
+/* ── 역 선택 시 흐림: 선택한 역 둘레만 뚫어 둔다 (테두리 선 없이 가장자리가 서서히 흐려짐) ── */
+.LiveMap-Blur {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none; /* 클릭은 지도로 — 지도 클릭이 선택 해제 */
+  opacity: 0;
+  background: rgba(246, 248, 251, .42);
+  backdrop-filter: blur(6px) saturate(.6);
+  -webkit-mask-image: radial-gradient(circle 170px at var(--fx, -999px) var(--fy, -999px), transparent 60%, #000 100%);
+  mask-image: radial-gradient(circle 170px at var(--fx, -999px) var(--fy, -999px), transparent 60%, #000 100%);
+  transition: opacity var(--motion-short, .2s) var(--ease-in, ease-in);
+}
+.LiveMap--focused .LiveMap-Blur {
+  opacity: 1;
+  transition: opacity var(--motion-medium, .3s) var(--ease-out, ease-out);
+}
+/* ── 역 정보 팝업: 누른 역 바로 옆 ── */
+.LiveMap-Popup {
+  position: absolute;
+  z-index: 4;
+  width: 360px; /* 도착 열차는 6편까지라 스크롤 없이 들어간다 — overflow를 두면 꼬리가 잘림 */
+  box-shadow: 0 16px 40px rgba(15, 46, 38, .18);
+  /* 팝업 기준: 90% → 100% + Fade (Ease out) — 역 쪽에서 커지듯 */
+  animation: LiveMap-pop-in var(--motion-medium, .3s) var(--ease-out, ease-out) both;
+}
+.LiveMap-Popup--right { transform-origin: 0 var(--tail-y); }
+.LiveMap-Popup--left { transform-origin: 100% var(--tail-y); }
+@keyframes LiveMap-pop-in { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+/* 역을 가리키는 작은 꼬리 */
+.LiveMap-Popup::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--tail-y) - 8px);
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: 1px solid var(--lm-line);
+  transform: rotate(45deg);
+}
+.LiveMap-Popup--right::before { left: -9px; border-top: none; border-right: none; }
+.LiveMap-Popup--left::before { right: -9px; border-bottom: none; border-left: none; }
+
+/* ── 역 표시 (카카오 커스텀 오버레이) ── */
+.LiveMap-Station {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transform: translateX(10px); /* 점의 가운데가 좌표에 오도록 (점 지름 20px의 절반) */
+}
+.LiveMap-StationLabel {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--lm-line);
+  box-shadow: var(--lm-shadow);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lm-navy);
+  white-space: nowrap;
+}
+.LiveMap-StationDot {
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--lm-navy); /* 얇은 테두리 */
+  box-shadow: var(--lm-shadow);
+  transition: transform var(--motion-short, .2s) var(--ease-out, ease-out), background-color var(--motion-short, .2s);
+}
+.LiveMap-Station:hover .LiveMap-StationDot { transform: scale(1.15); }
+.LiveMap-Station--minor { transform: translateX(6px); }
+.LiveMap-Station--minor .LiveMap-StationLabel { font-size: 11px; font-weight: 500; color: var(--lm-muted); padding: 3px 8px; box-shadow: none; }
+.LiveMap-Station--minor .LiveMap-StationDot { width: 12px; height: 12px; border-width: 2px; }
+.LiveMap-Station--selected .LiveMap-StationDot { background: var(--lm-rail); border-color: #fff; box-shadow: 0 0 0 2px var(--lm-rail); } /* 빛 번짐 없이 얇은 테두리만 */
+.LiveMap-Station--selected .LiveMap-StationLabel { background: var(--lm-rail); border-color: var(--lm-rail); color: #fff; }
+
+/* ── 열차 표시 ── */
+.LiveMap-Train {
+  position: relative;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+}
+/* 동그란 흰 바탕 위에 train 아이콘을 열차 종류 색으로 칠한다 (아이콘 모양만 가져와 색은 CSS로) */
+.LiveMap-TrainBody {
+  width: 38px;
+  height: 38px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--train-color);
+  box-shadow: 0 2px 6px rgba(15, 46, 38, .3);
+  display: grid;
+  place-items: center;
+}
+.LiveMap-TrainBody::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  background: var(--train-color);
+  -webkit-mask: var(--train-icon) center / contain no-repeat;
+  mask: var(--train-icon) center / contain no-repeat;
+}
+.LiveMap-TrainLabel {
+  position: absolute;
+  left: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--train-color);
+  white-space: nowrap;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+}
+
+/* ── 떠 있는 패널 공통 ── */
+.LiveMap-Panel {
+  position: absolute;
+  z-index: 3;
+  left: 16px;
+  top: 16px;
+  width: 380px;
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+}
+.LiveMap-Card {
+  position: relative;
+  background: rgba(255, 255, 255, .98);
+  border: 1px solid var(--lm-line);
+  border-radius: 16px;
+  box-shadow: var(--lm-shadow);
+  padding: 18px 20px;
+}
+.LiveMap-Enter { animation: LiveMap-enter var(--motion-medium, .3s) var(--ease-out, ease-out) both; }
+@keyframes LiveMap-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.LiveMap-SectionTitle { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; font-weight: 700; }
+.LiveMap-SectionTitle small { font-size: 12px; font-weight: 500; color: var(--lm-faint); }
+.LiveMap-SectionTitle--gap { margin-top: 18px; }
+
+.LiveMap-Running { display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--lm-line); }
+.LiveMap-Running:last-of-type { border-bottom: none; }
+.LiveMap-Running i { width: 12px; height: 12px; border-radius: 4px; }
+.LiveMap-Running b { display: block; font-size: 13px; }
+.LiveMap-Running small { font-size: 12px; color: var(--lm-muted); }
+.LiveMap-Running em { font-style: normal; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; font-weight: 700; color: var(--lm-rail); }
+
+.LiveMap-Empty { padding: 12px 0 4px; font-size: 13px; color: var(--lm-muted); line-height: 1.6; }
+.LiveMap-Jump { display: block; width: 100%; margin-top: 8px; padding: 10px 0; border: 1px solid var(--lm-rail); border-radius: 10px; background: var(--lm-blue-50); color: var(--lm-rail); font: inherit; font-weight: 700; cursor: pointer; }
+
+.LiveMap-Chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.LiveMap-Chips button { text-align: left; border: 1px solid var(--lm-line); background: #fff; border-radius: 12px; padding: 10px 12px; font-family: inherit; color: inherit; cursor: pointer; transition: border-color var(--motion-short, .2s) var(--ease-out, ease-out); }
+.LiveMap-Chips button:hover { border-color: var(--lm-rail); }
+.LiveMap-Chips b { display: block; font-size: 14px; }
+.LiveMap-Chips small { font-size: 11px; color: var(--lm-faint); line-height: 1.4; }
+
+/* 역 카드 */
+.LiveMap-Close { position: absolute; right: 14px; top: 14px; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--lm-line); background: #fff; color: var(--lm-muted); font-size: 16px; cursor: pointer; }
+.LiveMap-Pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--lm-rail); background: var(--lm-blue-50); padding: 5px 11px; border-radius: 999px; }
+.LiveMap-Pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.LiveMap-StationName { font-size: 26px; font-weight: 900; margin: 10px 0 2px; }
+.LiveMap-Sub { margin: 0 0 14px; font-size: 13px; color: var(--lm-muted); }
+.LiveMap-TableHead, .LiveMap-Row { display: grid; grid-template-columns: 54px 1fr 72px; align-items: center; }
+.LiveMap-TableHead { font-size: 11px; font-weight: 700; color: var(--lm-faint); padding: 10px 0 6px; border-bottom: 1px solid var(--lm-navy); margin-top: 6px; }
+.LiveMap-TableHead span:last-child, .LiveMap-Eta { text-align: right; }
+.LiveMap-Row { padding: 9px 0; border-bottom: 1px solid var(--lm-line); font-size: 13px; }
+.LiveMap-Row time { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700; font-size: 15px; }
+.LiveMap-Who { display: flex; flex-direction: column; }
+.LiveMap-Who b { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.LiveMap-Who b i { width: 9px; height: 9px; border-radius: 3px; }
+.LiveMap-Who small { font-size: 11px; color: var(--lm-faint); }
+.LiveMap-Eta { font-size: 12px; font-weight: 700; color: var(--lm-muted); }
+.LiveMap-Row--next { background: linear-gradient(90deg, rgba(19, 137, 111, .08), transparent); }
+.LiveMap-Row--next time, .LiveMap-Row--next .LiveMap-Eta { color: var(--lm-rail); }
+.LiveMap-Row--here .LiveMap-Eta { color: var(--lm-ok); }
+.LiveMap-Fine { margin: 8px 0 0; font-size: 11px; color: var(--lm-faint); line-height: 1.5; }
+.LiveMap-Actions { display: flex; gap: 8px; margin-top: 12px; }
+.LiveMap-Actions button { flex: 1; padding: 11px 0; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
+.LiveMap-Secondary { background: var(--lm-blue-50); color: var(--lm-rail); }
+.LiveMap-Primary { background: var(--lm-deep); color: #fff; }
+
+/* ── 오른쪽 위: 검색 + 시계 ── */
+.LiveMap-Top { position: absolute; z-index: 3; right: 16px; top: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.LiveMap-Search { display: flex; gap: 6px; padding: 6px; background: #fff; border: 1px solid var(--lm-line); border-radius: 999px; box-shadow: var(--lm-shadow); }
+.LiveMap-Search input { width: 220px; height: 38px; border: 2px solid var(--lm-rail); border-radius: 999px; padding: 0 14px; font-family: inherit; font-size: 14px; outline: none; }
+.LiveMap-Search button { height: 38px; padding: 0 18px; border: none; border-radius: 999px; background: var(--lm-deep); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.LiveMap-SearchMiss { margin: 0; padding: 6px 12px; font-size: 12px; background: #fff; border-radius: 10px; box-shadow: var(--lm-shadow); color: var(--lm-muted); }
+.LiveMap-Clock { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; background: #fff; border: 1px solid var(--lm-line); border-radius: 999px; box-shadow: var(--lm-shadow); font-size: 12px; }
+.LiveMap-ClockTime { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 18px; font-weight: 700; }
+.LiveMap-Clock small { color: var(--lm-faint); margin-right: 4px; }
+.LiveMap-Clock button { border: 1px solid var(--lm-line); background: var(--lm-ground); border-radius: 999px; padding: 6px 11px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--lm-navy); cursor: pointer; }
+.LiveMap-Clock button.is-on { background: var(--lm-deep); border-color: var(--lm-deep); color: #fff; }
+
+/* ── 아래: 범례 · 안내 · 상태 ── */
+.LiveMap-Legend { position: absolute; z-index: 3; right: 16px; bottom: 16px; display: flex; gap: 14px; padding: 8px 14px; background: rgba(255, 255, 255, .96); border: 1px solid var(--lm-line); border-radius: 999px; font-size: 12px; color: var(--lm-muted); }
+.LiveMap-Legend span { display: flex; align-items: center; gap: 6px; }
+.LiveMap-Legend i { width: 14px; height: 10px; border-radius: 3px; }
+.LiveMap-Note { position: absolute; z-index: 3; left: 16px; bottom: 40px; max-width: 420px; margin: 0; text-align: left; line-height: 1.5; font-size: 12px; color: var(--lm-muted); text-shadow: 0 0 4px #fff, 0 0 4px #fff; }
+.LiveMap-Status { position: absolute; z-index: 4; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px 20px; background: #fff; border-radius: 14px; box-shadow: var(--lm-shadow); font-size: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .LiveMap-Blur, .LiveMap--focused .LiveMap-Blur { transition-duration: .01ms; }
+  .LiveMap-Popup, .LiveMap-Enter { animation: none; }
+}
+
+/* ── 역 팝업을 보는 동안 접힌 '지금 달리는 열차' ── */
+.LiveMap-PanelPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--lm-line);
+  border-radius: 999px;
+  box-shadow: var(--lm-shadow);
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--lm-navy);
+  cursor: pointer;
+  transition: border-color var(--motion-short, .2s) var(--ease-out, ease-out);
+}
+.LiveMap-PanelPill:hover { border-color: var(--lm-rail); }
+.LiveMap-PanelPill b { color: var(--lm-rail); }
+.LiveMap-PanelPillDot { width: 8px; height: 8px; border-radius: 50%; background: var(--lm-ok); box-shadow: 0 0 0 4px rgba(19, 163, 107, .15); }
+
+/* 범례 안의 노선 표시: 철길 무늬 */
+.LiveMap-Legend .LiveMap-LegendRail { width: 24px; height: 5px; border-radius: 3px; background: var(--rail-color); opacity: .75; }
+.LiveMap-Note a { color: inherit; }
+
+/* ── 확대·축소 버튼: 지도 오른쪽 가운데 ── */
+.LiveMap-Zoom {
+  position: absolute;
+  z-index: 3;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--lm-line);
+  border-radius: 14px;
+  box-shadow: var(--lm-shadow);
+  overflow: hidden;
+}
+.LiveMap-Zoom button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: #fff;
+  color: var(--lm-navy);
+  font-family: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--motion-short, .2s) var(--ease-out, ease-out);
+}
+.LiveMap-Zoom button + button { border-top: 1px solid var(--lm-line); }
+.LiveMap-Zoom button:hover { background: var(--lm-ground); }
+.LiveMap-Zoom button:active { background: var(--lm-blue-50); }
+
+/* 고른 역은 점과 이름을 조금 크게 */
+.LiveMap-Station--selected .LiveMap-StationDot { transform: scale(1.3); }
+.LiveMap-Station--selected .LiveMap-StationLabel { font-size: 15px; padding: 6px 13px; }
+
+/* ── 역으로 날아가는 동안: 역·열차 표시는 잠깐 숨기고(지도와 함께 커지면 어색해서), 흐림은 도착 뒤에 ── */
+.LiveMap-Station, .LiveMap-Train { transition: opacity .35s var(--ease-out, ease-out); }
+/* 역·열차 표시는 날아가는 동안에도 그대로 보인다 (지도 확대만큼 반대로 줄여 크기 유지) */
+/* 흐림은 누르자마자 서서히 (도착 자리를 미리 비워 둠) */
+/* 도착하면 팝업은 그 자리에서 커지듯 나타난다 (기존 LiveMap-pop-in) */

@@ -7,8 +7,8 @@
   width: 1440px;
   margin: 0 auto;
   min-height: 1024px;
-  background-color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
+  background-color: transparent; /* 페이지 바탕(딥그린 시안)이 보이게 */
+  font-family: var(--font-body);
 }
 
 /* 상단 헤더 */
@@ -30,11 +30,11 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   color: inherit;
   font-size: 23px;
   font-weight: 700;
-  color: #333;
+  color: #0F2E26;
   flex-shrink: 0;
 }
 
@@ -48,10 +48,10 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
   font-weight: 400;
-  color: #333;
+  color: #0F2E26;
   padding: 0;
   flex-shrink: 0;
 }
@@ -82,7 +82,7 @@
 .TrainInfoView-Title {
   font-size: 40px;
   font-weight: 700;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 58px;
   margin: 0;
 }
@@ -90,7 +90,7 @@
 .TrainInfoView-Subtitle {
   font-size: 19px;
   font-weight: 400;
-  color: #575757;
+  color: #5F6F69;
   line-height: 28px;
   margin: 0;
   white-space: nowrap;
@@ -102,8 +102,8 @@
 }
 
 .TrainInfoView-SearchConditions {
-  background-color: #f5f5f5;
-  border: 1px solid #d6d6d6;
+  background-color: #F2F6F3;
+  border: 1px solid #DCE3DF;
   border-radius: 12px;
   padding: 22px;
   display: flex;
@@ -124,7 +124,7 @@
 .TrainInfoView-FieldLabel {
   font-size: 14px;
   font-weight: 500;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 21px;
   white-space: nowrap;
 }
@@ -132,29 +132,29 @@
 .TrainInfoView-FieldInput {
   height: 48px;
   background: #ffffff;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 8px;
   padding: 0 13px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 16px;
-  color: #1f1f1f;
+  color: #0F2E26;
   cursor: pointer;
 }
 
 .TrainInfoView-FieldArrow {
   font-size: 14px;
-  color: #707070;
+  color: #5F6F69;
 }
 
 .TrainInfoView-SearchButton {
   height: 48px;
   width: 208px;
-  background-color: #333;
+  background-color: #0E4D3E;
   border: none;
   border-radius: 8px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 500;
   color: #ffffff;
@@ -163,7 +163,7 @@
 }
 
 .TrainInfoView-SearchButton:hover {
-  background-color: #444;
+  background-color: #176A55;
 }
 
 /* 검색 결과 */
@@ -184,18 +184,18 @@
 .TrainInfoView-ResultCount {
   font-size: 23px;
   font-weight: 700;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 34px;
 }
 
 .TrainInfoView-ResultNote {
   font-size: 14px;
-  color: #707070;
+  color: #5F6F69;
   line-height: 21px;
 }
 
 .TrainInfoView-ResultCard {
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 12px;
   height: 112px;
   padding: 24px;
@@ -214,14 +214,14 @@
 .TrainInfoView-TrainName {
   font-size: 24px;
   font-weight: 700;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 35px;
   white-space: nowrap;
 }
 
 .TrainInfoView-TrainRoute {
   font-size: 17px;
-  color: #575757;
+  color: #5F6F69;
   line-height: 25px;
   white-space: nowrap;
 }
@@ -235,7 +235,7 @@
 
 .TrainInfoView-DepartureLabel {
   font-size: 14px;
-  color: #707070;
+  color: #5F6F69;
   line-height: 21px;
   white-space: nowrap;
 }
@@ -243,7 +243,7 @@
 .TrainInfoView-DepartureTime {
   font-size: 22px;
   font-weight: 700;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 32px;
   white-space: nowrap;
 }
@@ -252,12 +252,12 @@
   width: 144px;
   height: 46px;
   background: #ffffff;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 8px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 500;
-  color: #1f1f1f;
+  color: #0F2E26;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -265,7 +265,7 @@
 }
 
 .TrainInfoView-DetailButton:hover {
-  background-color: #f5f5f5;
+  background-color: #F2F6F3;
 }
 
 /* ==========================================
@@ -284,7 +284,7 @@
 }
 
 .TrainInfoView-ResultCard:hover {
-  border-color: #aaa;
+  border-color: #9AA7A2;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
@@ -293,7 +293,7 @@
 }
 
 .TrainInfoView-FieldInput:hover {
-  border-color: #aaa;
+  border-color: #9AA7A2;
 }
 
 .TrainInfoView-SearchButton,
@@ -307,3 +307,132 @@
 .TrainInfoView-DetailButton:active {
   transform: scale(0.97);
 }
+
+/* ==========================================
+   열차 찾기 — 흰 카드 한 줄 (딥그린 시안)
+   출발 → 도착 | 시간 ··· [열차 찾기]
+   ========================================== */
+.TrainSearch {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 18px 20px 18px 28px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(15, 46, 38, .07);
+}
+.TrainSearch-Field { display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+.TrainSearch-Field > span { font-size: 13px; color: var(--ng-gray); }
+/* 값: 테두리 없이 크게 — 누르면 기본 목록·시각 선택이 열린다 */
+.TrainSearch-Field select, .TrainSearch-Field input {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  padding: 2px 22px 2px 0;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ng-ink);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.TrainSearch-Field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%239AA7A2' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  background-size: 14px;
+  max-width: 230px;
+  field-sizing: content; /* 고른 역 이름 길이만큼만 — 긴 역 이름 기준으로 넓어지지 않게 */
+}
+.TrainSearch-Field input { padding-right: 0; }
+.TrainSearch-Field input::-webkit-calendar-picker-indicator { opacity: .4; cursor: pointer; }
+.TrainSearch-Field select:focus-visible, .TrainSearch-Field input:focus-visible { outline: 2px solid var(--ng-teal); outline-offset: 4px; }
+.TrainSearch-Field select:disabled, .TrainSearch-Field input:disabled { color: var(--ng-gray); cursor: not-allowed; }
+.TrainSearch-Swap {
+  align-self: flex-end;
+  margin-bottom: 4px;
+  border: none;
+  background: none;
+  padding: 4px 6px;
+  font-size: 20px;
+  color: #9AA7A2;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color var(--motion-short, .2s) var(--ease-out, ease-out), transform var(--motion-medium, .3s) var(--ease-out, ease-out);
+}
+.TrainSearch-Swap:not(:disabled):hover { color: var(--ng-teal); transform: rotate(180deg); }
+.TrainSearch-Swap:disabled { cursor: default; }
+.TrainSearch-Divider { width: 1px; height: 40px; background: var(--ng-line); margin: 0 8px; }
+.TrainSearch-Button {
+  margin-left: auto;
+  height: 52px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 14px;
+  background: var(--ng-green);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--motion-short, .2s) var(--ease-out, ease-out), transform var(--motion-short, .2s) var(--ease-out, ease-out);
+}
+.TrainSearch-Button:hover:not(:disabled) { background: #176A55; }
+.TrainSearch-Button:active:not(:disabled) { transform: scale(.97); }
+.TrainSearch-Button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ==========================================
+   검색 결과 — 위 「열차 찾기」 카드와 같은 흰 카드 (딥그린 시안)
+   테두리 없이 흰 바탕 + 은은한 그림자, 둥근 모서리 20px
+   ========================================== */
+.TrainInfoView-Main > p[role='status'] { margin: 8px 0 0; font-size: 16px; font-weight: 700; color: var(--ng-ink); }
+.TrainInfoView-Results { gap: 12px; }
+.TrainInfoView-ResultCard {
+  height: auto;
+  padding: 22px 24px 22px 28px;
+  background: #fff;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(15, 46, 38, .07);
+  transition: box-shadow var(--motion-short) var(--ease-out), transform var(--motion-short) var(--ease-out);
+}
+.TrainInfoView-ResultCard:hover { border-color: transparent; box-shadow: 0 12px 32px rgba(15, 46, 38, .11); transform: translateY(-1px); }
+.TrainInfoView-ResultInfo > span:last-child { font-size: 14px; color: var(--ng-gray); }
+.TrainInfoView-TrainName { font-size: 22px; line-height: 1.4; display: inline-flex; align-items: center; gap: 10px; }
+/* 열차 종류 색: 카드 왼쪽 색 띠 + 종류 배지 (색은 utils/trainColors.ts) */
+.TrainInfoView-ResultCard { position: relative; overflow: hidden; }
+.TrainInfoView-ResultCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: var(--train-color, #55657C);
+}
+.TrainInfoView-TypeBadge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--train-color, #55657C);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.TrainInfoView-DepartureInfo > span:first-child { font-size: 13px; color: var(--ng-gray); }
+.TrainInfoView-DepartureTime { font-size: 24px; font-variant-numeric: tabular-nums; }
+/* 상세 보기: 테두리 없는 옅은 초록 버튼, 올리면 딥그린 */
+.TrainInfoView-DetailButton {
+  width: auto;
+  height: 46px;
+  padding: 0 20px;
+  background: #F2F6F3;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ng-green);
+}
+.TrainInfoView-DetailButton:hover { background: var(--ng-green); color: #fff; }

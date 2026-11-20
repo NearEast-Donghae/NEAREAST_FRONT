@@ -8,9 +8,9 @@
   margin: 0 auto;
   min-height: calc(100vh - 110px); /* AppHeader 높이 제외 */
   padding: 28px 95px 64px;
-  background-color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
-  color: #333;
+  background-color: transparent; /* 페이지 바탕(딥그린 시안)이 보이게 */
+  font-family: var(--font-body);
+  color: #0F2E26;
 }
 
 /* 페이지 제목 — 계획하기 페이지 제목과 같은 크기 */
@@ -29,7 +29,7 @@
 
 .MyPageView-Card {
   padding: 28px 32px;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 12px;
   background: #ffffff;
 }
@@ -53,7 +53,7 @@
   height: 56px;
   flex-shrink: 0;
   border-radius: 50%;
-  background-color: #333;
+  background-color: #0E4D3E;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,19 +71,19 @@
 .MyPageView-Email {
   margin: 0;
   font-size: 14px;
-  color: #575757;
+  color: #5F6F69;
 }
 
 .MyPageView-InfoList {
   margin: 0;
-  border-top: 1px solid #e0eaf0;
+  border-top: 1px solid #E6EBE8;
 }
 
 .MyPageView-InfoRow {
   display: flex;
   gap: 24px;
   padding: 14px 0;
-  border-bottom: 1px solid #e0eaf0;
+  border-bottom: 1px solid #E6EBE8;
   font-size: 15px;
 }
 
@@ -91,7 +91,7 @@
   width: 80px;
   flex-shrink: 0;
   padding-top: 2px;
-  color: #707070;
+  color: #5F6F69;
 }
 
 .MyPageView-InfoRow dd {
@@ -126,36 +126,36 @@
 .MyPageView-Button {
   height: 40px;
   padding: 0 18px;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 8px;
   background: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 700;
-  color: #333;
+  color: #0F2E26;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .MyPageView-Button:hover:not(:disabled) {
-  background-color: #f5f5f5;
+  background-color: #F2F6F3;
 }
 
 .MyPageView-Button:disabled {
-  color: #aaa;
+  color: #9AA7A2;
   cursor: default;
 }
 
 .MyPageView-Button--primary,
 .MyPageView-Button--primary:hover:not(:disabled) {
-  border-color: #333;
-  background-color: #333;
+  border-color: #0F2E26;
+  background-color: #0E4D3E;
   color: #ffffff;
 }
 
 .MyPageView-Button--primary:disabled {
-  border-color: #aaa;
-  background-color: #aaa;
+  border-color: #9AA7A2;
+  background-color: #9AA7A2;
   color: #ffffff;
 }
 
@@ -177,16 +177,16 @@
   padding: 4px 8px;
   border: none;
   background: none;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
-  color: #4a6070;
+  color: #13896F;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .MyPageView-TextButton:disabled {
-  color: #aaa;
+  color: #9AA7A2;
   cursor: default;
 }
 
@@ -194,9 +194,9 @@
   margin: 12px 0 0;
   padding: 10px 14px;
   border-radius: 8px;
-  background-color: #eef2f5;
+  background-color: #E6F4EF;
   font-size: 13px;
-  color: #4a6070;
+  color: #13896F;
 }
 
 /* 계정 */
@@ -206,7 +206,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 16px 0;
-  border-top: 1px solid #e0eaf0;
+  border-top: 1px solid #E6EBE8;
 }
 
 .MyPageView-AccountLabel {
@@ -218,7 +218,7 @@
 .MyPageView-AccountText {
   margin: 0;
   font-size: 13px;
-  color: #707070;
+  color: #5F6F69;
 }
 
 /* ── 모션 (styles/motion.css 기준) ── */
@@ -231,5 +231,5 @@
 .MyPageView-ComingSoon {
   margin: 0;
   font-size: 13px;
-  color: #aaa;
+  color: #9AA7A2;
 }

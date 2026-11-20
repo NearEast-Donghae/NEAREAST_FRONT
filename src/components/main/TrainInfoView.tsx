@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { getPlaces, getStationTrains, searchTrains, type PlaceDto, type TrainDto, type TimetableBasis } from '../../api/catalog';
+import Dropdown from '../ui/Dropdown';
 import './TrainInfoView.css';
 import { readSessionState, writeSessionState } from '../../utils/sessionState';
+import { trainTypeColor } from '../../utils/trainColors';
 
 export interface TrainResult {
   id: string;
@@ -22,8 +24,7 @@ export default function TrainInfoView({ onViewDetail, initialStationId }: TrainI
   const [fromId, setFromId] = useState(initialStationId ?? previousSearch.fromId);
   const [toId, setToId] = useState(initialStationId ? '' : previousSearch.toId);
   const [after, setAfter] = useState(initialStationId ? '00:00' : previousSearch.after);
-  const formRef = useRef<HTMLFormElement>(null);
-  const restoreSearch = useRef(!initialStationId && previousSearch.searched);
+  // 고른 조건(역·시각)은 기억해 두지만, 결과는 '열차 찾기'를 눌렀을 때만 보여 준다
   const [results, setResults] = useState<TrainDto[]>([]);
   const [basis, setBasis] = useState<TimetableBasis | null>(null);
   const [searchedStationId, setSearchedStationId] = useState('');
@@ -44,12 +45,6 @@ export default function TrainInfoView({ onViewDetail, initialStationId }: TrainI
     }).catch(() => { if (!cancelled) setError('역 목록을 불러오지 못했어요.'); });
     return () => { cancelled = true; searchVersion.current += 1; };
   }, [attempt]);
-  useEffect(() => {
-    if (stations.length && restoreSearch.current) {
-      restoreSearch.current = false;
-      formRef.current?.requestSubmit();
-    }
-  }, [stations]);
   function clearResults() {
     searchVersion.current += 1;
     setResults([]); setSearched(false); setBasis(null);
@@ -74,23 +69,27 @@ export default function TrainInfoView({ onViewDetail, initialStationId }: TrainI
     <main className="TrainInfoView-Main">
       <h1 className="TrainInfoView-Title">열차 정보</h1>
       <p className="TrainInfoView-Subtitle">구간을 조회하거나, 한 역을 지나는 열차를 찾아보세요.</p>
-      <form ref={formRef} className="Integration-Fields" onSubmit={handleSearch}>
-        <label>조회 역<select aria-label="조회 역" required value={fromId} disabled={loading} onChange={(event) => { setFromId(event.target.value); clearResults(); }}>
-          <option value="">역 선택</option>{stations.map((station) => <option key={station.id} value={station.id}>{station.name}</option>)}
-        </select></label>
-        <label>도착역<select aria-label="도착역" value={toId} disabled={loading} onChange={(event) => { setToId(event.target.value); clearResults(); }}>
-          <option value="">전체 · 이 역을 지나는 열차</option>{stations.filter((station) => station.id !== fromId && station.passenger_stop).map((station) => <option key={station.id} value={station.id}>{station.name}</option>)}
-        </select></label>
-        <label>조회 시작 시각<input type="time" required value={after} disabled={loading} onChange={(event) => { setAfter(event.target.value); clearResults(); }} /></label>
-        <button type="submit" className="TrainInfoView-SearchButton" disabled={!fromId || loading}>{loading ? '조회 중…' : '열차 찾기'}</button>
+      {/* 시안처럼 흰 카드 한 줄: 출발 → 도착 | 시간 ··· 열차 찾기. 값은 크게, 이름표는 작게, 입력칸 테두리 없이 */}
+      <form className="TrainSearch" onSubmit={handleSearch}>
+        <div className="TrainSearch-Field"><span aria-hidden="true">출발</span><Dropdown aria-label="조회 역" placeholder="역 선택" value={fromId} disabled={loading}
+          options={stations.map((station) => ({ value: station.id, label: station.name }))}
+          onChange={(value) => { setFromId(value); if (value === toId) setToId(''); clearResults(); }} /></div>
+        <button type="button" className="TrainSearch-Swap" aria-label="출발역과 도착역 바꾸기" disabled={loading || !toId}
+          onClick={() => { setFromId(toId); setToId(fromId); clearResults(); }}>→</button>
+        <div className="TrainSearch-Field"><span aria-hidden="true">도착</span><Dropdown aria-label="도착역" value={toId} disabled={loading}
+          options={[{ value: '', label: '전체 (지나는 열차)' }, ...stations.filter((station) => station.id !== fromId && station.passenger_stop).map((station) => ({ value: station.id, label: station.name }))]}
+          onChange={(value) => { setToId(value); clearResults(); }} /></div>
+        <span className="TrainSearch-Divider" aria-hidden="true" />
+        <label className="TrainSearch-Field"><span>시간</span><input type="time" required value={after} disabled={loading} onChange={(event) => { setAfter(event.target.value); clearResults(); }} /></label>
+        <button type="submit" className="TrainSearch-Button" disabled={!fromId || loading}>{loading ? '조회 중…' : '열차 찾기'}</button>
       </form>
       <p className="Integration-Note">현재 제공되는 기준일 시간표예요. 실시간 운행·예약 가능 여부는 철도 운영사에서 확인해 주세요.</p>
       {error && <p role="alert">{error} {!stations.length && <button onClick={() => setAttempt((value) => value + 1)}>다시 시도</button>}</p>}
       {basis && <p className="Integration-Note">기준일: {basis.target_date ?? '자료별 상이'} · {basis.summary} {(basis.limits ?? []).join(' · ')}</p>}
       {searched && <p role="status">검색 결과 {results.length}건{!results.length && ' · 조건에 맞는 열차가 없어요.'}</p>}
       <div className="TrainInfoView-Results">{results.map((train) =>
-        <div key={train.no} className="TrainInfoView-ResultCard">
-          <div className="TrainInfoView-ResultInfo"><span className="TrainInfoView-TrainName">{train.type} {train.no}</span><span>{train.origin} → {train.destination}</span></div>
+        <div key={train.no} className="TrainInfoView-ResultCard" style={{ '--train-color': trainTypeColor(train.type ?? '') } as CSSProperties}>
+          <div className="TrainInfoView-ResultInfo"><span className="TrainInfoView-TrainName"><span className="TrainInfoView-TypeBadge">{train.type}</span>{train.no}</span><span>{train.origin} → {train.destination}</span></div>
           <div className="TrainInfoView-DepartureInfo"><span>{stationName} {train.passing ? '통과 · 탑승 불가' : '정차'}</span>
             <span className="TrainInfoView-DepartureTime">{train.dep ?? train.time ?? train.arr ?? '시각 미확인'}</span></div>
           <button className="TrainInfoView-DetailButton" onClick={() => onViewDetail({

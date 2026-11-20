@@ -134,7 +134,7 @@ label:has(> .motion-checkbox-input) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #aaa;
+  border: 2px solid #9AA7A2;
   border-radius: 5px;
   background-color: #ffffff;
   transition: background-color var(--motion-short) var(--ease-in-out),
@@ -159,8 +159,8 @@ label:has(> .motion-checkbox-input) {
 }
 
 .motion-checkbox-input:checked + .motion-checkbox {
-  border-color: #333;
-  background-color: #333;
+  border-color: #0F2E26;
+  background-color: #0E4D3E;
 }
 
 .motion-checkbox-input:checked + .motion-checkbox path {
@@ -168,7 +168,7 @@ label:has(> .motion-checkbox-input) {
 }
 
 .motion-checkbox-input:focus-visible + .motion-checkbox {
-  outline: 2px solid #4a6070;
+  outline: 2px solid #13896F;
   outline-offset: 2px;
 }
 

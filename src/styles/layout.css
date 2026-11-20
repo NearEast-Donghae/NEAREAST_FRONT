@@ -5,7 +5,7 @@
 }
 
 html { scrollbar-gutter: stable; }
-body { font-family: 'Noto Sans KR', sans-serif; color: #333; }
+body { font-family: var(--font-body); color: #0F2E26; }
 button, input, select, textarea { font-family: inherit; }
 
 .AppHeader {
@@ -68,21 +68,21 @@ button, input, select, textarea { font-family: inherit; }
 .AiPlannerView-History { flex-shrink: 0; }
 .LoginGate-Content--locked { min-height: calc(100dvh - var(--app-header-height)); }
 .AppSession-Status { max-width: var(--app-max-width); margin: 0 auto; padding: 28px var(--app-gutter); box-sizing: border-box; }
-.ChatPlanCard { width: 100%; box-sizing: border-box; border: 1px solid #d6d6d6; border-radius: 16px; padding: 20px; background: #fafafa; }
+.ChatPlanCard { width: 100%; box-sizing: border-box; border: 1px solid #DCE3DF; border-radius: 16px; padding: 20px; background: #F2F6F3; }
 .ChatPlanCard h2 { margin: 0 0 16px; font-size: 17px; }
 .ChatPlanCard .Integration-Note { margin-bottom: 0; }
 .PlanningSummary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin: 20px 0; }
 .PlanningSummary div { min-width: 0; }
-.PlanningSummary dt { font-size: 13px; color: #666; margin-bottom: 5px; }
+.PlanningSummary dt { font-size: 13px; color: #5F6F69; margin-bottom: 5px; }
 .PlanningSummary dd { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
-.PlanningReview-Notice { padding: 14px 18px; border: 1px solid #ccc; border-radius: 12px; margin: 20px 0; line-height: 1.6; }
+.PlanningReview-Notice { padding: 14px 18px; border: 1px solid #9AA7A2; border-radius: 12px; margin: 20px 0; line-height: 1.6; }
 .PlanningReview-Notice p:first-child { margin-top: 0; }
 .PlanningReview-Notice p:last-child { margin-bottom: 0; }
 .PlanningReview-Places { margin: 20px 0; }
 .PlanningReview-Places summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
 .PlanningLayout__header .Integration-Actions { margin: 0; }
-.Integration-Panel .PlanningButton--primary { background: #333; color: #fff; border-color: #333; }
-.Integration-Panel .PlanningButton--primary:disabled { background: #e5e5e5; color: #666; border-color: #ddd; }
+.Integration-Panel .PlanningButton--primary { background: #0E4D3E; color: #fff; border-color: #0E4D3E; }
+.Integration-Panel .PlanningButton--primary:disabled { background: #E6EBE8; color: #5F6F69; border-color: #DCE3DF; }
 .AiPlannerView-ChatTitle { min-width: 0; overflow-wrap: anywhere; }
 .SavedPlacesCard__detail { border: none; padding: 0; background: none; font: inherit; font-weight: 600; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
@@ -96,3 +96,48 @@ button, input, select, textarea { font-family: inherit; }
   .MyTripsView-Body { grid-template-columns: minmax(200px, 280px) minmax(0, 1fr); }
   .AiPlannerView-History { width: 220px; }
 }
+
+/* 헤더 흰 띠는 화면 끝까지 — 헤더 내용은 1440px 안에 두고, 흰 바탕과 아래 선만 창 폭 전체로 깐다
+   (바탕이 옅은 초록이라 1440px 상자만 희면 양옆이 잘린 것처럼 보였다) */
+html { overflow-x: clip; }
+.AppHeader { isolation: isolate; }
+.AppHeader::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: #fff;
+  border-bottom: 1px solid var(--ng-line);
+}
+/* 키보드로 이동할 때 보이는 테두리도 둥근 청록 선으로 */
+.AppHeader-NavItem:focus-visible, .AppHeader-Logo:focus-visible { outline: 2px solid var(--ng-teal); outline-offset: 6px; border-radius: 6px; }
+.AppHeader-NavItem:focus:not(:focus-visible), .AppHeader-Logo:focus:not(:focus-visible) { outline: none; }
+
+/* ── 헤더 탭: 마우스를 올리면 아래 밑줄이 가운데서 양옆으로 그려진다 (현재 탭은 항상 밑줄) ── */
+.AppHeader-NavItem {
+  position: relative;
+  transition: color var(--motion-short, .2s) var(--ease-out, ease-out);
+}
+.AppHeader-NavItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ng-green);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform var(--motion-medium, .3s) var(--ease-out, cubic-bezier(0, 0, .2, 1));
+}
+.AppHeader-NavItem:hover { color: var(--ng-ink); }
+.AppHeader-NavItem:hover::before,
+.AppHeader-NavItem--active::before { transform: scaleX(1); }
+/* 마우스를 뗄 때는 조금 빠르게 사라짐 (Ease in) */
+.AppHeader-NavItem:not(:hover):not(.AppHeader-NavItem--active)::before { transition: transform var(--motion-short, .2s) var(--ease-in, cubic-bezier(.4, 0, 1, 1)); }
+@media (prefers-reduced-motion: reduce) { .AppHeader-NavItem::before { transition: none; } }

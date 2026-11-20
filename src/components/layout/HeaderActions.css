@@ -12,10 +12,10 @@
   display: inline-flex;
   align-items: center;
   padding: 8px 18px;
-  border: 1px solid #333;
+  border: 1px solid #0F2E26;
   border-radius: 100px;
-  background-color: #333;
-  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #0E4D3E;
+  font-family: var(--font-body);
   font-size: 15px;
   font-weight: 500;
   color: #ffffff;
@@ -24,11 +24,11 @@
 }
 
 .HeaderActions-LoginButton:hover {
-  background-color: #444;
+  background-color: #176A55;
 }
 
 .HeaderActions-LoginButton--active,
 .HeaderActions-LoginButton--active:hover {
-  background-color: #4a6070;
-  border-color: #4a6070;
+  background-color: #13896F;
+  border-color: #13896F;
 }

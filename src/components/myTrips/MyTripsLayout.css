@@ -8,9 +8,9 @@
   margin: 0 auto;
   min-height: calc(100vh - 110px); /* AppHeader 높이 제외 */
   padding: 28px 95px 64px;
-  background-color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
-  color: #333;
+  background-color: transparent; /* 페이지 바탕(딥그린 시안)이 보이게 */
+  font-family: var(--font-body);
+  color: #0F2E26;
 }
 
 /* 페이지 제목 — 계획하기 페이지 제목과 같은 크기 */
@@ -26,7 +26,7 @@
   display: flex;
   gap: 8px;
   margin: 24px 0 28px;
-  border-bottom: 1px solid #d6d6d6;
+  border-bottom: 1px solid #DCE3DF;
 }
 
 .MyTripsLayout-Tab {
@@ -34,18 +34,18 @@
   margin-bottom: -1px;
   border-bottom: 2px solid transparent;
   font-size: 17px;
-  color: #737373;
+  color: #5F6F69;
   text-decoration: none;
 }
 
 .MyTripsLayout-Tab:hover {
-  color: #333;
+  color: #0F2E26;
 }
 
 .MyTripsLayout-Tab--active {
-  border-bottom-color: #333;
+  border-bottom-color: #0F2E26;
   font-weight: 700;
-  color: #333;
+  color: #0F2E26;
 }
 
 .MyTripsLayout-Content {
@@ -57,6 +57,6 @@
   width: auto;
   max-width: 640px;
   padding: 24px 26px;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 12px;
 }

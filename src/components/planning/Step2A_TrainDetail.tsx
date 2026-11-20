@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import { trainTypeColor } from '../../utils/trainColors';
 import './Step2A_TrainDetail.css';
 
 // 나가는 애니메이션 길이 — Step2A_TrainDetail.css의 퇴장 애니메이션(var(--motion-short))과 같게
@@ -72,7 +73,7 @@ const Step2A_TrainDetail = ({
         if (event.target === event.currentTarget) requestClose();
       }}
     >
-      <div className="Step2A_TrainDetail__panel">
+      <div className="Step2A_TrainDetail__panel" style={{ '--train-color': trainTypeColor(trainDetail.trainType) } as CSSProperties}>
         {/* 뒤로가기 헤더 */}
         <button className="Step2A_TrainDetail__backButton" onClick={requestClose}>
           〈&nbsp; 열차 상세정보

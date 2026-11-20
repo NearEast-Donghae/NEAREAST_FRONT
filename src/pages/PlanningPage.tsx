@@ -7,7 +7,8 @@ import { planningDraftStore } from '../store/planningDraft';
 import { useSavedPlaces } from '../hooks/useSavedPlaces';
 import { useSavedTrains } from '../hooks/useSavedTrains';
 import { ROUTES, navigateTo, conversationRoute } from '../routes';
-import StepIndicator from '../components/planning/StepIndicator';
+import Steps from '../components/ui/Steps';
+import Dropdown from '../components/ui/Dropdown';
 import TripRoute from '../components/planning/TripRoute';
 import PlanningSummary from '../components/planning/PlanningSummary';
 import { getMissingPlanningFields, getUnsupportedPlanningConditions, getVisitIds } from '../utils/planningConditions';
@@ -28,8 +29,13 @@ export default function PlanningPage() {
   }));
   const [catalog, setCatalog] = useState<PlaceDto[]>([]);
   const [options, setOptions] = useState<PlanningOptions | null>(null);
-  const [step, setStep] = useState<1 | 2 | 3>(() => draft?.source === 'chat' && !getMissingPlanningFields(draft.conditions).length ? 2 : 1);
+  const [step, setStepValue] = useState<1 | 2 | 3>(() => draft?.source === 'chat' && !getMissingPlanningFields(draft.conditions).length ? 2 : 1);
   const [error, setError] = useState<string | null>(null);
+  // 단계가 바뀔 때 내용이 어느 쪽에서 들어올지 (앞으로 = 오른쪽에서, 뒤로 = 왼쪽에서)
+  const [stepDirection, setStepDirection] = useState<'forward' | 'back'>('forward');
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const setStep = (next: 1 | 2 | 3) => { setStepDirection(next < stepRef.current ? 'back' : 'forward'); setStepValue(next); };
   const [loading, setLoading] = useState(true);
   const [attempt, setAttempt] = useState(0);
   const [generating, setGenerating] = useState(false);
@@ -158,7 +164,10 @@ export default function PlanningPage() {
   }
 
   return <div className="PlanningLayout">
-    <StepIndicator currentStep={step} labels={['1 기본 정보', '2 조건 확인', '3 생성된 일정']} />
+    {/* 지나온 단계는 눌러서 돌아갈 수 있다 (일정 생성 중에는 막음) */}
+    <Steps className="PlanningLayout__steps" aria-label="계획 단계" current={step - 1} clickable={!generating}
+      items={[{ title: '기본 정보' }, { title: '조건 확인' }, { title: '생성된 일정' }]}
+      onStepChange={(index) => { if (!generating && index + 1 < step) { setStep((index + 1) as 1 | 2); setError(null); } }} />
     <header className="PlanningLayout__header"><h1 ref={headingRef} tabIndex={-1} className="PlanningLayout__title">{step === 3 ? '여행 일정이 완성됐어요' : draft?.source === 'chat' ? '대화에서 이어서 계획하기' : '여행 계획하기'}</h1>
       <p className="PlanningLayout__subtitle">{step === 3 ? '선택한 장소를 잇는 도보 일정과 이동 경로가 내 계정에 저장됐어요.' : draft?.source === 'chat' ? step === 1 ? '대화에서 받은 내용은 채워 두었어요. 비어 있는 항목만 보완해 주세요.' : '대화에서 정한 조건이에요. 맞다면 바로 일정을 생성할 수 있어요.' : '출발 장소와 방문지를 선택해 실제 이동 경로가 있는 일정을 만들어 보세요.'}</p>
       <div className="Integration-Actions">
@@ -167,29 +176,42 @@ export default function PlanningPage() {
       </div>
     </header>
     <main className="PlanningLayout__content">
-      <section className="PlanningCard Integration-Panel">
+      <section key={step} className={`PlanningCard Integration-Panel PlanningStep-Enter PlanningStep-Enter--${stepDirection}`}>
         <p className="Integration-Note">현재 자동 생성은 당일 도보 여행을 지원해요. 열차 탑승·관찰 조건을 넣은 일정은 아직 지원하지 않아요.</p>
         {loading && <p role="status">장소를 불러오고 있어요…</p>}
         {!loading && !options && <button onClick={() => setAttempt((value) => value + 1)}>다시 불러오기</button>}
         {error && <p ref={errorRef} tabIndex={-1} className="Integration-Error" role="alert">{error}</p>}
         {!loading && options && step === 1 && <form onSubmit={nextStep}>
           {draft?.source === 'chat' && !!missingFields.length && <p role="status">추가로 정할 정보: {missingFields.join(', ')}</p>}
-          <div className="Integration-Fields">
-            <label>여행 날짜<input type="date" required value={conditions.travelDate ?? ''} onChange={(event) => patchConditions({ travelDate: event.target.value })} /></label>
-            <label>시작 시각<input type="time" required value={conditions.startTime ?? ''} onChange={(event) => patchConditions({ startTime: event.target.value })} /></label>
-            <label>종료 시각<input type="time" required value={conditions.endTime ?? ''} onChange={(event) => patchConditions({ endTime: event.target.value })} /></label>
+          {/* 열차 정보 검색칸과 같은 모양: 작은 이름표 + 큰 값, 테두리 없이. '언제' 줄과 '어디서' 줄 */}
+          <div className="PlanBar">
+            <span className="PlanBar-Kicker">언제</span>
+            <label className="PlanBar-Field"><span>날짜</span><input type="date" required value={conditions.travelDate ?? ''} onChange={(event) => patchConditions({ travelDate: event.target.value })} /></label>
+            <span className="PlanBar-Divider" aria-hidden="true" />
+            <label className="PlanBar-Field"><span>시작</span><input type="time" required value={conditions.startTime ?? ''} onChange={(event) => patchConditions({ startTime: event.target.value })} /></label>
+            <span className="PlanBar-Arrow" aria-hidden="true">→</span>
+            <label className="PlanBar-Field"><span>종료</span><input type="time" required value={conditions.endTime ?? ''} onChange={(event) => patchConditions({ endTime: event.target.value })} /></label>
           </div>
-          <div className="Integration-Fields">
-            <label>출발 장소<select aria-label="출발 장소" required value={conditions.departurePlaceId ?? ''} onChange={(event) => patchConditions({ departurePlaceId: event.target.value })}>
-              <option value="">출발 장소 선택</option>{departureOptions.map((place) => <option key={place.id} value={place.id}>{place.name}</option>)}
-            </select></label>
-            <label>마지막 도착 장소<select aria-label="마지막 도착 장소" value={conditions.arrivalPlaceId ?? ''} onChange={(event) => patchConditions({ arrivalPlaceId: event.target.value || null })}>
-              <option value="">방문지 중에서 결정</option>{catalog.filter((place) => optionIndex.get(place.id)?.canVisit || place.id === conditions.arrivalPlaceId).map((place) => <option key={place.id} value={place.id}>{place.name}</option>)}
-            </select></label>
-            <label>도보 한도 (분, 선택)<input type="number" min={0} max={1440} value={conditions.maxWalkingMinutes ?? ''} onChange={(event) => patchConditions({ maxWalkingMinutes: event.target.value === '' ? null : Number(event.target.value) })} /></label>
+          <div className="PlanBar">
+            <span className="PlanBar-Kicker">어디서</span>
+            {/* 부드럽게 열리는 드롭다운 (열차 정보와 같은 것). label로 감싸면 항목을 고를 때 다시 열려서 div로 */}
+            <div className="PlanBar-Field"><span aria-hidden="true">출발</span>
+              <Dropdown aria-label="출발 장소" placeholder="출발 장소 선택" value={conditions.departurePlaceId ?? ''}
+                options={departureOptions.map((place) => ({ value: place.id, label: place.name }))}
+                onChange={(value) => patchConditions({ departurePlaceId: value })} /></div>
+            <span className="PlanBar-Arrow" aria-hidden="true">→</span>
+            <div className="PlanBar-Field"><span aria-hidden="true">마지막 도착</span>
+              <Dropdown aria-label="마지막 도착 장소" value={conditions.arrivalPlaceId ?? ''}
+                options={[{ value: '', label: '방문지 중에서 결정' }, ...catalog.filter((place) => optionIndex.get(place.id)?.canVisit || place.id === conditions.arrivalPlaceId).map((place) => ({ value: place.id, label: place.name }))]}
+                onChange={(value) => patchConditions({ arrivalPlaceId: value || null })} /></div>
+            <span className="PlanBar-Divider" aria-hidden="true" />
+            <label className="PlanBar-Field"><span>도보 한도 (선택)</span>
+              <span className="PlanBar-Unit"><input type="number" min={0} max={1440} placeholder="제한 없음" value={conditions.maxWalkingMinutes ?? ''} onChange={(event) => patchConditions({ maxWalkingMinutes: event.target.value === '' ? null : Number(event.target.value) })} />{conditions.maxWalkingMinutes != null && <em>분</em>}</span></label>
           </div>
-          {requiredIds.length > 0 && <p>포함할 장소: {requiredIds.map(placeName).join(', ')}</p>}
-          <button className="PlanningButton PlanningButton--primary" type="submit">방문지 확인 →</button>
+          <div className="PlanBar-Foot">
+            {requiredIds.length > 0 ? <p className="Integration-Note">포함할 장소: {requiredIds.map(placeName).join(', ')}</p> : <span />}
+            <button className="PlanBar-Button" type="submit">방문지 확인 →</button>
+          </div>
         </form>}
         {!loading && options && step === 2 && <>
           <h2>이 조건으로 여행해요</h2>

@@ -22,7 +22,7 @@
   min-height: 530px;
   background-color: #ffffff;
   border-radius: 50px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   overflow: hidden;
 }
 
@@ -49,7 +49,7 @@
 .StationInfoPopup-Title {
   font-size: 16px;
   font-weight: 500;
-  color: #575757;
+  color: #5F6F69;
   line-height: 24px;
 }
 
@@ -57,7 +57,7 @@
   width: 42px;
   height: 42px;
   background: #ffffff;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -65,7 +65,7 @@
   cursor: pointer;
   font-size: 26px;
   font-weight: 500;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 38px;
   padding: 0 14px;
 }
@@ -81,7 +81,7 @@
 .StationInfoPopup-Photo {
   width: 220px;
   height: 194px;
-  background-color: #ebebeb;
+  background-color: #E6EBE8;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -91,7 +91,7 @@
 
 .StationInfoPopup-PhotoPlaceholder {
   font-size: 15px;
-  color: #707070;
+  color: #5F6F69;
 }
 
 .StationInfoPopup-Info {
@@ -111,28 +111,28 @@
 .StationInfoPopup-Name {
   font-size: 35px;
   font-weight: 700;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 51px;
   margin: 0;
 }
 
 .StationInfoPopup-Status {
   height: 30px;
-  background-color: #ebebeb;
+  background-color: #E6EBE8;
   border-radius: 15px;
   padding: 0 10px;
   display: flex;
   align-items: center;
   font-size: 13px;
   font-weight: 500;
-  color: #575757;
+  color: #5F6F69;
   line-height: 19px;
 }
 
 .StationInfoPopup-Description {
   font-size: 18px;
   font-weight: 400;
-  color: #575757;
+  color: #5F6F69;
   line-height: 29px;
   width: 426px;
   margin: 0;
@@ -141,7 +141,7 @@
 .StationInfoPopup-TrainsLabel {
   font-size: 17px;
   font-weight: 700;
-  color: #1f1f1f;
+  color: #0F2E26;
   line-height: 25px;
   margin: 0;
 }
@@ -155,21 +155,21 @@
 
 .StationInfoPopup-TrainTag {
   height: 30px;
-  background-color: #ebebeb;
+  background-color: #E6EBE8;
   border-radius: 15px;
   padding: 0 10px;
   display: flex;
   align-items: center;
   font-size: 13px;
   font-weight: 500;
-  color: #575757;
+  color: #5F6F69;
 }
 
 /* 구분선 */
 .StationInfoPopup-Divider {
   width: 704px;
   height: 1px;
-  background-color: #d6d6d6;
+  background-color: #DCE3DF;
 }
 
 /* 관심 목록 담기 버튼 */
@@ -179,13 +179,13 @@
   left: 48px;
   width: 676px;
   height: 54px;
-  background-color: #333;
+  background-color: #0E4D3E;
   border: none;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 500;
   color: #ffffff;
@@ -194,12 +194,12 @@
 }
 
 .StationInfoPopup-WishlistButton:hover {
-  background-color: #444;
+  background-color: #176A55;
 }
 
 .StationInfoPopup-WishlistButton--saved,
 .StationInfoPopup-WishlistButton--saved:hover {
-  background-color: #4a6070;
+  background-color: #13896F;
 }
 
 /* ── 모션 (styles/motion.css 기준: 팝업) ──

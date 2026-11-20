@@ -8,8 +8,8 @@
   width: 1440px;
   margin: 0 auto;
   min-height: 1024px;
-  background-color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
+  background-color: transparent; /* 페이지 바탕(딥그린 시안)이 보이게 */
+  font-family: var(--font-body);
 }
 
 /* 상단 메뉴 (top-28, left-95, w-1250) */
@@ -24,7 +24,7 @@
   overflow: hidden;
   padding-bottom: 16px;
   padding-top: 10px;
-  color: #333;
+  color: #0F2E26;
   white-space: nowrap;
 }
 
@@ -33,7 +33,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   color: inherit;
   font-size: 23px;
   font-weight: 700;
@@ -49,10 +49,10 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
   font-weight: 400;
-  color: #333;
+  color: #0F2E26;
   padding: 0;
   flex-shrink: 0;
 }
@@ -76,7 +76,7 @@
 .FinalItineraryView-Title {
   font-size: 34px;
   font-weight: 700;
-  color: #333;
+  color: #0F2E26;
   margin: 0;
   white-space: nowrap;
 }
@@ -84,7 +84,7 @@
 .FinalItineraryView-Subtitle {
   font-size: 17px;
   font-weight: 400;
-  color: #737373;
+  color: #5F6F69;
   margin: 0;
   white-space: pre;
 }
@@ -116,7 +116,7 @@
 .FinalItineraryView-TimelineTitle {
   font-size: 25px;
   font-weight: 700;
-  color: #242a33;
+  color: #0F2E26;
   margin: 0;
   padding-bottom: 10px;
   overflow: hidden;
@@ -130,7 +130,7 @@
   gap: 22px;
   width: 870px;
   background-color: #ffffff;
-  border: 0.5px solid #d7dee5;
+  border: 0.5px solid #DCE3DF;
   border-radius: 5px;
   padding: 13px 13px;
   overflow: hidden;
@@ -151,7 +151,7 @@
 .FinalItineraryView-RowIcon {
   font-size: 20px;
   font-weight: 700;
-  color: #242a33;
+  color: #0F2E26;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -160,7 +160,7 @@
 .FinalItineraryView-RowDesc {
   font-size: 17px;
   font-weight: 400;
-  color: #242a33;
+  color: #0F2E26;
   white-space: nowrap;
   flex: 1;
 }
@@ -189,7 +189,7 @@
 /* 여행 동선 카드 */
 .FinalItineraryView-RouteCard {
   background-color: #ffffff;
-  border: 1px solid #d7dee5;
+  border: 1px solid #DCE3DF;
   border-radius: 9px;
   padding: 17px 14px;
   display: flex;
@@ -204,7 +204,7 @@
 .FinalItineraryView-RouteCardTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #242a33;
+  color: #0F2E26;
   margin: 0;
   white-space: nowrap;
 }
@@ -224,7 +224,7 @@
 /* 여행 요약 카드 */
 .FinalItineraryView-SummaryCard {
   background-color: #ffffff;
-  border: 1px solid #d7dee5;
+  border: 1px solid #DCE3DF;
   border-radius: 9px;
   padding: 20px 16px;
   display: flex;
@@ -234,7 +234,7 @@
   box-sizing: border-box;
   overflow: hidden;
   flex-shrink: 0;
-  color: #242a33;
+  color: #0F2E26;
 }
 
 .FinalItineraryView-SummaryTitle {
@@ -270,12 +270,12 @@
   width: 220px;
   padding: 13px 22px;
   background-color: #ffffff;
-  border: 1px solid #d7d7d7;
+  border: 1px solid #DCE3DF;
   border-radius: 6px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
   font-weight: 700;
-  color: #333;
+  color: #0F2E26;
   cursor: pointer;
   text-align: left;
   box-sizing: border-box;
@@ -284,10 +284,10 @@
 .FinalItineraryView-SaveButton {
   width: 220px;
   padding: 13px 22px;
-  background-color: #333;
+  background-color: #0E4D3E;
   border: none;
   border-radius: 6px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
   font-weight: 700;
   color: #ffffff;
