@@ -1,8 +1,7 @@
 import React from 'react';
 import './TrainDetailView.css';
 import type { TrainPurpose } from '../../types/neareast';
-import stationStopIcon from '../../assets/icons/station-stop.svg';
-import stationPassIcon from '../../assets/icons/station-pass.svg';
+import { trainTypeColor } from '../../utils/trainColors';
 
 interface StopInfo {
   stationName: string;
@@ -39,8 +38,12 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
   pending = false,
   children,
 }) => {
+  // trainName은 "종류 번호" 형태 — 마지막 칸이 번호, 앞부분이 종류
+  const cut = trainName.lastIndexOf(' ');
+  const type = cut > 0 ? trainName.slice(0, cut) : '';
+  const no = cut > 0 ? trainName.slice(cut + 1) : trainName;
   return (
-    <div className="TrainDetailView">
+    <div className="TrainDetailView" style={{ '--train-color': trainTypeColor(type) } as React.CSSProperties}>
 
       {/* 본문 */}
       <main className="TrainDetailView-Main motion-stagger">
@@ -52,7 +55,7 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
         </div>
 
         <div className="TrainDetailView-TitleBlock motion-stagger">
-          <h1 className="TrainDetailView-Title">{trainName}</h1>
+          <h1 className="TrainDetailView-Title">{type && <span className="TrainDetailView-TypeBadge">{type}</span>}{no}</h1>
           <p className="TrainDetailView-Subtitle">{route}</p>
           <span className="TrainDetailView-OperationDays">{operationDays}</span>
         </div>
@@ -84,10 +87,10 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
                   {index < stops.length - 1 && (
                     <div className="TrainDetailView-ConnectorLine" />
                   )}
-                  <img
-                    src={stop.isStop ? stationStopIcon : stationPassIcon}
-                    alt={stop.isStop ? '정차' : '통과'}
-                    className="TrainDetailView-StopIcon"
+                  <span
+                    role="img"
+                    aria-label={stop.isStop ? '정차' : '통과'}
+                    className={`TrainDetailView-StopIcon${stop.isStop ? '' : ' TrainDetailView-StopIcon--pass'}`}
                   />
                 </div>
 

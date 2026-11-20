@@ -24,10 +24,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 20px;
-  color: #333;
+  color: #0F2E26;
   background: none;
   border: none;
   cursor: pointer;
@@ -63,7 +63,7 @@
   align-items: center;
   justify-content: center;
   font-size: 32px;
-  background: #f5f5f5;
+  background: #F2F6F3;
   border-radius: 8px;
 }
 
@@ -73,23 +73,29 @@
   gap: 4px;
 }
 
+/* 열차 종류 배지 — 열차 정보 탭과 같은 색 (utils/trainColors.ts) */
 .Step2A_TrainDetail__trainType {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px;
-  color: #737373;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--train-color, #55657C);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
 }
 
 .Step2A_TrainDetail__trainNumber {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 24px;
-  color: #333;
+  color: #0F2E26;
 }
 
 .Step2A_TrainDetail__trainRoute {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
-  color: #333;
+  color: #0F2E26;
 }
 
 .Step2A_TrainDetail__schedule {
@@ -100,22 +106,22 @@
 }
 
 .Step2A_TrainDetail__scheduleLabel {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 .Step2A_TrainDetail__scheduleTime {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 22px;
-  color: #333;
+  color: #0F2E26;
 }
 
 .Step2A_TrainDetail__scheduleDuration {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 /* 노선도 */
@@ -132,16 +138,16 @@
 }
 
 .Step2A_TrainDetail__routeTitle {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 19px;
-  color: #333;
+  color: #0F2E26;
 }
 
 .Step2A_TrainDetail__routeLegend {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 12px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 .Step2A_TrainDetail__routeMap {
@@ -161,7 +167,7 @@
   left: 50%;
   width: 100%;
   height: 2px;
-  background: #d7d7d7;
+  background: color-mix(in srgb, var(--train-color, #DCE3DF) 35%, #fff);
   z-index: -1;
 }
 
@@ -180,13 +186,13 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid #333;
+  border: 2px solid var(--train-color, #0F2E26);
   box-sizing: border-box; /* 테두리까지 14px — 역 사이 선(top: 6px)이 원 한가운데를 지나게 */
   flex-shrink: 0;
 }
 
 .Step2A_TrainDetail__stopDot--stop {
-  background: #333;
+  background: var(--train-color, #0E4D3E);
 }
 
 .Step2A_TrainDetail__stopDot--pass {
@@ -194,16 +200,16 @@
 }
 
 .Step2A_TrainDetail__stopName {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
-  color: #333;
+  color: #0F2E26;
   text-align: center;
 }
 
 .Step2A_TrainDetail__stopType {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 11px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 /* 추가 버튼 */
