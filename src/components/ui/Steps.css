@@ -1,0 +1,127 @@
+/* Steps — 딥그린 시안 색. 테두리 대신 채움(fill)으로만 그린다, 빛 번짐(네온) 없음 */
+.ui-steps {
+  --st-marker: 32px;
+  --st-gap: 12px;
+  --st-track: #E6EBE8;
+  --st-fill: #0E4D3E;
+  --st-current-ring: #E6F4EF;
+  --st-text: #0F2E26;
+  --st-muted: #9AA7A2;
+  --st-error: #C8372D;
+  --st-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --st-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+  max-width: 720px;
+  font-family: var(--font-body);
+}
+.ui-steps[data-size='sm'] { --st-marker: 26px; }
+.ui-steps[data-size='lg'] { --st-marker: 38px; }
+
+.ui-steps__step { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; }
+.ui-steps__step:last-child { flex: 0 0 auto; }
+
+.ui-steps__body {
+  display: flex;
+  align-items: center;
+  gap: var(--st-gap);
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+.ui-steps__body--button { cursor: pointer; border-radius: 999px; }
+.ui-steps__body--button:disabled { cursor: default; }
+.ui-steps__body--button:focus-visible { outline: 2px solid #13896F; outline-offset: 4px; }
+
+/* 단계 원 */
+.ui-steps__marker {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: var(--st-marker);
+  height: var(--st-marker);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--st-track);
+  color: var(--st-muted);
+  transition: background-color 150ms var(--st-ease-out), color 150ms var(--st-ease-out), transform 340ms var(--st-spring);
+}
+.ui-steps__step[data-status='complete'] .ui-steps__marker { background: var(--st-fill); color: #fff; }
+.ui-steps__step[data-status='current'] .ui-steps__marker { background: var(--st-current-ring); color: var(--st-fill); }
+.ui-steps__step[data-status='error'] .ui-steps__marker { background: var(--st-error); color: #fff; }
+
+/* 누름: 빨리 눌렀다 떼도 보이게, 놓을 때는 살짝 튕기며 돌아옴 */
+.ui-steps__body--button[data-pressed='true'] .ui-steps__marker { transform: scale(1.12); transition: transform 80ms var(--st-ease-out); }
+.ui-steps__body--button:not(:disabled):hover .ui-steps__title { text-decoration: underline; text-underline-offset: 4px; }
+
+/* 체크 표시: 선이 그려지며 나타남 */
+.ui-steps__marker svg { width: 55%; height: 55%; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ui-steps__check path { stroke-dasharray: 16; stroke-dashoffset: 16; animation: ui-step-check 300ms var(--st-ease-out) 120ms forwards; }
+@keyframes ui-step-check { to { stroke-dashoffset: 0; } }
+
+/* 글자 */
+.ui-steps__text { display: flex; flex-direction: column; min-width: 0; }
+.ui-steps__title { font-size: 15px; font-weight: 500; color: var(--st-muted); white-space: nowrap; transition: color 150ms var(--st-ease-out); }
+.ui-steps__step[data-status='complete'] .ui-steps__title { color: var(--st-text); }
+.ui-steps__step[data-status='current'] .ui-steps__title { color: var(--st-text); font-weight: 700; }
+.ui-steps__description { font-size: 12px; color: var(--st-muted); }
+
+/* 단계 사이 선: 회색 트랙 위에 딥그린이 왼쪽부터 채워진다 */
+.ui-steps__connector {
+  position: relative;
+  flex: 1;
+  min-width: 24px;
+  height: 4px;
+  margin: 0 16px;
+  border-radius: 2px;
+  background: var(--st-track);
+  overflow: hidden;
+}
+.ui-steps__connector::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--st-fill);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 340ms var(--st-ease-out);
+}
+.ui-steps__step[data-status='complete'] .ui-steps__connector::after { transform: scaleX(1); }
+
+/* 현재 단계 원: 다음 단계로 미끄러져 간다 */
+.ui-steps__thumb {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background: var(--st-fill);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+  box-shadow: 0 0 0 5px var(--st-current-ring);
+  transition: transform 420ms var(--st-spring);
+}
+.ui-steps__thumb--instant { transition: none; }
+
+.ui-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-steps__thumb, .ui-steps__connector::after, .ui-steps__marker { transition: none; }
+  .ui-steps__check path { animation: none; stroke-dashoffset: 0; }
+}
