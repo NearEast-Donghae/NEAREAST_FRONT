@@ -1,0 +1,259 @@
+/* ==========================================
+   스마트폰 화면 (폭 760px 이하)
+   - 다른 CSS보다 나중에 불러와서(main.tsx) 같은 선택자라도 이 파일이 이긴다
+   - 넓은 화면 모양은 건드리지 않는다
+   ========================================== */
+
+/* 넓은 화면에서는 탭 아이콘·짧은 이름을 숨긴다 */
+.AppHeader-NavIcon, .AppHeader-NavShort { display: none; }
+
+@media (max-width: 760px) {
+  :root {
+    --app-gutter: 16px;
+    --m-header: 56px;
+    /* 아래 탭 막대 + 아이폰 홈 막대 자리 */
+    --m-tabbar: calc(62px + env(safe-area-inset-bottom, 0px));
+    --app-header-height: var(--m-header);
+  }
+  body { padding-bottom: var(--m-tabbar); -webkit-text-size-adjust: 100%; }
+
+  /* ── 위 헤더: 로고 + 로그인만, 낮게 ── */
+  .AppHeader {
+    width: 100%;
+    height: var(--m-header);
+    min-height: 0;
+    padding: 0 var(--app-gutter);
+    flex-wrap: nowrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .AppHeader-Logo { font-size: 19px; }
+  .HeaderActions { min-width: 0; }
+  .HeaderActions-LoginButton { padding: 7px 14px; font-size: 14px; }
+
+  /* ── 탭은 화면 아래 탭 막대로: 아이콘 + 짧은 이름 ── */
+  .AppHeader-Nav {
+    position: fixed;
+    z-index: 60;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    order: 0;
+    width: auto;
+    height: var(--m-tabbar);
+    padding: 0 4px env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    background: rgba(255, 255, 255, .97);
+    border-top: 1px solid var(--ng-line);
+    box-shadow: 0 -4px 16px rgba(15, 46, 38, .05);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .AppHeader-NavItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    height: 62px;
+    font-size: 11px;
+    font-weight: 500;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .AppHeader-NavItem::after { display: none; }
+  .AppHeader-NavText { display: none; }
+  .AppHeader-NavShort { display: block; white-space: nowrap; }
+  .AppHeader-NavIcon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--motion-short, .2s) var(--ease-out, ease-out);
+  }
+  .AppHeader-NavItem--active { color: var(--ng-green); font-weight: 700; }
+  .AppHeader-NavItem--active .AppHeader-NavIcon { stroke-width: 2.2; }
+  .AppHeader-NavItem:active .AppHeader-NavIcon { transform: scale(.9); }
+  /* 밑줄 대신 위쪽 짧은 막대로 현재 탭 표시 */
+  .AppHeader-NavItem::before { top: 0; bottom: auto; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; }
+  .AppHeader-NavItem:hover { color: inherit; }
+  .AppHeader-NavItem--active:hover { color: var(--ng-green); }
+  .AppHeader-NavItem:hover:not(.AppHeader-NavItem--active)::before { transform: scaleX(0); }
+
+  /* ── 페이지 공통: 좁은 여백, 제목 작게 ── */
+  .MapView, .TrainInfoView, .TrainDetailView, .PlanningLayout,
+  .MyTripsLayout, .MyPageView, .AuthView, .AppPage { padding: 20px var(--app-gutter) 32px; min-height: 0; }
+  .TrainInfoView-Title, .TrainDetailView-Title { font-size: 26px; line-height: 1.35; }
+  .TrainInfoView-Main, .TrainDetailView-Main { gap: 16px; }
+  .Integration-Note { font-size: 12px; line-height: 1.6; }
+
+  /* ==========================================
+     철도 지도: 지도는 헤더와 탭 막대 사이를 꽉 채운다
+     ========================================== */
+  .LiveMap { height: calc(100dvh - var(--m-header) - var(--m-tabbar)); min-height: 420px; }
+
+  /* 위: 검색은 한 줄 가득, 시계는 그 아래 왼쪽 */
+  .LiveMap-Top { left: 12px; right: 12px; top: 12px; align-items: stretch; }
+  .LiveMap-Search { padding: 4px; }
+  .LiveMap-Search input { flex: 1; width: auto; min-width: 0; height: 40px; font-size: 16px; } /* 16px 미만이면 아이폰이 확대해 버린다 */
+  .LiveMap-Search button { height: 40px; padding: 0 16px; }
+  .LiveMap-Clock { align-self: flex-start; padding: 4px 4px 4px 12px; gap: 6px; }
+  .LiveMap-ClockTime { font-size: 16px; }
+  .LiveMap-Clock small { display: none; }
+  .LiveMap-Clock button { padding: 6px 10px; }
+
+  /* 범례는 숨겨 지도를 넓게 */
+  .LiveMap-Legend { display: none; }
+  /* 확대·축소 버튼: 오른쪽, 검색창 아래 (아래 시트에 가리지 않는 높이) */
+  .LiveMap-Zoom { top: 160px; right: 12px; transform: none; border-radius: 12px; }
+  .LiveMap-Zoom button { width: 40px; height: 40px; font-size: 20px; -webkit-tap-highlight-color: transparent; }
+  /* 출처 표시는 지켜야 해서 시계 아래에 작게 */
+  .LiveMap-Note { left: 12px; right: 12px; top: 112px; bottom: auto; max-width: none; font-size: 10px; line-height: 1.45; }
+
+  /* '지금 달리는 열차' 패널은 아래에서 올라온 시트 */
+  .LiveMap-Panel { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 46%; }
+  .LiveMap-Panel > .LiveMap-Card { border-radius: 20px 20px 0 0; border-bottom: none; padding: 10px 16px 16px; box-shadow: 0 -6px 24px rgba(15, 46, 38, .12); }
+  .LiveMap-Panel > .LiveMap-Card::before { content: ''; display: block; width: 36px; height: 4px; margin: 0 auto 12px; border-radius: 2px; background: var(--lm-line); }
+  .LiveMap-Chips small { display: none; }
+  .LiveMap-Chips button { padding: 12px; }
+  .LiveMap-SectionTitle small { font-size: 11px; }
+  /* 역 시트를 보는 동안 접힌 버튼은 숨김 (시트와 겹침) */
+  .LiveMap--focused .LiveMap-Panel { display: none; }
+
+  /* 역 정보: 역 옆 팝업 대신 아래에서 올라오는 시트 (역은 지도 위쪽에 내려앉는다) */
+  .LiveMap-Popup {
+    position: absolute; /* .LiveMap-Card의 relative보다 우선 */
+    left: 0 !important;
+    right: 0;
+    top: auto !important;
+    bottom: 0;
+    width: auto;
+    max-height: 62%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    padding: 10px 16px 16px;
+    box-shadow: 0 -8px 28px rgba(15, 46, 38, .16);
+    transform-origin: 50% 100%;
+    animation-name: LiveMap-sheet-in;
+  }
+  .LiveMap-Popup::before { position: static; display: block; width: 36px; height: 4px; margin: 0 auto 8px; border: none; border-radius: 2px; background: var(--lm-line); transform: none; }
+  .LiveMap-StationName { font-size: 22px; margin-top: 8px; }
+  .LiveMap-Close { width: 36px; height: 36px; top: 12px; right: 12px; }
+  .LiveMap-Actions button { padding: 13px 0; font-size: 14px; }
+  /* 흐림 구멍은 조금 작게 (화면이 좁아서) */
+  .LiveMap-Blur {
+    -webkit-mask-image: radial-gradient(circle 120px at var(--fx, -999px) var(--fy, -999px), transparent 60%, #000 100%);
+    mask-image: radial-gradient(circle 120px at var(--fx, -999px) var(--fy, -999px), transparent 60%, #000 100%);
+  }
+
+  /* ==========================================
+     열차 정보
+     ========================================== */
+  /* 검색: 출발 → 도착 한 줄, 시간 한 줄, 버튼 한 줄 */
+  .TrainSearch { flex-wrap: wrap; gap: 12px 8px; padding: 16px; }
+  .TrainSearch > .TrainSearch-Field:not(label) { flex: 1 1 0; min-width: 0; }
+  .TrainSearch .Dropdown, .TrainSearch .Dropdown button { max-width: 100%; }
+  .TrainSearch-Divider { display: none; }
+  .TrainSearch > label.TrainSearch-Field { flex: 1 1 100%; padding-top: 12px; border-top: 1px solid var(--ng-line); }
+  .TrainSearch-Field input { font-size: 18px; }
+  .TrainSearch-Button { flex: 1 1 100%; margin-left: 0; height: 50px; }
+
+  /* 결과 카드: 위에 열차·시각, 아래에 상세 보기 버튼 */
+  .TrainInfoView-ResultCard { flex-wrap: wrap; gap: 12px; padding: 16px 16px 16px 20px; }
+  .TrainInfoView-ResultInfo { flex: 1 1 0; min-width: 0; }
+  .TrainInfoView-TrainName { font-size: 19px; gap: 8px; }
+  .TrainInfoView-DepartureInfo { min-width: 0; width: auto; text-align: right; }
+  .TrainInfoView-DepartureTime { font-size: 21px; }
+  .TrainInfoView-DetailButton { flex: 1 1 100%; height: 42px; }
+
+  /* ==========================================
+     열차 상세: 표 칸을 좁게
+     ========================================== */
+  .TrainDetailView-TableHeader, .TrainDetailView-StopRow { grid-template-columns: 28px minmax(0, 1fr) 40px 52px 52px; padding-left: 12px; padding-right: 12px; column-gap: 6px; }
+  .TrainDetailView-StopRow { padding-top: 11px; padding-bottom: 11px; }
+  .TrainDetailView-ColStation { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .TrainDetailView-ColType { font-size: 12px; }
+  .TrainDetailView-ColArrival, .TrainDetailView-ColDeparture { font-size: 14px; font-variant-numeric: tabular-nums; }
+  .TrainDetailView-TableHeader span { font-size: 12px; }
+  .TrainDetailView-TypeBadge { font-size: 14px; padding: 5px 12px; }
+  .TrainDetailView-SaveButtons { flex-direction: column; }
+  .TrainDetailView-SaveButton { width: 100%; flex: none; height: 52px; }
+
+  /* ==========================================
+     AI 여행 플래너: 대화 목록은 위쪽 가로 줄, 대화창은 그 아래 가득
+     ========================================== */
+  .AiPlannerView { width: 100%; min-height: 0; }
+  .AiPlannerView-Chat { width: 100%; flex-direction: column; height: calc(100dvh - var(--m-header) - var(--m-tabbar)); min-height: 0; }
+  .AiPlannerView-History {
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: none;
+    border-bottom: 1px solid var(--ng-line);
+    scrollbar-width: none;
+  }
+  .AiPlannerView-History::-webkit-scrollbar { display: none; }
+  .AiPlannerView-NewChatButton { flex: none; width: auto; height: 36px; padding: 0 14px; white-space: nowrap; }
+  .AiPlannerView-HistoryTitle, .AiPlannerView-HistoryEmpty { display: none; }
+  .AiPlannerView-HistoryList { flex-direction: row; gap: 6px; }
+  .AiPlannerView-HistoryItem { flex: none; max-width: 180px; border: 1px solid var(--ng-line); border-radius: 999px; background: #fff; }
+  .AiPlannerView-HistoryOpen { padding: 7px 30px 7px 14px; }
+  .AiPlannerView-HistoryItemDate { display: none; }
+  .AiPlannerView-HistoryDelete { opacity: 1; }
+  .AiPlannerView-ChatMain { flex: 1; min-height: 0; }
+  .AiPlannerView-ChatBar, .AiPlannerView-MessageColumn, .AiPlannerView-Footer { width: calc(100% - 32px); }
+  .AiPlannerView-ChatBar { padding-top: 10px; padding-bottom: 10px; }
+  .AiPlannerView-ChatTitle { font-size: 18px; }
+  .AiPlannerView-WelcomeTitle { font-size: 21px; }
+  .AiPlannerView-WelcomeGrid { grid-template-columns: 1fr; gap: 8px; }
+  .AiPlannerView-WelcomeCard { padding: 14px 16px; }
+  .AiPlannerView-Input { font-size: 16px; } /* 16px 미만이면 아이폰이 확대해 버린다 */
+  .AiPlannerView-InputBar { padding-left: 16px; }
+  .AiPlannerView-Footer { padding-bottom: 10px; }
+
+  /* ==========================================
+     여행 계획하기
+     ========================================== */
+  .PlanningLayout__title { font-size: 26px; }
+  /* 단계 표시: 지금 단계만 이름을 보이고, 나머지는 번호만 */
+  .ui-steps__step:not([data-status='current']) .ui-steps__title,
+  .ui-steps__step:not([data-status='current']) .ui-steps__description { display: none; }
+  .ui-steps__step:not([data-status='current']) { flex: 0 1 auto; }
+  .ui-steps__step[data-status='current'] { flex: 1 1 auto; }
+
+  /* 조건 입력: 칸을 위아래로 쌓고, 시작·종료만 나란히 */
+  .PlanBar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; padding: 16px 0; }
+  .PlanBar-Kicker { grid-column: 1 / -1; width: auto; }
+  .PlanBar-Arrow, .PlanBar-Divider { display: none; }
+  .PlanBar-Field { min-width: 0; }
+  .PlanBar-Field:has(input[type='date']), .PlanBar-Field:has(.Dropdown), .PlanBar-Field:has(input[type='number']) { grid-column: 1 / -1; }
+  .PlanBar-Field input { font-size: 18px; max-width: 100%; }
+  .Integration-Panel .PlanBar .Dropdown-Button { font-size: 18px; max-width: 100%; }
+  .PlanBar-Foot { flex-direction: column; align-items: stretch; }
+  .PlanBar-Button, .Integration-Panel .PlanBar-Button { width: 100%; }
+  .Integration-Panel { padding: 20px 16px; border-radius: 18px; }
+
+  /* ==========================================
+     나의 여행 일정 · 공통 팝업
+     ========================================== */
+  .MyTripsView-Body { grid-template-columns: 1fr; }
+  .LoginGate-Dialog { width: calc(100% - 32px); max-width: 420px; box-sizing: border-box; }
+  .StationInfoPopup { width: calc(100vw - 24px); padding: 20px; }
+}
+
+@keyframes LiveMap-sheet-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
