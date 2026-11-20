@@ -15,7 +15,7 @@ interface MyPageViewProps {
   // 실패하면 화면에 보여줄 문구를 던진다
   onUpdateNickname: (nickname: string) => Promise<void>;
   onChangePassword: (request: ChangePasswordRequest) => Promise<void>;
-  onLogout: () => void;
+  onLogout: () => Promise<void>;
   onDeleteAccount: () => Promise<void>;
 }
 
@@ -247,6 +247,14 @@ const AccountSection: React.FC<Pick<MyPageViewProps, 'isAccountEditSupported' | 
 }) => {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true); setError(null);
+    try { await onLogout(); }
+    catch { setError('로그아웃하지 못했어요. 연결 상태를 확인하고 다시 시도해 주세요.'); }
+    finally { setIsLoggingOut(false); }
+  };
 
   const handleDelete = async () => {
     if (!window.confirm('정말 탈퇴할까요?\n계정과 계정 정보는 되돌릴 수 없어요.')) return;
@@ -269,8 +277,8 @@ const AccountSection: React.FC<Pick<MyPageViewProps, 'isAccountEditSupported' | 
           <p className="MyPageView-AccountLabel">로그아웃</p>
           <p className="MyPageView-AccountText">이 브라우저에서 로그아웃해요.</p>
         </div>
-        <button className="MyPageView-Button" onClick={onLogout}>
-          로그아웃
+        <button className="MyPageView-Button" onClick={handleLogout} disabled={isLoggingOut || isDeleting}>
+          {isLoggingOut ? '로그아웃 중…' : '로그아웃'}
         </button>
       </div>
 

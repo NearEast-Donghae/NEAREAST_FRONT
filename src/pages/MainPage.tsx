@@ -1,271 +1,45 @@
-import React, { useCallback, useState } from 'react';
-import {
-  MapView,
-  StationInfoPopup,
-  AiPlannerView,
-  TrainInfoView,
-  TrainDetailView,
-  ItineraryComparisonView,
-  FinalItineraryView,
-} from '../components/main';
-import { createItinerary } from '../api/itineraries';
-import { ROUTES, navigateTo } from '../routes';
-import { splitDotList } from '../utils/format';
-import { useSavedTrains } from '../hooks/useSavedTrains';
-import { savedTrainsStore } from '../store/savedTrains';
-import { useSavedPlaces } from '../hooks/useSavedPlaces';
-import { savedPlacesStore } from '../store/savedPlaces';
-import type { StationKind } from '../components/main/KakaoMap';
+import { useCallback } from 'react';
+import MapView, { type MainNavTab } from '../components/main/MapView';
+import AiPlannerView from '../components/main/AiPlannerView';
+import TrainInfoView from '../components/main/TrainInfoView';
+import TrainDetail from '../components/main/TrainDetail';
+import PlaceDetail from '../components/main/PlaceDetail';
+import { ROUTES, navigateTo, conversationRoute } from '../routes';
+import { planningDraftStore } from '../store/planningDraft';
+import type { PlanningConditions } from '../api/planning';
 
-const stationPlaceId = (stationName: string) => `station-${stationName}`;
-import type {
-  MainNavTab,
-  TrainResult,
-  StopInfo,
-  ComparisonOption,
-  TimelineRow,
-  TravelSummary,
-} from '../components/main';
+interface MainPageProps { initialNav?: MainNavTab; routeHash: string; }
+const NAV_ROUTES = {
+  '철도 지도': '#/map', '열차 정보': '#/trains', 'AI 여행 플래너': '#/chat',
+  '여행 계획하기': ROUTES.planning, '나의 여행 일정': ROUTES.myTrips,
+} as const;
 
-type MainView =
-  | 'map'
-  | 'trainInfo'
-  | 'trainDetail'
-  | 'aiPlanner'
-  | 'itineraryComparison'
-  | 'finalItinerary';
-
-// — 더미 데이터 (실제 API 연동 시 교체) —
-
-const DUMMY_STOPS: StopInfo[] = [
-  { stationName: '동해역', arrivalTime: null, departureTime: '08:00', isStop: true },
-  { stationName: '묵호역', arrivalTime: '08:12', departureTime: '08:14', isStop: true },
-  { stationName: '정동진역', arrivalTime: '08:35', departureTime: '08:37', isStop: true },
-  { stationName: '강릉역', arrivalTime: null, departureTime: null, isStop: false },
-  { stationName: '삼척해변역', arrivalTime: '09:10', departureTime: '09:12', isStop: true },
-];
-
-// 추천 일정 비교 옵션 3가지 (피그마 디자인 기준)
-const COMPARISON_OPTIONS: ComparisonOption[] = [
-  {
-    id: 'option-1',
-    title: '열차 우선',
-    totalTime: '약 8시간 30분',
-    timeRange: '09:00–17:30',
-    stationCount: 3,
-    stations: ['동해역', '묵호역', '정동진역'],
-    trainExperiences: [
-      '✓  탑승 2회 (동해→묵호역, 묵호→정동진역)',
-      '✓  관찰 2회 (정동진역, 동해역)',
-    ],
-  },
-  {
-    id: 'option-2',
-    title: '방문지 우선',
-    totalTime: '약 8시간',
-    timeRange: '09:00–17:00',
-    stationCount: 5,
-    stations: ['동해역', '묵호역', '망상역', '정동진역', '옥계역(폐역)'],
-    trainExperiences: [
-      '✓  탑승 1회 (동해역→묵호역)',
-      '✓  관찰 1회 (정동진역)',
-    ],
-  },
-  {
-    id: 'option-3',
-    title: '균형형',
-    totalTime: '약 8시간 20분',
-    timeRange: '09:00–17:20',
-    stationCount: 4,
-    stations: ['동해역', '묵호역', '망상역', '정동진역'],
-    trainExperiences: [
-      '✓  탑승 1회 (동해역→묵호역)',
-      '✓  관찰 2회 (묵호역, 정동진역)',
-    ],
-  },
-];
-
-// 최종 여행 일정 타임라인 (피그마 디자인 기준)
-const DUMMY_TIMELINE: TimelineRow[] = [
-  { id: 'row-1', time: '10:00', timeMarker: '○', icon: '▣', description: '묵호역 출발' },
-  { id: 'row-2', time: '10:20', timeMarker: '○', icon: '◉', description: 'ITX-마음 관찰 (묵호역)' },
-  { id: 'row-3', time: '11:00', timeMarker: '○', icon: '⌂', description: '정동진역 탐방' },
-  { id: 'row-4', time: '12:00', timeMarker: '●', icon: '♧', description: '정동진 해변 산책 (40분)' },
-  { id: 'row-5', time: '12:40', timeMarker: '○', icon: '♨', description: '정동진 카페 휴식 (50분)' },
-  { id: 'row-6', time: '14:00', timeMarker: '○', icon: '◉', description: '열차 관찰 (정동진역)' },
-  { id: 'row-7', time: '15:00', timeMarker: '○', icon: '⌂', description: '묵호역 복귀 및 여행 마무리' },
-];
-
-const DUMMY_SUMMARY: TravelSummary = {
-  date: '2026.11.21 (토)',
-  timeRange: '10:00 – 17:00',
-  visitedStations: '묵호역 · 정동진역',
-  trainName: 'ITX-마음',
-  extraActivities: '해변 산책 · 카페',
-};
-
-interface MainPageProps {
-  // 계획하기 페이지 헤더에서 다른 탭을 눌러 돌아올 때 해당 탭으로 바로 열기 위함
-  initialNav?: MainNavTab;
+export default function MainPage({ initialNav = '철도 지도', routeHash }: MainPageProps) {
+  const route = routeHash || NAV_ROUTES[initialNav];
+  const [path, query] = route.split('?');
+  const stationId = new URLSearchParams(query).get('station') ?? undefined;
+  const handleNavigate = (tab: MainNavTab) => navigateTo(NAV_ROUTES[tab]);
+  const returnConversation = new URLSearchParams(query).get('conversation') ?? undefined;
+  const closePlace = useCallback(() => navigateTo(returnConversation ? conversationRoute(returnConversation) : '#/map'), [returnConversation]);
+  const startPlan = (conditions: PlanningConditions, conversationId?: string) => {
+    planningDraftStore.set({ source: conversationId ? 'chat' : 'planner', conversationId, conditions });
+    navigateTo(ROUTES.planning);
+  };
+  if (path.startsWith('#/trains/')) return <TrainDetail
+    trainNo={decodeURIComponent(path.slice('#/trains/'.length))} stationId={stationId} onNavigate={handleNavigate} />;
+  if (path === '#/trains') return <TrainInfoView key={stationId ?? 'all'}
+    initialStationId={stationId}
+    onViewDetail={(train) => navigateTo(`#/trains/${encodeURIComponent(train.trainNo)}?station=${encodeURIComponent(train.stationId)}`)} />;
+  if (path === '#/chat') return <AiPlannerView
+    initialConversationId={new URLSearchParams(query).get('conversation') ?? undefined}
+    onCreateItinerary={(conditions, conversationId) => startPlan(conditions ?? {}, conversationId)}
+    onPlaceDetail={(placeId, conversationId) => navigateTo(`#/places/${encodeURIComponent(placeId)}${conversationId ? `?conversation=${encodeURIComponent(conversationId)}` : ''}`)} />;
+  const placeId = path.startsWith('#/places/') ? decodeURIComponent(path.slice('#/places/'.length)) : null;
+  return <>
+    <MapView
+      onStationClick={(identifier) => navigateTo(`#/places/${encodeURIComponent(identifier)}`)} />
+    {placeId && <PlaceDetail key={placeId} placeId={placeId} onClose={closePlace}
+      onPlan={(identifier) => startPlan({ requiredPlaceIds: [identifier] })}
+      onTrains={(identifier) => navigateTo(`#/trains?station=${encodeURIComponent(identifier)}`)} />}
+  </>;
 }
-
-const INITIAL_VIEW_BY_NAV: Partial<Record<MainNavTab, MainView>> = {
-  '철도 지도': 'map',
-  '열차 정보': 'trainInfo',
-  'AI 여행 플래너': 'aiPlanner',
-};
-
-const MainPage: React.FC<MainPageProps> = ({ initialNav = '철도 지도' }) => {
-  const [currentView, setCurrentView] = useState<MainView>(INITIAL_VIEW_BY_NAV[initialNav] ?? 'map');
-  const [activeNav, setActiveNav] = useState<MainNavTab>(initialNav);
-  const [selectedStation, setSelectedStation] = useState<string | null>(null);
-  // 지도 마커로 연 역의 종류 — 폐역이면 팝업에 '운영 중단'으로 표시
-  const [selectedStationKind, setSelectedStationKind] = useState<StationKind | null>(null);
-  const [selectedTrain, setSelectedTrain] = useState<TrainResult | null>(null);
-  const savedTrains = useSavedTrains();
-  const savedPlaces = useSavedPlaces();
-
-  // 팝업의 Esc 처리(useEffect)가 렌더마다 다시 걸리지 않도록 같은 함수를 유지
-  const handleCloseStationPopup = useCallback(() => setSelectedStation(null), []);
-
-  // 관심 목록 = 담아둔 장소. AI 플래너에서 담은 역 카드와 같은 id를 써서 중복으로 담기지 않게 한다
-  const handleToggleStationWishlist = (stationName: string) => {
-    const placeId = stationPlaceId(stationName);
-    if (savedPlaces.some((place) => place.id === placeId)) {
-      savedPlacesStore.remove(placeId);
-      return;
-    }
-    savedPlacesStore.add(
-      { id: placeId, name: stationName, category: '역', stationName, description: `${stationName} 역 정보` },
-      '철도 지도'
-    );
-  };
-  const selectedTrainPurpose =
-    savedTrains.find((train) => train.id === selectedTrain?.id)?.purpose ?? null;
-
-  const handleSaveAiItinerary = async () => {
-    try {
-      await createItinerary({
-        source: 'ai',
-        title: `${DUMMY_SUMMARY.visitedStations} 여행`,
-        travelDateLabel: DUMMY_SUMMARY.date,
-        timeRange: DUMMY_SUMMARY.timeRange,
-        stations: splitDotList(DUMMY_SUMMARY.visitedStations),
-        trains: splitDotList(DUMMY_SUMMARY.trainName),
-        activities: splitDotList(DUMMY_SUMMARY.extraActivities),
-        timeline: DUMMY_TIMELINE.map(({ time, icon, description }) => ({ time, icon, description })),
-      });
-    } catch {
-      alert('여행 계획을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
-      return;
-    }
-    navigateTo(ROUTES.myTrips);
-  };
-
-  const handleNavigate = (tab: MainNavTab) => {
-    setActiveNav(tab);
-    switch (tab) {
-      case '철도 지도':     setCurrentView('map');        break;
-      case '열차 정보':     setCurrentView('trainInfo');   break;
-      case 'AI 여행 플래너': setCurrentView('aiPlanner');   break;
-      case '여행 계획하기':  navigateTo(ROUTES.planning); break;
-      case '나의 여행 일정': navigateTo(ROUTES.myTrips); break;
-    }
-  };
-
-  const handleViewTrainDetail = (train: TrainResult) => {
-    setSelectedTrain(train);
-    setCurrentView('trainDetail');
-  };
-
-  return (
-    <>
-      {currentView === 'map' && (
-        <>
-          <MapView
-            activeNav={activeNav}
-            onNavigate={handleNavigate}
-            onStationClick={(name, kind) => {
-              setSelectedStation(name);
-              setSelectedStationKind(kind ?? null);
-            }}
-          />
-          {selectedStation !== null && (
-            <StationInfoPopup
-              stationName={selectedStation}
-              operationStatus={selectedStationKind === 'closed' ? '운영 중단' : '운영 중'}
-              description="동해안 해안선을 따라 운행하는 동해선의 주요 역입니다."
-              trains={['동해산타열차', '바다열차', 'S-train']}
-              isSaved={savedPlaces.some((place) => place.id === stationPlaceId(selectedStation))}
-              onClose={handleCloseStationPopup}
-              onAddToWishlist={handleToggleStationWishlist}
-            />
-          )}
-        </>
-      )}
-
-      {currentView === 'trainInfo' && (
-        <TrainInfoView
-          activeNav={activeNav}
-          onNavigate={handleNavigate}
-          onViewDetail={handleViewTrainDetail}
-        />
-      )}
-
-      {currentView === 'trainDetail' && selectedTrain !== null && (
-        <TrainDetailView
-          activeNav={activeNav}
-          onNavigate={handleNavigate}
-          trainName={selectedTrain.trainName}
-          route={selectedTrain.route}
-          stops={DUMMY_STOPS}
-          operationDays="매일 운행"
-          onBack={() => setCurrentView('trainInfo')}
-          savedPurpose={selectedTrainPurpose}
-          onSaveTrain={(purpose) =>
-            savedTrainsStore.toggle(
-              {
-                id: selectedTrain.id,
-                trainName: selectedTrain.trainName,
-                route: selectedTrain.route,
-                savedFrom: '열차 정보',
-              },
-              purpose
-            )
-          }
-        />
-      )}
-
-      {currentView === 'aiPlanner' && (
-        <AiPlannerView
-          activeNav={activeNav}
-          onNavigate={handleNavigate}
-          onCreateItinerary={() => setCurrentView('itineraryComparison')}
-        />
-      )}
-
-      {currentView === 'itineraryComparison' && (
-        <ItineraryComparisonView
-          activeNav={activeNav}
-          onNavigate={handleNavigate}
-          options={COMPARISON_OPTIONS}
-          onSelectOption={() => setCurrentView('finalItinerary')}
-          onBack={() => setCurrentView('aiPlanner')}
-        />
-      )}
-
-      {currentView === 'finalItinerary' && (
-        <FinalItineraryView
-          activeNav={activeNav}
-          onNavigate={handleNavigate}
-          timeline={DUMMY_TIMELINE}
-          summary={DUMMY_SUMMARY}
-          onBack={() => setCurrentView('itineraryComparison')}
-          onSave={handleSaveAiItinerary}
-        />
-      )}
-    </>
-  );
-};
-
-export default MainPage;

@@ -12,7 +12,11 @@ export const ROUTES = {
 // 한동안 '담아둔 장소·열차'가 마이페이지 안에 있었던 주소 — 북마크해 둔 사람도 열리게 받아준다
 export const LEGACY_MY_PAGE_SAVED_HASH = '#/mypage/saved';
 
-export type Route = (typeof ROUTES)[keyof typeof ROUTES];
+export type Route = (typeof ROUTES)[keyof typeof ROUTES] | `#/places/${string}` | `#/trains${string}` | `#/chat${string}` | '#/map';
+
+export function conversationRoute(conversationId?: string): Route {
+  return conversationId ? `#/chat?conversation=${encodeURIComponent(conversationId)}` : '#/chat';
+}
 
 export function navigateTo(route: Route): void {
   window.location.hash = route;

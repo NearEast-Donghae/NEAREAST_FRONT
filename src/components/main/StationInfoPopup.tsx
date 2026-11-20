@@ -9,13 +9,15 @@ type TrainType = string;
 
 interface StationInfoPopupProps {
   stationName: string;
-  operationStatus: '운영 중' | '운영 중단';
+  operationStatus: string;
   description: string;
   trains: TrainType[];
   // 관심 목록(담아둔 장소)에 이미 담겼는지
   isSaved: boolean;
   onClose: () => void;
   onAddToWishlist: (stationName: string) => void;
+  children?: React.ReactNode;
+  pending?: boolean;
 }
 
 export default function StationInfoPopup({
@@ -26,10 +28,15 @@ export default function StationInfoPopup({
   isSaved,
   onClose,
   onAddToWishlist,
+  children,
+  pending = false,
 }: StationInfoPopupProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocus = useRef(document.activeElement as HTMLElement | null);
   // 닫을 때 나가는 애니메이션(Ease in)을 보여준 뒤 실제로 닫는다
   const [isClosing, setIsClosing] = useState(false);
+  const closeTimer = useRef<number | null>(null);
 
   const requestClose = useCallback(() => {
     if (isClosing) return;
@@ -38,18 +45,36 @@ export default function StationInfoPopup({
       return;
     }
     setIsClosing(true);
-    window.setTimeout(onClose, POPUP_EXIT_MS);
+    closeTimer.current = window.setTimeout(onClose, POPUP_EXIT_MS);
   }, [isClosing, onClose]);
 
   // 열리면 닫기 버튼에 포커스를 두고, Esc로 닫는다
   useEffect(() => {
-    closeButtonRef.current?.focus();
+    closeButtonRef.current?.focus({ preventScroll: true });
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') requestClose();
+      if (event.key === 'Tab') {
+        const focusable = dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input, select, textarea, [tabindex="0"]');
+        if (!focusable?.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [requestClose]);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      if (closeTimer.current !== null) window.clearTimeout(closeTimer.current);
+      if (previousFocus.current?.isConnected) previousFocus.current.focus({ preventScroll: true });
+    };
+  }, []);
 
   function handleAddToWishlist() {
     onAddToWishlist(stationName);
@@ -65,6 +90,7 @@ export default function StationInfoPopup({
       }}
     >
       <div
+        ref={dialogRef}
         className="StationInfoPopup"
         role="dialog"
         aria-modal="true"
@@ -74,7 +100,7 @@ export default function StationInfoPopup({
 
           {/* 팝업 상단 */}
           <div className="StationInfoPopup-Header">
-            <span className="StationInfoPopup-Title">역 상세정보</span>
+            <span className="StationInfoPopup-Title">장소 상세정보</span>
             <button
               ref={closeButtonRef}
               className="StationInfoPopup-CloseButton"
@@ -87,16 +113,13 @@ export default function StationInfoPopup({
 
           {/* 역 소개 */}
           <div className="StationInfoPopup-Body">
-            <div className="StationInfoPopup-Photo">
-              <span className="StationInfoPopup-PhotoPlaceholder">역 사진</span>
-            </div>
             <div className="StationInfoPopup-Info">
               <div className="StationInfoPopup-NameRow">
                 <h2 id="StationInfoPopup-Name" className="StationInfoPopup-Name">{stationName}</h2>
                 <span className="StationInfoPopup-Status">{operationStatus}</span>
               </div>
               <p className="StationInfoPopup-Description">{description}</p>
-              <p className="StationInfoPopup-TrainsLabel">이 역을 지나는 열차</p>
+              {trains.length > 0 && <p className="StationInfoPopup-TrainsLabel">이 역을 지나는 열차</p>}
               <div className="StationInfoPopup-TrainList">
                 {trains.map((train) => (
                   <span key={train} className="StationInfoPopup-TrainTag">
@@ -108,6 +131,7 @@ export default function StationInfoPopup({
           </div>
 
           <div className="StationInfoPopup-Divider" />
+          {children}
         </div>
 
         {/* 관심 목록에 담기 — 담은 역은 여행 계획하기의 역 선택에 자동으로 들어간다 */}
@@ -115,6 +139,7 @@ export default function StationInfoPopup({
           className={`StationInfoPopup-WishlistButton${isSaved ? ' StationInfoPopup-WishlistButton--saved' : ''}`}
           onClick={handleAddToWishlist}
           aria-pressed={isSaved}
+          disabled={pending}
         >
           {isSaved ? '✓ 관심 목록에 담음 · 다시 누르면 빠져요' : '관심 목록에 담기'}
         </button>

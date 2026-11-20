@@ -9,6 +9,7 @@ import type {
   ChatResponse,
   PlanConditions,
 } from '../types/neareast';
+import type { PlanningConditions } from './planning';
 
 // AI 여행 플래너 대화 — 화면(AiPlannerView)은 이 파일의 함수만 쓴다.
 //   VITE_USE_MOCK_CHAT=false : 백엔드(NEAREAST_BACK)의 /conversations 가 대화를 저장하고 답한다
@@ -25,7 +26,7 @@ const createLocalId = (prefix: string) =>
   `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 // 백엔드는 메시지마다 UUID requestId를 받아, 같은 요청을 다시 보내도 한 번만 처리한다
-function createRequestId(): string {
+export function createRequestId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
   // https·localhost가 아니면 randomUUID가 없어서 같은 형식(UUID v4)으로 직접 만든다
   const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -44,6 +45,7 @@ interface BackendConversation {
 }
 
 interface BackendChatResponse {
+  action?: { type: 'plan_request'; payload: PlanningConditions } | null;
   reply: string;
   chips?: string[];
   proposals?: { type: 'add' | 'remove'; target: string; reason: string }[];
@@ -99,7 +101,8 @@ async function toChatResponse(response: BackendChatResponse): Promise<ChatRespon
         source: response.sources?.length ? response.sources.join(', ') : undefined,
       };
     });
-  return { reply: response.reply, quickReplies: response.chips, places };
+  return { reply: response.reply, quickReplies: response.chips, places,
+    planningConditions: response.action?.type === 'plan_request' ? response.action.payload : undefined };
 }
 
 function toFriendlyError(error: unknown): Error {
@@ -148,6 +151,7 @@ export async function loadConversation(
         text: response?.reply ?? message.content,
         options: response?.quickReplies?.length ? response.quickReplies : undefined,
         places: response?.places?.length ? response.places : undefined,
+        planningConditions: response?.planningConditions,
       };
     })
   );
@@ -165,6 +169,8 @@ export async function sendConversationMessage(params: {
   conversationId: string | null;
   text: string;
   request: ChatRequest;
+  requestId?: string;
+  onConversationCreated?: (conversationId: string) => void;
 }): Promise<{ conversationId: string; response: ChatResponse }> {
   if (!IS_SERVER_CHAT) {
     return {
@@ -177,9 +183,13 @@ export async function sendConversationMessage(params: {
     const conversationId =
       params.conversationId ??
       (await apiClient.post<BackendConversation>('/conversations', { title: createConversationTitle(params.text) })).id;
+    params.onConversationCreated?.(conversationId);
+    if (params.text.length > 1000) throw new Error('메시지는 1,000자까지 보낼 수 있어요.');
     const message = await apiClient.post<BackendMessage>(
       `/conversations/${encodeURIComponent(conversationId)}/messages`,
-      { requestId: createRequestId(), message: params.text.slice(0, 1000) }
+      { requestId: params.requestId ?? createRequestId(), message: params.text,
+        // 관심 목록은 서버가 읽는다. 전부 필수 방문지(screen pins)로 승격하지 않는다.
+        context: { pins: [] } }
     );
     const response = message.response
       ? await toChatResponse(message.response)

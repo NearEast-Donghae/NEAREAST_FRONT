@@ -18,15 +18,21 @@ function readFromStorage(): AuthUser | null {
   }
 }
 
-let currentUser: AuthUser | null = readFromStorage();
+const isMockAuth = import.meta.env.VITE_USE_MOCK_AUTH !== 'false';
+// 서버 인증에서는 브라우저 캐시를 로그인 증거로 사용하지 않는다.
+let currentUser: AuthUser | null = isMockAuth ? readFromStorage() : null;
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((listener) => listener());
 
 // 다른 탭에서 로그인·로그아웃한 것도 반영
 window.addEventListener('storage', (event) => {
   if (event.key !== STORAGE_KEY) return;
-  currentUser = readFromStorage();
-  notify();
+  if (isMockAuth) {
+    currentUser = readFromStorage();
+    notify();
+  } else {
+    window.dispatchEvent(new Event('neareast:restore-session'));
+  }
 });
 
 export const authStore = {

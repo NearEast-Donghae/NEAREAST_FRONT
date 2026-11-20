@@ -27,6 +27,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ activeNav, isMyPageActive = false
             className={`AppHeader-NavItem${tab === activeNav ? ' AppHeader-NavItem--active' : ''}`}
             onClick={() => onNavigate(tab)}
             aria-current={tab === activeNav ? 'page' : undefined}
+            data-label={tab}
           >
             {tab}
           </button>

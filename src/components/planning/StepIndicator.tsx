@@ -23,14 +23,15 @@ const resolveIndicatorStep = (currentStep: PlanningStep): number => {
 
 interface StepIndicatorProps {
   currentStep: PlanningStep;
+  labels?: string[];
 }
 
-const StepIndicator = ({ currentStep }: StepIndicatorProps) => {
+const StepIndicator = ({ currentStep, labels }: StepIndicatorProps) => {
   const activeIndex = resolveIndicatorStep(currentStep);
 
   return (
     <nav className="StepIndicator" aria-label="계획 단계">
-      {STEPS.map((step) => {
+      {(labels ? labels.map((label, index) => ({ id: index + 1, label })) : STEPS).map((step) => {
         const stepNum = step.id as number;
         const isDone    = stepNum < activeIndex;
         const isActive  = stepNum === activeIndex;

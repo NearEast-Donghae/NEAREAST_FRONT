@@ -3,7 +3,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 
 class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public detail?: unknown) {
     super(message);
     this.name = 'ApiError';
   }
@@ -27,11 +27,17 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     method,
     headers,
     credentials: 'include', // 로그인 쿠키를 같이 보낸다
+    signal: AbortSignal.timeout(path === '/users/me' ? 8000 : /messages|generations/.test(path) ? 180000 : 20000),
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   if (!response.ok) {
-    throw new ApiError(response.status, `${method} ${path} 실패 (${response.status})`);
+    const payload = await response.json().catch(() => null);
+    if (response.status === 401 && !path.startsWith('/auth/')) {
+      setCsrfToken(null);
+      window.dispatchEvent(new Event('neareast:session-expired'));
+    }
+    throw new ApiError(response.status, `${method} ${path} 실패 (${response.status})`, payload?.detail);
   }
 
   // 204 No Content 는 본문이 없어서 json() 이 실패하므로 따로 처리

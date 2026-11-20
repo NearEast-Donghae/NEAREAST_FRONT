@@ -1,7 +1,5 @@
 import React from 'react';
-import HeaderActions from '../layout/HeaderActions';
 import './TrainDetailView.css';
-import type { MainNavTab } from './MapView';
 import type { TrainPurpose } from '../../types/neareast';
 import stationStopIcon from '../../assets/icons/station-stop.svg';
 import stationPassIcon from '../../assets/icons/station-pass.svg';
@@ -15,8 +13,6 @@ interface StopInfo {
 }
 
 interface TrainDetailViewProps {
-  activeNav: MainNavTab;
-  onNavigate: (tab: MainNavTab) => void;
   trainName: string;
   route: string;
   stops: StopInfo[];
@@ -25,13 +21,13 @@ interface TrainDetailViewProps {
   // 이 열차를 담아둔 용도 (담지 않았으면 null)
   savedPurpose: TrainPurpose | null;
   onSaveTrain: (purpose: TrainPurpose) => void;
+  canBoard?: boolean;
+  pending?: boolean;
+  children?: React.ReactNode;
 }
 
-const NAV_TABS: MainNavTab[] = ['철도 지도', '열차 정보', 'AI 여행 플래너', '여행 계획하기', '나의 여행 일정'];
 
 const TrainDetailView: React.FC<TrainDetailViewProps> = ({
-  activeNav,
-  onNavigate,
   trainName,
   route,
   stops,
@@ -39,25 +35,12 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
   onBack,
   savedPurpose,
   onSaveTrain,
+  canBoard = true,
+  pending = false,
+  children,
 }) => {
   return (
     <div className="TrainDetailView">
-      {/* 헤더 네비게이션 */}
-      <header className="TrainDetailView-Header">
-        <button className="TrainDetailView-Logo" onClick={() => onNavigate('철도 지도')}>NEAREAST</button>
-        <nav className="TrainDetailView-Nav">
-          {NAV_TABS.map((tab) => (
-            <button
-              key={tab}
-              className={`TrainDetailView-NavItem${activeNav === tab ? ' TrainDetailView-NavItem--active' : ''}`}
-              onClick={() => onNavigate(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </nav>
-        <HeaderActions />
-      </header>
 
       {/* 본문 */}
       <main className="TrainDetailView-Main motion-stagger">
@@ -125,11 +108,13 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
 
         {/* 여행에 담기 — 한 열차는 탑승·관찰 중 하나로만 담긴다 */}
         <section className="TrainDetailView-SaveSection" aria-label="이 열차를 여행에 담기">
+          {children}
           <div className="TrainDetailView-SaveButtons">
             <button
               className={`TrainDetailView-SaveButton TrainDetailView-SaveButton--board${savedPurpose === 'board' ? ' TrainDetailView-SaveButton--saved' : ''}`}
               onClick={() => onSaveTrain('board')}
               aria-pressed={savedPurpose === 'board'}
+              disabled={!canBoard || pending}
             >
               {savedPurpose === 'board' ? '✓ 탑승할 열차로 담음' : '탑승할 열차로 담기'}
             </button>
@@ -137,6 +122,7 @@ const TrainDetailView: React.FC<TrainDetailViewProps> = ({
               className={`TrainDetailView-SaveButton TrainDetailView-SaveButton--watch${savedPurpose === 'watch' ? ' TrainDetailView-SaveButton--saved' : ''}`}
               onClick={() => onSaveTrain('watch')}
               aria-pressed={savedPurpose === 'watch'}
+              disabled={pending}
             >
               {savedPurpose === 'watch' ? '✓ 관찰할 열차로 담음' : '관찰할 열차로 담기'}
             </button>
