@@ -4,9 +4,47 @@
 /* 화면들은 피그마 1440px 캔버스 그대로라, 캔버스는 가운데 두고 헤더만 화면 왼쪽에 고정하기 위한 값.
    --page-width는 main.tsx가 스크롤바를 뺀 실제 화면 폭으로 갱신한다 (100vw는 스크롤바를 포함해서 어긋남) */
 :root {
+  /* 딥그린 시안 색 (디자인 기준) */
+  --ng-ink: #0F2E26;
+  --ng-gray: #5F6F69;
+  --ng-line: #E6EBE8;
+  --ng-bg: #F6F8F6;
+  --ng-teal: #13896F;
+  --ng-teal-50: #E6F4EF;
+  --ng-green: #0E4D3E;
+  /* 폰트: Pretendard 하나로, 굵기로 위계를 나눈다 */
+  --font-title: 'Pretendard Variable', Pretendard, -apple-system, 'Malgun Gothic', sans-serif;
+  --font-body: 'Pretendard Variable', Pretendard, -apple-system, 'Malgun Gothic', sans-serif;
   --page-offset: max(0px, calc((var(--page-width, 100vw) - 1440px) / 2));
 }
 
 body {
   margin: 0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  background: var(--ng-bg);
+  color: var(--ng-ink);
 }
+
+/* 기본 링크도 딥그린 시안의 청록으로 (브라우저 기본 파랑 대신) */
+a[href]:not([class]) { color: var(--ng-teal); }
+a[href]:not([class]):visited { color: var(--ng-teal); }
+
+/* 제목 글꼴: 로고, 페이지 제목, 큰 강조 문구 */
+/* body :is(...)로 써서 각 화면 CSS의 글꼴 지정보다 우선한다 */
+body :is(h1, h2, .AppHeader-Logo, .LiveMap-StationName, .PlanningLayout__title, [class$='-Title'], [class*='-Title ']) { font-family: var(--font-title); letter-spacing: -0.01em; }
+button, input, select, textarea { font-family: inherit; }
+
+/* ── 글자 굵기 체계 (Pretendard) ──
+   제목 800 · 소제목 700 · 강조 값·버튼 600 · 메뉴·이름표 500 · 본문·설명 400 */
+body { font-weight: 400; }
+body :is(h1, .PlanningLayout__title, .TrainInfoView-Title, .TrainDetailView-Title) { font-weight: 800; letter-spacing: -0.025em; }
+body :is(h2, h3, [class$='-SectionTitle'], .LiveMap-StationName) { font-weight: 700; letter-spacing: -0.015em; }
+body :is(.AppHeader-Logo) { font-weight: 800; letter-spacing: -0.01em; }
+body :is(.AppHeader-NavItem) { font-weight: 500; }
+body :is(.AppHeader-NavItem--active) { font-weight: 700; }
+body :is(button, .btn) { font-weight: 600; }
+/* 시각·숫자: 굵게 + 폭을 맞춰 줄이 가지런하게 */
+body :is(time, .TrainInfoView-DepartureTime, .LiveMap-ClockTime) { font-variant-numeric: tabular-nums; font-weight: 700; }
+/* 설명·안내 문구는 가볍게 */
+body :is(p, .Integration-Note, [class$='-Subtitle'], [class$='-Sub']) { font-weight: 400; }

@@ -5,7 +5,7 @@
   width: 910px;
   padding: 24px 26px;
   background: #fff;
-  border: 1px solid #d7d7d7;
+  border: 1px solid #DCE3DF;
   border-radius: 8px;
 }
 
@@ -16,10 +16,10 @@
 }
 
 .Step4FreeTime__slotTitle {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 19px;
-  color: #333;
+  color: #0F2E26;
   margin: 0;
 }
 
@@ -32,12 +32,12 @@
 
 .Step4FreeTime__categoryTag {
   padding: 8px 10px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
   font-weight: 400;
-  color: #737373;
+  color: #5F6F69;
   background: #fff;
-  border: 1px solid #d7d7d7;
+  border: 1px solid #DCE3DF;
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.15s;
@@ -46,9 +46,9 @@
 }
 
 .Step4FreeTime__categoryTag--active {
-  background: #333;
+  background: #0E4D3E;
   color: #fff;
-  border-color: #333;
+  border-color: #0F2E26;
   font-weight: 700;
 }
 
@@ -62,7 +62,7 @@
 }
 
 .Step4FreeTime__activityItem {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E6EBE8;
   min-height: 52px;
 }
 
@@ -78,15 +78,15 @@
 .Step4FreeTime__checkbox {
   width: 18px;
   height: 18px;
-  accent-color: #333;
+  accent-color: #0F2E26;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .Step4FreeTime__activityName {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
-  color: #333;
+  color: #0F2E26;
 }
 
 /* 안내 카드 */
@@ -99,17 +99,17 @@
 }
 
 .Step4FreeTime__guideTitle {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 17px;
-  color: #333;
+  color: #0F2E26;
   margin: 0;
 }
 
 .Step4FreeTime__guideText {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
-  color: #737373;
+  color: #5F6F69;
   margin: 0;
   line-height: 1.5;
 }

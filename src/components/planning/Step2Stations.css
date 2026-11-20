@@ -8,16 +8,16 @@
 .Step2Stations__tabs {
   display: flex;
   gap: 8px;
-  border-bottom: 2px solid #d7d7d7;
+  border-bottom: 2px solid #DCE3DF;
   margin-bottom: 16px;
 }
 
 .Step2Stations__tab {
   padding: 13px 25px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 18px;
   font-weight: 400;
-  color: #737373;
+  color: #5F6F69;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -28,8 +28,8 @@
 
 .Step2Stations__tab--active {
   font-weight: 700;
-  color: #333;
-  border-bottom-color: #333;
+  color: #0F2E26;
+  border-bottom-color: #0F2E26;
 }
 
 .Step2Stations__searchBar {
@@ -37,28 +37,28 @@
   align-items: center;
   gap: 10px;
   padding: 14px 19px;
-  border: 1px solid #d7d7d7;
+  border: 1px solid #DCE3DF;
   border-radius: 6px;
   margin-bottom: 16px;
 }
 
 .Step2Stations__searchIcon {
   font-size: 18px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 .Step2Stations__searchInput {
   flex: 1;
   border: none;
   outline: none;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 17px;
-  color: #333;
+  color: #0F2E26;
   background: transparent;
 }
 
 .Step2Stations__searchInput::placeholder {
-  color: #737373;
+  color: #5F6F69;
 }
 
 .Step2Stations__stationList {
@@ -70,7 +70,7 @@
 }
 
 .Step2Stations__stationItem {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E6EBE8;
 }
 
 .Step2Stations__stationLabel {
@@ -85,30 +85,30 @@
 .Step2Stations__checkbox {
   width: 18px;
   height: 18px;
-  accent-color: #333;
+  accent-color: #0F2E26;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .Step2Stations__stationName {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 18px;
   font-weight: 400;
-  color: #333;
+  color: #0F2E26;
   flex: 1;
 }
 
 .Step2Stations__stationStatus {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 .Step2Stations__hint {
   margin-top: 16px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
-  color: #737373;
+  color: #5F6F69;
 }
 
 /* 요약 카드 */
@@ -120,25 +120,25 @@
 }
 
 .Step2Stations__summaryTitle {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 20px;
-  color: #333;
+  color: #0F2E26;
   margin: 0 0 4px;
 }
 
 .Step2Stations__summaryCategory {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 18px;
-  color: #333;
+  color: #0F2E26;
   margin: 0;
 }
 
 .Step2Stations__summaryItems {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
-  color: #737373;
+  color: #5F6F69;
   margin: 0 0 8px;
 }
 
@@ -147,8 +147,8 @@
   flex-shrink: 0;
   padding: 2px 10px;
   border-radius: 100px;
-  background-color: #333;
-  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #0E4D3E;
+  font-family: var(--font-body);
   font-size: 12px;
   font-weight: 500;
   color: #ffffff;

@@ -18,13 +18,13 @@
   width: 400px;
   box-sizing: border-box;
   padding: 36px 36px 32px;
-  border: 1px solid #e0eaf0;
+  border: 1px solid #E6EBE8;
   border-radius: 16px;
   background-color: #ffffff;
   box-shadow: 0 16px 48px rgba(24, 35, 45, 0.18);
   text-align: center;
-  font-family: 'Noto Sans KR', sans-serif;
-  color: #333;
+  font-family: var(--font-body);
+  color: #0F2E26;
 }
 
 .LoginGate-Icon {
@@ -42,7 +42,7 @@
   margin: 0 0 26px;
   font-size: 15px;
   line-height: 1.6;
-  color: #575757;
+  color: #5F6F69;
 }
 
 .LoginGate-Actions {
@@ -53,29 +53,29 @@
 
 .LoginGate-Button {
   height: 50px;
-  border: 1px solid #d6d6d6;
+  border: 1px solid #DCE3DF;
   border-radius: 8px;
   background-color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 700;
-  color: #333;
+  color: #0F2E26;
   cursor: pointer;
 }
 
 .LoginGate-Button:hover {
-  background-color: #f5f5f5;
+  background-color: #F2F6F3;
 }
 
 .LoginGate-Button--primary,
 .LoginGate-Button--primary:hover {
-  border-color: #333;
-  background-color: #333;
+  border-color: #0F2E26;
+  background-color: #0E4D3E;
   color: #ffffff;
 }
 
 .LoginGate-Button--primary:hover {
-  background-color: #444;
+  background-color: #176A55;
 }
 
 /* ── 모션 (styles/motion.css 기준: 팝업) ──
